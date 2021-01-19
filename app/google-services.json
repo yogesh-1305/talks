@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "830608765307",
+    "project_id": "talks-24fbf",
+    "storage_bucket": "talks-24fbf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:830608765307:android:065ceb098caa9798290dde",
+        "android_client_info": {
+          "package_name": "com.example.talks"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "830608765307-or4mhnlc61vketb36h2t7en3rj9m2ogf.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.talks",
+            "certificate_hash": "1e8041a9efedd55b77afb4158687a2fbf79c4f35"
+          }
+        },
+        {
+          "client_id": "830608765307-93lfm4qlc9mm6n29g6gng8g8uhlq1a72.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDpKa-sbKzmx1f3Yn-S0amaqRDv1W2ivP8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "830608765307-93lfm4qlc9mm6n29g6gng8g8uhlq1a72.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
