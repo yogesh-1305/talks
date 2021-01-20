@@ -1,24 +1,21 @@
 package com.example.talks.signup.screens
 
+import android.app.AlertDialog
+import android.app.SearchManager
+import android.content.DialogInterface
 import android.os.Bundle
-import android.util.Log
-import android.util.SparseIntArray
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
+import android.widget.Toast
 import androidx.navigation.Navigation
 import com.example.talks.R
-import com.google.firebase.FirebaseException
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.PhoneAuthCredential
-import com.google.firebase.auth.PhoneAuthOptions
-import com.google.firebase.auth.PhoneAuthProvider
 import com.hbb20.CountryCodePicker
-import java.util.concurrent.TimeUnit
 
+@Suppress("NAME_SHADOWING")
 class FirstFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -31,13 +28,32 @@ class FirstFragment : Fragment() {
         view.findViewById<Button>(R.id.next_button).setOnClickListener{
             val countryCode = code.selectedCountryCode.toString()
             val phoneNumber = number.text.toString()
-            val action = FirstFragmentDirections.actionFirstFragmentToSecondFragment("+$countryCode$phoneNumber")
-            Navigation.findNavController(view).navigate(action)
+
+            if (phoneNumber.length == 10){
+                val dialog = AlertDialog.Builder(activity)
+                dialog.setTitle("+$countryCode$phoneNumber")
+                dialog.setMessage("Confirm verify the above phone number?")
+                dialog.setPositiveButton("VERIFY"){ _: DialogInterface, _: Int ->
+                    val action = FirstFragmentDirections.actionFirstFragmentToSecondFragment("+$countryCode$phoneNumber")
+                    Navigation.findNavController(view).navigate(action)
+                }
+                dialog.setNegativeButton("CANCEL"){ dialog: DialogInterface, _:Int ->
+                    dialog.dismiss()
+                }
+                dialog.show()
+
+            }else{
+                val dialog = AlertDialog.Builder(activity)
+                dialog.setTitle("Please Enter a Valid Phone number.")
+                dialog.setPositiveButton("OK"){ dialog: DialogInterface, _: Int ->
+                    dialog.dismiss()
+                }
+                dialog.show()
+            }
         }
 
         return view
+
     }
-
-
 
 }

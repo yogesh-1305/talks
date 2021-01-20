@@ -10,9 +10,12 @@
         android:name="com.example.talks.signup.screens.WelcomeFragment"
         android:label="fragment_welcome"
         tools:layout="@layout/fragment_welcome" >
+
         <action
             android:id="@+id/action_welcomeFragment_to_firstFragment"
-            app:destination="@id/firstFragment" />
+            app:destination="@id/firstFragment"
+            app:popUpTo="@id/welcomeFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/firstFragment"
@@ -21,7 +24,11 @@
         tools:layout="@layout/fragment_first" >
         <action
             android:id="@+id/action_firstFragment_to_secondFragment"
-            app:destination="@id/secondFragment" />
+            app:destination="@id/secondFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popUpTo="@id/firstFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/secondFragment"
@@ -31,5 +38,22 @@
         <argument
             android:name="phone_number"
             app:argType="string" />
+        <action
+            android:id="@+id/action_secondFragment_to_firstFragment2"
+            app:destination="@id/firstFragment"
+            app:enterAnim="@anim/from_left"
+            app:exitAnim="@anim/to_right"
+            app:popUpTo="@id/secondFragment"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_secondFragment_to_confirmation_screen"
+            app:destination="@id/confirmation_screen"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left" />
     </fragment>
+    <fragment
+        android:id="@+id/confirmation_screen"
+        android:name="com.example.talks.signup.screens.ConfirmationScreen"
+        android:label="fragment_confirmation_screen"
+        tools:layout="@layout/fragment_confirmation_screen" />
 </navigation>

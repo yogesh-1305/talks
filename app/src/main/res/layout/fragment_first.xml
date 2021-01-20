@@ -23,10 +23,12 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        android:capitalize="characters"
         android:text="Enter your phone number"
         android:textAlignment="center"
         android:textColor="#00C853"
         android:textSize="18sp"
+        android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -56,6 +58,8 @@
         android:ems="10"
         android:hint="phone number"
         android:inputType="phone"
+        android:maxLength="10"
+        android:selectAllOnFocus="true"
         android:textColor="#0B0606"
         android:textColorHint="#636161"
         app:layout_constraintBottom_toBottomOf="@+id/countryCodePicker"
@@ -75,6 +79,19 @@
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editTextPhone" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/animationView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/next_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView5"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/phone_animation" />
 
     <Button
         android:id="@+id/next_button"
