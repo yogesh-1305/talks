@@ -64,6 +64,8 @@ dependencies {
     implementation 'com.google.firebase:firebase-storage:19.2.1'
 
     //OTP Verification
+    implementation 'com.github.aabhasr1:OtpView:v1.1.2-ktx'
+    implementation 'com.github.aabhasr1:OtpView:v1.1.2'
     implementation 'com.github.mukeshsolanki:android-otpview-pinview:2.1.2'
 
     //Lottie Animations

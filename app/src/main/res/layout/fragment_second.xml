@@ -28,7 +28,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:text="verify number"
+        android:text="Verify number"
         android:textAlignment="center"
         android:textColor="#00C853"
         android:textSize="18sp"
@@ -49,23 +49,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/waiting_instructions_text_view" />
 
-    <com.mukesh.OtpView
+    <in.aabhasjindal.otptextview.OtpTextView
         android:id="@+id/otpView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:inputType="number"
-        android:itemBackground="#CCCACA"
-        android:textColor="@color/black"
-        app:OtpCursorColor="@color/teal_200"
-        app:OtpItemCount="6"
-        app:OtpItemHeight="40dp"
-        app:OtpItemWidth="40dp"
-        app:OtpLineColor="@color/black"
-        app:OtpViewType="none"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        android:focusable="true"
+        android:textColor="#000000"
+        app:bar_active_color="@color/teal_700"
+        app:bar_enabled="true"
+        app:bar_error_color="@color/red"
+        app:bar_height="2dp"
+        app:bar_success_color="#00C853"
+        app:height="40dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/wrong_number_text" />
+        app:layout_constraintTop_toBottomOf="@+id/wrong_number_text"
+        app:length="6"
+        app:otp_text_size="24dp"
+        app:width="40dp" />
 
     <TextView
         android:id="@+id/textView9"
@@ -82,6 +86,7 @@
         android:id="@+id/animationView"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        android:layout_marginTop="32dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -90,5 +95,14 @@
         app:lottie_autoPlay="true"
         app:lottie_loop="true"
         app:lottie_rawRes="@raw/waiting_pigeon" />
+
+    <TextView
+        android:id="@+id/resend_otp_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="resend OTP"
+        app:layout_constraintBottom_toTopOf="@+id/animationView"
+        app:layout_constraintEnd_toEndOf="@+id/otpView"
+        app:layout_constraintTop_toBottomOf="@+id/textView9" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
