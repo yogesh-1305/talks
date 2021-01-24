@@ -1,15 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <group>
+    <group
+        android:id="@+id/group1"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/contactScreenFragment"
             android:title="Contacts"
+            android:checked="true"
             android:icon="@drawable/people_icon"/>
         <item
-            android:id="@+id/contactScreenFragment1"
-            android:title="Contacts"
+            android:id="@+id/settingsFragment"
+            android:title="Settings"
             android:icon="@drawable/people_icon"/>
+
+    </group>
+
+    <group
+        android:id="@+id/group2"
+        android:checkableBehavior="single">
         <item
             android:id="@+id/contactScreenFragment2"
             android:title="Contacts"
@@ -22,5 +31,27 @@
             android:id="@+id/contactScreenFragment4"
             android:title="Contacts"
             android:icon="@drawable/people_icon"/>
+
+    </group>
+
+    <group
+        android:id="@+id/group3"
+        android:checkableBehavior="single">
+        <item
+            android:id="@+id/subtitle"
+            android:title="Subtitle">
+            <menu>
+                <item
+                    android:id="@+id/item4"
+                    android:icon="@drawable/people_icon"
+                    android:title="Item 4" />
+
+                <item
+                    android:id="@+id/item5"
+                    android:icon="@drawable/people_icon"
+                    android:title="Item 5" />
+
+            </menu>
+        </item>
     </group>
 </menu>

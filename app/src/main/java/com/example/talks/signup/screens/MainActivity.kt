@@ -1,8 +1,10 @@
-package com.example.talks
+package com.example.talks.signup.screens
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.talks.R
+import com.example.talks.home.HomeScreenActivity
 import com.google.firebase.auth.FirebaseAuth
 
 class MainActivity : AppCompatActivity() {

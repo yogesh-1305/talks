@@ -14,8 +14,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light.NoActionBar">
-        <activity android:name=".HomeScreenActivity"></activity>
-        <activity android:name=".MainActivity">
+        <activity android:name=".home.HomeScreenActivity"></activity>
+        <activity android:name=".signup.screens.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -7,7 +7,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
-import com.example.talks.HomeScreenActivity
+import com.example.talks.home.HomeScreenActivity
 import com.example.talks.R
 
 class ConfirmationScreen : Fragment() {
