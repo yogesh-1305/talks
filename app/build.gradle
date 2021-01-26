@@ -67,7 +67,6 @@ dependencies {
     //OTP Verification
     implementation 'com.github.aabhasr1:OtpView:v1.1.2-ktx'
     implementation 'com.github.aabhasr1:OtpView:v1.1.2'
-    implementation 'com.github.mukeshsolanki:android-otpview-pinview:2.1.2'
 
     //Lottie Animations
     implementation "com.airbnb.android:lottie:3.6.0"

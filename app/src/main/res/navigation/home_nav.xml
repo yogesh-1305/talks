@@ -8,14 +8,33 @@
         android:id="@+id/homeScreenFragment"
         android:name="com.example.talks.home.HomeScreenFragment"
         android:label="@string/app_name"
-        tools:layout="@layout/fragment_home_screen" />
+        tools:layout="@layout/fragment_home_screen" >
+        <action
+            android:id="@+id/action_homeScreenFragment_to_contactScreenFragment2"
+            app:destination="@id/contactScreenFragment"
+            app:enterAnim="@anim/nav_default_enter_anim" />
+        <action
+            android:id="@+id/action_homeScreenFragment_to_settingsFragment2"
+            app:destination="@id/settingsFragment"
+            app:enterAnim="@anim/nav_default_enter_anim" />
+    </fragment>
     <fragment
         android:id="@+id/contactScreenFragment"
         android:name="com.example.talks.home.ContactScreenFragment"
         android:label="Contacts"
-        tools:layout="@layout/fragment_contact_screen" />
+        tools:layout="@layout/fragment_contact_screen" >
+        <action
+            android:id="@+id/action_contactScreenFragment_to_homeScreenFragment2"
+            app:destination="@id/homeScreenFragment"
+            app:enterAnim="@anim/nav_default_enter_anim" />
+    </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.talks.home.SettingsFragment"
-        android:label="SettingsFragment" />
+        android:label="SettingsFragment" >
+        <action
+            android:id="@+id/action_settingsFragment_to_homeScreenFragment2"
+            app:destination="@id/homeScreenFragment"
+            app:enterAnim="@anim/nav_default_enter_anim" />
+    </fragment>
 </navigation>

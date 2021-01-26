@@ -14,6 +14,7 @@ import android.widget.Toast
 import androidx.navigation.Navigation
 import com.example.talks.R
 import com.hbb20.CountryCodePicker
+import kotlinx.coroutines.coroutineScope
 
 @Suppress("NAME_SHADOWING")
 class FirstFragment : Fragment() {

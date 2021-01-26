@@ -1,6 +1,8 @@
 package com.example.talks.home
 
 import android.os.Bundle
+import android.view.Menu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.drawerlayout.widget.DrawerLayout
@@ -36,9 +38,16 @@ class HomeScreenActivity : AppCompatActivity() {
         setupActionBarWithNavController(navController, appBarConfiguration)
 
         listener = NavController.OnDestinationChangedListener{controller, destination, arguments ->
-            if (destination.id == R.id.contactScreenFragment){
-                // write code here if want to change something while inside contactScreenFragment.
-                // extend the if else block as you add more fragments.
+            when (destination.id) {
+                R.id.homeScreenFragment -> {
+                    Toast.makeText(applicationContext, controller.toString(), Toast.LENGTH_SHORT).show()
+                }
+                R.id.contactScreenFragment -> {
+                    Toast.makeText(applicationContext, controller.toString(), Toast.LENGTH_SHORT).show()
+                }
+                R.id.settingsFragment -> {
+                    Toast.makeText(applicationContext, controller.toString(), Toast.LENGTH_SHORT).show()
+                }
             }
         }
     }
@@ -56,5 +65,9 @@ class HomeScreenActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         navController.addOnDestinationChangedListener(listener)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        return super.onCreateOptionsMenu(menu)
     }
 }
