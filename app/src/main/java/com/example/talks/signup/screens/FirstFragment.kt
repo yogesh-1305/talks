@@ -4,17 +4,22 @@ import android.app.AlertDialog
 import android.app.SearchManager
 import android.content.DialogInterface
 import android.os.Bundle
+import android.view.KeyEvent
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.example.talks.R
 import com.hbb20.CountryCodePicker
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 
 @Suppress("NAME_SHADOWING")
 class FirstFragment : Fragment() {
@@ -31,30 +36,36 @@ class FirstFragment : Fragment() {
             val phoneNumber = number.text.toString()
 
             if (phoneNumber.length == 10){
-                val dialog = AlertDialog.Builder(activity)
-                dialog.setTitle("+$countryCode$phoneNumber")
-                dialog.setMessage("Confirm verify the above phone number?")
-                dialog.setPositiveButton("VERIFY"){ _: DialogInterface, _: Int ->
-                    val action = FirstFragmentDirections.actionFirstFragmentToSecondFragment("+$countryCode$phoneNumber")
-                    Navigation.findNavController(view).navigate(action)
+                lifecycleScope.launch(Dispatchers.Main){
+                    val dialog = AlertDialog.Builder(activity)
+                    dialog.setTitle("+$countryCode$phoneNumber")
+                    dialog.setMessage("Confirm verify the above phone number?")
+                    dialog.setPositiveButton("VERIFY"){ _: DialogInterface, _: Int ->
+                        val action = FirstFragmentDirections.actionFirstFragmentToSecondFragment("+$countryCode$phoneNumber")
+                        Navigation.findNavController(view).navigate(action)
+                    }
+                    dialog.setNegativeButton("CANCEL"){ dialog: DialogInterface, _:Int ->
+                        dialog.dismiss()
+                    }
+                    dialog.show()
                 }
-                dialog.setNegativeButton("CANCEL"){ dialog: DialogInterface, _:Int ->
-                    dialog.dismiss()
-                }
-                dialog.show()
 
             }else{
-                val dialog = AlertDialog.Builder(activity)
-                dialog.setTitle("Please Enter a Valid Phone number.")
-                dialog.setPositiveButton("OK"){ dialog: DialogInterface, _: Int ->
-                    dialog.dismiss()
+                lifecycleScope.launch(Dispatchers.Main){
+                    val dialog = AlertDialog.Builder(activity)
+                    dialog.setTitle("Please Enter a Valid Phone number.")
+                    dialog.setPositiveButton("OK"){ dialog: DialogInterface, _: Int ->
+                        dialog.dismiss()
+                    }
+                    dialog.show()
                 }
-                dialog.show()
+
             }
         }
 
         return view
 
     }
+
 
 }

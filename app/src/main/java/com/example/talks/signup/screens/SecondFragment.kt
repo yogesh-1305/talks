@@ -14,15 +14,21 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.example.talks.R
+import com.example.talks.database.User
+import com.example.talks.database.UserViewModel
 import com.google.firebase.FirebaseApp
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 
@@ -34,6 +40,8 @@ class SecondFragment : Fragment() {
     private lateinit var otpTextView: OtpTextView
     private var storedVerificationId = ""
     private lateinit var resendOTPTextView: TextView
+    private lateinit var phoneNumber: String
+    private lateinit var userViewModel: UserViewModel
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -45,12 +53,15 @@ class SecondFragment : Fragment() {
         context?.let { FirebaseApp.initializeApp(it) }
         auth = FirebaseAuth.getInstance()
         auth.setLanguageCode("en")
+        userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
 
         // retrieving phone number string from First Fragment
-        val phoneNumber = args.phoneNumber
+        phoneNumber = args.phoneNumber
         waitingText.text = "Waiting to automatically detect an SMS sent to \'$phoneNumber\'"
 
-        sendVerificationCode(phoneNumber)
+        lifecycleScope.launch(Dispatchers.IO){
+            sendVerificationCode(phoneNumber)
+        }
 
         // OTP Handler
         otpTextView.otpListener = object : OTPListener {
@@ -142,6 +153,8 @@ class SecondFragment : Fragment() {
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     Log.i("sign in success-----", it.toString())
+                    val user = User(0, phoneNumber, "Hello New_User", " ")
+                    addUserToLocalDatabase(user)
                     view?.let { it1 ->
                         Navigation.findNavController(it1)
                             .navigate(R.id.action_secondFragment_to_confirmation_screen)
@@ -154,6 +167,12 @@ class SecondFragment : Fragment() {
             }
     }
 
+    private fun addUserToLocalDatabase(user: User){
+        userViewModel.addUser(user)
+        Log.i("database-------", user.phoneNumber)
+
+    }
+
     private fun showAlertDialogForIncorrectOtp(){
         val dialog = AlertDialog.Builder(activity)
         dialog.setTitle("OOPS! Incorrect OTP.")
@@ -164,5 +183,3 @@ class SecondFragment : Fragment() {
         dialog.show()
     }
 }
-
-
