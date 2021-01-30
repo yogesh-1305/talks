@@ -27,6 +27,9 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
@@ -42,23 +45,33 @@ class SecondFragment : Fragment() {
     private lateinit var resendOTPTextView: TextView
     private lateinit var phoneNumber: String
     private lateinit var userViewModel: UserViewModel
+    private lateinit var fireStore : FirebaseFirestore
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
         val view = inflater.inflate(R.layout.fragment_second, container, false)
+
+        // views
         otpTextView = view.findViewById(R.id.otpView)
         val waitingText = view.findViewById<TextView>(R.id.waiting_instructions_text_view)
+
+        // Firebase initialization
         context?.let { FirebaseApp.initializeApp(it) }
         auth = FirebaseAuth.getInstance()
         auth.setLanguageCode("en")
+        fireStore = Firebase.firestore
+
+        // User viewModel to access the Room Database
         userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
 
         // retrieving phone number string from First Fragment
         phoneNumber = args.phoneNumber
         waitingText.text = "Waiting to automatically detect an SMS sent to \'$phoneNumber\'"
 
+        // sending verification code to the phone number
+        // on IO thread.
         lifecycleScope.launch(Dispatchers.IO){
             sendVerificationCode(phoneNumber)
         }
@@ -112,7 +125,6 @@ class SecondFragment : Fragment() {
             }
 
         }.start()
-
     }
 
     private fun sendVerificationCode(phoneNumber: String) {
@@ -133,11 +145,9 @@ class SecondFragment : Fragment() {
         override fun onVerificationCompleted(p0: PhoneAuthCredential) {
             signInWithPhoneAuthCredentials(p0)
         }
-
         override fun onVerificationFailed(p0: FirebaseException) {
             Toast.makeText(activity, p0.localizedMessage, Toast.LENGTH_SHORT).show()
         }
-
         override fun onCodeSent(
             verificationId: String,
             forceResendingToken: PhoneAuthProvider.ForceResendingToken
@@ -155,6 +165,7 @@ class SecondFragment : Fragment() {
                     Log.i("sign in success-----", it.toString())
                     val user = User(0, phoneNumber, "Hello New_User", " ")
                     addUserToLocalDatabase(user)
+                    addUserToFirebaseDatabase(user)
                     view?.let { it1 ->
                         Navigation.findNavController(it1)
                             .navigate(R.id.action_secondFragment_to_confirmation_screen)
@@ -170,7 +181,14 @@ class SecondFragment : Fragment() {
     private fun addUserToLocalDatabase(user: User){
         userViewModel.addUser(user)
         Log.i("database-------", user.phoneNumber)
+    }
 
+    private fun addUserToFirebaseDatabase(user: User){
+        fireStore.collection("user_data")
+            .add(user)
+            .addOnSuccessListener {
+                Log.i("firestore----------", it.id)
+            }
     }
 
     private fun showAlertDialogForIncorrectOtp(){

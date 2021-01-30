@@ -14,7 +14,7 @@
         <!-- Customize your theme here. -->
 
 <!--        change window background color-->
-        <item name="android:windowBackground">@color/black</item>
+<!--        <item name="android:windowBackground">@color/black</item>-->
 
 <!--        Makes the status bar transparent-->
 <!--        <item name="android:windowTranslucentStatus">true</item>-->

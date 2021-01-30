@@ -20,7 +20,7 @@
     </fragment>
     <fragment
         android:id="@+id/contactScreenFragment"
-        android:name="com.example.talks.home.ContactScreenFragment"
+        android:name="com.example.talks.home.contactScreen.ContactScreenFragment"
         android:label="Contacts"
         tools:layout="@layout/fragment_contact_screen" >
         <action
