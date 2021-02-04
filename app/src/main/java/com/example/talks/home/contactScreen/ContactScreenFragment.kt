@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.talks.R
 import com.example.talks.databinding.FragmentContactScreenBinding
+import com.trendyol.bubblescrollbarlib.BubbleTextProvider
 
 class ContactScreenFragment : Fragment() {
 
@@ -41,10 +42,13 @@ class ContactScreenFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         contactList = ArrayList()
         recyclerView = binding.contactsRecyclerView
+        val scrollBar = binding.bubbleScrollBar
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
+        scrollBar.attachToRecyclerView(recyclerView)
         adapter = ContactAdapter(contactList)
         recyclerView.adapter = adapter
+        scrollBar.bubbleTextProvider = BubbleTextProvider {adapter.itemCount.toString()}
         if (isPermissionGranted()) {
             readContacts()
         }

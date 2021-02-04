@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".signup.screens.SecondFragment">
+    tools:context=".signup.screens.secondFragment.SecondFragment">
 
     <TextView
         android:id="@+id/waiting_instructions_text_view"
@@ -97,10 +97,11 @@
         app:lottie_rawRes="@raw/waiting_pigeon" />
 
     <TextView
-        android:id="@+id/resend_otp_text_view"
+        android:id="@+id/resendOtpTextView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="resend OTP"
+        android:textColor="#100101"
         app:layout_constraintBottom_toTopOf="@+id/animationView"
         app:layout_constraintEnd_toEndOf="@+id/otpView"
         app:layout_constraintTop_toBottomOf="@+id/textView9" />

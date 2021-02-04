@@ -95,4 +95,13 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui-ktx:2.3.2'
     //Circle Image View
     implementation 'de.hdodenhof:circleimageview:3.1.0'
+    //Scrollbar
+    implementation 'com.github.Trendyol:BubbleScrollBar:0.1'
+    //Image Cropping
+    implementation 'com.github.yalantis:ucrop:2.2.6-native'
+    // coil
+    implementation("io.coil-kt:coil:1.1.1")
+    //Glide
+    implementation 'com.github.bumptech.glide:glide:4.11.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 }

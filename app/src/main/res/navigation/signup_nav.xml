@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/welcomeFragment"
-        android:name="com.example.talks.signup.screens.WelcomeFragment"
+        android:name="com.example.talks.signup.screens.LauncherFragment"
         android:label="fragment_welcome"
-        tools:layout="@layout/fragment_welcome" >
+        tools:layout="@layout/fragment_launcher" >
 
         <action
             android:id="@+id/action_welcomeFragment_to_firstFragment"
@@ -19,7 +19,7 @@
     </fragment>
     <fragment
         android:id="@+id/firstFragment"
-        android:name="com.example.talks.signup.screens.FirstFragment"
+        android:name="com.example.talks.signup.screens.firstFragment.FirstFragment"
         android:label="fragment_first"
         tools:layout="@layout/fragment_first" >
         <action
@@ -32,7 +32,7 @@
     </fragment>
     <fragment
         android:id="@+id/secondFragment"
-        android:name="com.example.talks.signup.screens.SecondFragment"
+        android:name="com.example.talks.signup.screens.secondFragment.SecondFragment"
         android:label="fragment_second"
         tools:layout="@layout/fragment_second" >
         <argument
@@ -46,14 +46,44 @@
             app:popUpTo="@id/secondFragment"
             app:popUpToInclusive="true" />
         <action
-            android:id="@+id/action_secondFragment_to_confirmation_screen"
-            app:destination="@id/confirmation_screen"
-            app:enterAnim="@anim/from_right"
-            app:exitAnim="@anim/to_left" />
+            android:id="@+id/action_secondFragment_to_thirdFragment"
+            app:destination="@id/thirdFragment"
+            app:popUpTo="@id/thirdFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/confirmation_screen"
         android:name="com.example.talks.signup.screens.ConfirmationScreen"
         android:label="fragment_confirmation_screen"
         tools:layout="@layout/fragment_confirmation_screen" />
+    <fragment
+        android:id="@+id/thirdFragment"
+        android:name="com.example.talks.signup.screens.thirdFragment.ThirdFragment"
+        android:label="fragment_third"
+        tools:layout="@layout/fragment_third" >
+        <action
+            android:id="@+id/action_thirdFragment_to_confirmation_screen"
+            app:destination="@id/confirmation_screen"
+            app:popUpTo="@id/confirmation_screen"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_thirdFragment_to_welcomeFragment2"
+            app:destination="@id/welcomeFragment2"
+            app:popUpTo="@id/welcomeFragment2"
+            app:popUpToInclusive="true" />
+        <action
+            android:id="@+id/action_thirdFragment_to_galleryFragment"
+            app:destination="@id/galleryFragment"
+            app:popUpToInclusive="false" />
+    </fragment>
+    <fragment
+        android:id="@+id/welcomeFragment2"
+        android:name="com.example.talks.signup.screens.WelcomeFragment"
+        android:label="fragment_welcome2"
+        tools:layout="@layout/fragment_welcome" />
+    <dialog
+        android:id="@+id/galleryFragment"
+        android:name="com.example.talks.gallery.GalleryFragment"
+        android:label="fragment_gallery"
+        tools:layout="@layout/fragment_gallery" />
 </navigation>

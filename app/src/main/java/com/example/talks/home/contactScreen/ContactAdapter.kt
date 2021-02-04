@@ -5,6 +5,8 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.talks.databinding.ContactListItemViewBinding
+import com.trendyol.bubblescrollbarlib.BubbleScrollBar
+import com.trendyol.bubblescrollbarlib.BubbleTextProvider
 
 class ContactAdapter(private val contacts: List<Contact>) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>() {
 
