@@ -10,28 +10,40 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.talks.databinding.GalleryItemBinding
-import com.yalantis.ucrop.UCrop
+import com.theartofdev.edmodo.cropper.CropImage
+import com.theartofdev.edmodo.cropper.CropImageView
 import java.io.File
 
-class GalleryAdapter(private val images: MutableList<String>, private val context: Context) : RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder>() {
-    class GalleryViewHolder(val binding : GalleryItemBinding) : RecyclerView.ViewHolder(binding.root)
+class GalleryAdapter(private val images: MutableList<String>, private val context: Context) :
+    RecyclerView.Adapter<GalleryAdapter.GalleryViewHolder>() {
+    class GalleryViewHolder(val binding: GalleryItemBinding) : RecyclerView.ViewHolder(binding.root)
 
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): GalleryViewHolder {
-        return GalleryViewHolder(GalleryItemBinding.inflate(LayoutInflater.from(parent.context), parent, false))
+        return GalleryViewHolder(
+            GalleryItemBinding.inflate(
+                LayoutInflater.from(parent.context),
+                parent,
+                false
+            )
+        )
     }
 
     override fun onBindViewHolder(holder: GalleryViewHolder, position: Int) {
         val view = holder.binding
         val image = images[position]
-        var imageUri : Uri
+        var imageUri: Uri
         Glide.with(context).load(image).into(view.galleryImage)
 
-        view.galleryImage.setOnClickListener{
+        view.galleryImage.setOnClickListener {
             Toast.makeText(context, image, Toast.LENGTH_LONG).show()
             imageUri = Uri.fromFile(File(image))
-            UCrop.of(imageUri, Uri.fromFile(File(image+"cropped.jpg")))
-                .withAspectRatio(1F, 1F)
+            CropImage.activity(imageUri)
+                .setGuidelines(CropImageView.Guidelines.ON_TOUCH)
+                .setCropShape(CropImageView.CropShape.OVAL)
+                .setActivityTitle("Crop Image")
+                .setFixAspectRatio(true)
+                .setCropMenuCropButtonTitle("Done")
                 .start(context as Activity)
         }
 
@@ -39,6 +51,6 @@ class GalleryAdapter(private val images: MutableList<String>, private val contex
 
     override fun getItemCount(): Int {
         Log.i("Images size===", images.size.toString())
-       return images.size
+        return images.size
     }
 }

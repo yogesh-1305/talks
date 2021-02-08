@@ -3,11 +3,13 @@ package com.example.talks.signup.screens.secondFragment
 import `in`.aabhasjindal.otptextview.OTPListener
 import `in`.aabhasjindal.otptextview.OtpTextView
 import android.annotation.SuppressLint
+import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -15,21 +17,25 @@ import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.example.talks.R
 import com.example.talks.databinding.FragmentSecondBinding
+import com.example.talks.utils.WaitingDialog
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-
 
 @Suppress("NAME_SHADOWING")
 class SecondFragment : Fragment() {
 
     private lateinit var binding: FragmentSecondBinding
+
     private lateinit var viewModel: SecondFragmentViewModel
 
     private lateinit var auth: FirebaseAuth
+
     private val args: SecondFragmentArgs by navArgs()
+
     private lateinit var otpTextView: OtpTextView
     private lateinit var resendOTPTextView: TextView
     private lateinit var phoneNumber: String
+    private lateinit var dialog: WaitingDialog
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -38,22 +44,20 @@ class SecondFragment : Fragment() {
         binding = FragmentSecondBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(SecondFragmentViewModel::class.java)
 
-        // views
-        otpTextView = binding.otpView
+        phoneNumber = args.phoneNumber
         val waitingText = binding.waitingInstructionsTextView
+        waitingText.text = "Waiting to automatically detect an SMS sent to \'$phoneNumber\'"
+        otpTextView = binding.otpView
 
+        dialog = activity?.let { WaitingDialog(it) }!!
 
         // Firebase initialization
         context?.let { FirebaseApp.initializeApp(it) }
         auth = FirebaseAuth.getInstance()
         auth.setLanguageCode("en")
 
-        // retrieving phone number string from First Fragment
-        phoneNumber = args.phoneNumber
-        waitingText.text = "Waiting to automatically detect an SMS sent to \'$phoneNumber\'"
-
         context?.let {
-            viewModel.sendVerificationCode(phoneNumber, it, auth, binding.root)
+            viewModel.sendVerificationCode(phoneNumber, it, auth, dialog)
         }
 
         // OTP Handler
@@ -78,6 +82,16 @@ class SecondFragment : Fragment() {
             }
         }
 
+        viewModel.isUserLoggedIn.observe(viewLifecycleOwner, {
+            if (it){
+                dialog.dismiss()
+                Navigation.findNavController(binding.root)
+                    .navigate(R.id.action_secondFragment_to_thirdFragment)
+            }else{
+                dialog.dismiss()
+            }
+        })
+
         return binding.root
     }
 
@@ -96,12 +110,17 @@ class SecondFragment : Fragment() {
                 resendOTPTextView.isClickable = true
                 resendOTPTextView.setOnClickListener {
                     context?.let {
-                            it1 -> viewModel.sendVerificationCode(phoneNumber, it1, auth, binding.root)
+                            it1 -> viewModel.sendVerificationCode(phoneNumber, it1, auth, dialog)
                     }
                     start()
                 }
             }
         }.start()
+    }
+
+    private fun View.showKeyboard() {
+        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
     }
 
 }

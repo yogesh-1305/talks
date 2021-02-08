@@ -8,15 +8,21 @@ import android.content.DialogInterface
 import android.util.Log
 import android.view.View
 import android.widget.Toast
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.Navigation
 import com.example.talks.R
 import com.example.talks.database.User
+import com.example.talks.utils.WaitingDialog
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
 import com.google.firebase.auth.PhoneAuthOptions
 import com.google.firebase.auth.PhoneAuthProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 
 
@@ -27,32 +33,45 @@ class SecondFragmentViewModel : ViewModel() {
     private var phoneNumber = ""
     private lateinit var auth: FirebaseAuth
     private lateinit var context: Context
-    private lateinit var view: View
+    private lateinit var dialog: WaitingDialog
 
-    fun sendVerificationCode(phoneNumber: String, context: Context, auth: FirebaseAuth, view: View) {
+    val isUserLoggedIn: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
+    fun sendVerificationCode(
+        phoneNumber: String,
+        context: Context,
+        auth: FirebaseAuth,
+        dialog: WaitingDialog
+    ) {
         this.auth = auth
         this.phoneNumber = phoneNumber
         this.context = context
-        this.view = view
+        this.dialog = dialog
 
-        val options = context.let {
-            PhoneAuthOptions.newBuilder(auth)
-                .setPhoneNumber(phoneNumber)
-                .setTimeout(60L, TimeUnit.SECONDS)
-                .setActivity(it as Activity)
-                .setCallbacks(callbacks)
-                .build()
+        viewModelScope.launch(Dispatchers.IO) {
+            val options = context.let {
+                PhoneAuthOptions.newBuilder(auth)
+                    .setPhoneNumber(phoneNumber)
+                    .setTimeout(60L, TimeUnit.SECONDS)
+                    .setActivity(it as Activity)
+                    .setCallbacks(callbacks)
+                    .build()
+            }
+            PhoneAuthProvider.verifyPhoneNumber(options)
         }
-        PhoneAuthProvider.verifyPhoneNumber(options)
     }
 
     private var callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
         override fun onVerificationCompleted(p0: PhoneAuthCredential) {
             signInWithPhoneAuthCredentials(p0)
         }
+
         override fun onVerificationFailed(p0: FirebaseException) {
             Toast.makeText(context, p0.localizedMessage, Toast.LENGTH_SHORT).show()
         }
+
         override fun onCodeSent(
             verificationId: String,
             forceResendingToken: PhoneAuthProvider.ForceResendingToken
@@ -64,40 +83,43 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     private fun signInWithPhoneAuthCredentials(p0: PhoneAuthCredential) {
-        Log.i("auth===", p0.smsCode.toString())
-        auth.signInWithCredential(p0)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    Log.i("sign in success-----", it.toString())
-                        Navigation.findNavController(view)
-                            .navigate(R.id.action_secondFragment_to_thirdFragment)
+        dialog.startDialog()
+        viewModelScope.launch(Dispatchers.IO) {
+            auth.signInWithCredential(p0)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        Log.i("sign in success-----", it.toString())
+                        isUserLoggedIn.value = true
 
-                } else {
-                    Log.i("sign in failed-----", it.toString())
-                    showAlertDialogForIncorrectOtp()
+                    } else {
+                        isUserLoggedIn.value = false
+                        Log.i("sign in failed-----", it.toString())
+                        showAlertDialogForIncorrectOtp()
+
+                    }
 
                 }
-            }
+        }
     }
 
-    fun otpAuth(otp : String?, otpTextView: OtpTextView){
-        if (storedVerificationId != ""){
+    fun otpAuth(otp: String?, otpTextView: OtpTextView) {
+        if (storedVerificationId != "") {
             val credential =
                 PhoneAuthProvider.getCredential(storedVerificationId, otp.toString())
             signInWithPhoneAuthCredentials(credential)
 
-        }else {
+        } else {
             otpTextView.showError()
             showAlertDialogForIncorrectOtp()
             otpTextView.otp = ""
         }
     }
 
-    private fun showAlertDialogForIncorrectOtp(){
+    private fun showAlertDialogForIncorrectOtp() {
         val dialog = AlertDialog.Builder(context)
         dialog.setTitle("OOPS! Incorrect OTP.")
         dialog.setMessage("Maybe you've mistaken entering the correct OTP. ")
-        dialog.setPositiveButton("OK"){ dialog: DialogInterface, _: Int ->
+        dialog.setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
             dialog.dismiss()
         }
         dialog.show()

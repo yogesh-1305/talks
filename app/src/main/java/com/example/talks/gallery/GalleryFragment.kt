@@ -1,9 +1,7 @@
 package com.example.talks.gallery
 
 import android.annotation.SuppressLint
-import android.app.Activity.RESULT_OK
 import android.content.Context
-import android.content.Intent
 import android.database.Cursor
 import android.net.Uri
 import android.os.Build
@@ -13,19 +11,23 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.talks.BuildConfig
 import com.example.talks.databinding.FragmentGalleryBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
-import com.yalantis.ucrop.UCrop
 import java.util.*
 
-class GalleryFragment : BottomSheetDialogFragment() {
+class GalleryFragment() : BottomSheetDialogFragment() {
 
     private lateinit var binding: FragmentGalleryBinding
     private lateinit var imagesList: MutableList<String>
+
+    companion object {
+        fun newInstance(): GalleryFragment {
+            return GalleryFragment()
+        }
+    }
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreateView(

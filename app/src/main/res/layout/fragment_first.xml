@@ -63,6 +63,7 @@
         android:drawablePadding="12dp"
         android:ems="10"
         android:hint="Phone number"
+        android:imeOptions="actionDone"
         android:inputType="phone"
         android:maxLength="10"
         android:paddingHorizontal="12dp"

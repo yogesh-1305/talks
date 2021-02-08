@@ -25,9 +25,9 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="32dp"
+        android:background="@drawable/ic_baseline_camera"
         app:civ_border_color="@color/teal_200"
         app:civ_border_width="2dp"
-        android:src="@drawable/talks"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView12" />
@@ -45,6 +45,7 @@
         android:drawableStart="@drawable/person_layout"
         android:drawablePadding="12dp"
         android:ems="10"
+        android:imeOptions="actionNext"
         android:hint="Enter your name"
         android:inputType="textPersonName"
         android:paddingHorizontal="12dp"
@@ -55,17 +56,6 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textView13" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="32dp"
-        android:text="Update"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent" />
 
     <AutoCompleteTextView
         android:id="@+id/editTextTextEmailAddress"
@@ -80,12 +70,24 @@
         android:hint="Enter your e-mail (optional)"
         android:inputType="textEmailAddress"
         android:paddingHorizontal="12dp"
+        android:imeOptions="actionDone"
         android:textColor="@color/black"
         android:textColorHint="#72000000"
         app:layout_constraintEnd_toEndOf="@+id/third_fragment_name_editText"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/third_fragment_name_editText"
         app:layout_constraintTop_toBottomOf="@+id/third_fragment_name_editText" />
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="32dp"
+        android:text="Update"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/textView13"

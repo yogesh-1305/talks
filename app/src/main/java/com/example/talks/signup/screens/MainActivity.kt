@@ -1,14 +1,15 @@
 package com.example.talks.signup.screens
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.talks.R
+import com.example.talks.gallery.GalleryFragment
 import com.example.talks.home.HomeScreenActivity
 import com.example.talks.signup.screens.thirdFragment.ThirdFragment
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import com.yalantis.ucrop.UCrop
+import com.theartofdev.edmodo.cropper.CropImage
 
 class MainActivity : AppCompatActivity() {
 
@@ -31,17 +32,11 @@ class MainActivity : AppCompatActivity() {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-
-        if (resultCode == RESULT_OK && requestCode == UCrop.REQUEST_CROP) {
-
-            val resultUri = UCrop.getOutput(data!!)
-            ThirdFragment.getImageUriFromMainActivity(resultUri)
-
-
-        } else if (resultCode == UCrop.RESULT_ERROR) {
-
-            val cropError = UCrop.getError(data!!)
-            ThirdFragment.getCropImageErrorCode(cropError)
+        if(data != null){
+            val result = CropImage.getActivityResult(data)
+            val imageUri = result.uri
+            ThirdFragment.getImageUriFromMainActivity(imageUri)
+            val frag = GalleryFragment.newInstance()
         }
     }
 

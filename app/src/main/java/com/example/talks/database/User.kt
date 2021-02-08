@@ -1,5 +1,6 @@
 package com.example.talks.database
 
+import android.net.Uri
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
@@ -9,5 +10,5 @@ data class User(
     val id : Int,
     val phoneNumber : String,
     val userName : String,
-    val Email : String
+    val Email : String,
 )
