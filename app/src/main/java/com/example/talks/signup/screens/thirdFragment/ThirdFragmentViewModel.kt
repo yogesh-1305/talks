@@ -5,7 +5,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talks.FirebaseUser
+import com.example.talks.modal.FirebaseUser
 import com.example.talks.database.User
 import com.example.talks.database.UserViewModel
 import com.google.firebase.firestore.FirebaseFirestore
@@ -34,10 +34,11 @@ class ThirdFragmentViewModel : ViewModel() {
     val profileImageUrl: MutableLiveData<String?> by lazy {
         MutableLiveData<String?>()
     }
-    fun getUserFromDatabase(phoneNumber: String) {
 
-        fireStore.collection("user_data").document(phoneNumber)
-            .get()
+    fun getUserFromDatabase(phoneNumber: String, countryName: String, countryCode: String) {
+        val databaseName = fireStore.collection("user_database ($countryName $countryCode)")
+        val users = databaseName.document("($countryCode) $phoneNumber")
+        users.get()
             .addOnSuccessListener {
                 val user = it.toObject<FirebaseUser>()
                 if (user != null) {
@@ -62,9 +63,13 @@ class ThirdFragmentViewModel : ViewModel() {
     }
 
     fun addUserToFirebaseFireStore(user: FirebaseUser?) {
+        val countryName = user?.getCountryName()
+        val countryCode = user?.getCountryCode()
+        val phoneNumber = user?.getUserPhoneNumber()
         if (user != null) {
-            fireStore.collection("user_data").document(user.getUserPhoneNumber())
-                .set(user)
+            val databaseName = fireStore.collection("user_database ($countryName $countryCode)")
+            val users = databaseName.document("($countryCode) $phoneNumber")
+            users.set(user)
                 .addOnSuccessListener {
                     Log.i("success login====", "------------")
                     userCreatedInFireStore.value = true
@@ -80,7 +85,7 @@ class ThirdFragmentViewModel : ViewModel() {
     }
 
     fun uploadImageToStorage(image: Uri?, phoneNumber: String?) {
-        if (image!= null) {
+        if (image != null) {
             viewModelScope.launch(Dispatchers.IO) {
                 val storageRef = FirebaseStorage.getInstance().getReference("User_Profile_Images")
                 val userImages = storageRef.child(phoneNumber!!).child("Profile")
@@ -89,24 +94,24 @@ class ThirdFragmentViewModel : ViewModel() {
                     getDownloadUrl(uploadTask, userImages)
                 }
             }
-        }else{
+        } else {
             profileImageUrl.value = null
         }
 
     }
 
     private fun getDownloadUrl(uploadTask: UploadTask, userImage: StorageReference) {
-        uploadTask.continueWithTask{ it ->
-            if (!it.isSuccessful){
+        uploadTask.continueWithTask { it ->
+            if (!it.isSuccessful) {
                 it.exception?.let {
                     throw it
                 }
             }
             userImage.downloadUrl
-        }.addOnCompleteListener{
-            if (it.isSuccessful){
+        }.addOnCompleteListener {
+            if (it.isSuccessful) {
                 profileImageUrl.value = it.result.toString()
-            }else{
+            } else {
                 Log.i("failure upload", it.toString())
             }
         }

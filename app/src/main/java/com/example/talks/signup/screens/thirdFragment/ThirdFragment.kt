@@ -17,13 +17,13 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
-import com.example.talks.FirebaseUser
 import com.example.talks.R
 import com.example.talks.database.User
 import com.example.talks.database.UserViewModel
 import com.example.talks.databinding.FragmentThirdBinding
-import com.example.talks.gallery.GalleryFragment
+import com.example.talks.modal.FirebaseUser
 import com.example.talks.utils.UploadingDialog
 import com.example.talks.utils.WaitingDialog
 import com.google.android.material.snackbar.Snackbar
@@ -36,17 +36,20 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
     // Firebase Initialize
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-
     // View Binding
     private lateinit var binding: FragmentThirdBinding
-
     // View Models
     private lateinit var userViewModel: UserViewModel
     private lateinit var viewModel: ThirdFragmentViewModel
-
+    //args
+    private val args: ThirdFragmentArgs by navArgs()
     // Variables
     private val emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+"
-    private val phoneNumber = auth.currentUser?.phoneNumber
+
+    private var countryName = ""
+    private var countryCode = ""
+    private var phoneNumber = ""
+
     private lateinit var dialog: UploadingDialog
     private var retrievedImageUrl: String = ""
     private lateinit var waitingDialog: WaitingDialog
@@ -67,19 +70,20 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         binding = FragmentThirdBinding.inflate(inflater, container, false)
-
         // User viewModel to access the Room Database
         userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
         viewModel = ViewModelProvider(this).get(ThirdFragmentViewModel::class.java)
 
-//        Log.i("phone check ===", auth.currentUser?.phoneNumber.toString())
         dialog = UploadingDialog(activity as Activity)
         waitingDialog = WaitingDialog(activity as Activity)
         waitingDialog.startDialog()
 
-        viewModel.getUserFromDatabase(auth.currentUser?.phoneNumber.toString())
+        countryName = args.countryName
+        countryCode = args.countryCode
+        phoneNumber = args.phoneNumber
+
+        viewModel.getUserFromDatabase(phoneNumber, countryName, countryCode)
 
         binding.thirdFragmentUserImage.setOnClickListener {
             if (isPermissionGranted()) {
@@ -119,10 +123,8 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             val name = getNameFromEditText()
             val mail = getMailFromEditText()
             if (userCreated) {
-                val localUser = phoneNumber?.let { it1 -> User(0, it1, name, mail) }
-                if (localUser != null) {
-                    viewModel.addUserToLocalDatabase(localUser, userViewModel)
-                }
+                val localUser = User(0, phoneNumber, name, mail)
+                viewModel.addUserToLocalDatabase(localUser, userViewModel)
             }
         })
     }
@@ -150,12 +152,12 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 if (!validateEmail(mail)) {
                     createSnackBar("Please Enter a valid E-mail address")
                 } else {
-                    val user = phoneNumber?.let { it1 -> FirebaseUser(it1, name, mail, imageUrl) }
+                    val user = FirebaseUser(countryName, countryCode, phoneNumber, name, mail, imageUrl, true)
                     viewModel.addUserToFirebaseFireStore(user)
                 }
             } else {
                 val user =
-                    phoneNumber?.let { it1 -> FirebaseUser(it1, name, mail, retrievedImageUrl) }
+                    FirebaseUser( countryName, countryCode, phoneNumber, name, mail, retrievedImageUrl, true)
                 viewModel.addUserToFirebaseFireStore(user)
             }
         })
@@ -188,9 +190,13 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     }
 
     private fun validateEmailAndUpdateUserDetails() {
-        dialog.startDialog()
-        val image = getImageUri()
-        viewModel.uploadImageToStorage(image, phoneNumber)
+        if (validateEmail(getMailFromEditText())) {
+            dialog.startDialog()
+            val image = getImageUri()
+            viewModel.uploadImageToStorage(image, "+$countryCode $phoneNumber")
+        }else{
+            createSnackBar("Please enter a valid e-mail address")
+        }
     }
 
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
@@ -249,5 +255,4 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             navigateToGallery()
         }
     }
-
 }

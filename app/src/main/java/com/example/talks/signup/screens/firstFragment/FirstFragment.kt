@@ -6,7 +6,7 @@ import android.content.DialogInterface
 import android.net.ConnectivityManager
 import android.net.NetworkInfo
 import android.os.Bundle
-import android.telephony.PhoneNumberUtils
+import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -23,9 +23,8 @@ import com.hbb20.CountryCodePicker
 @Suppress("NAME_SHADOWING")
 class FirstFragment : Fragment(), TextView.OnEditorActionListener{
 
+    // view binding instance
     private lateinit var binding: FragmentFirstBinding
-    private lateinit var code: CountryCodePicker
-    private lateinit var number: EditText
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,16 +33,14 @@ class FirstFragment : Fragment(), TextView.OnEditorActionListener{
 
         binding = FragmentFirstBinding.inflate(inflater, container, false)
 
-        code = binding.countryCodePicker
-        number = binding.editTextPhone
-
         binding.nextButton.setOnClickListener {
             val countryCode = getCountryCode()
             val phoneNumber = getPhoneNumber()
+            val countryName = getCountryName()
 
             if (isDataConnected(context)) {
-                if (phoneNumber.length == 10 && !phoneNumber.contains("/^[ A-Za-z0-9_@./#&+-]*\$/")) {
-                    proceedForVerification(countryCode, phoneNumber)
+                if (phoneNumber.length == 10) {
+                    proceedForVerification(countryCode, phoneNumber, countryName)
                 } else {
                     showErrorDialog("Please enter a valid phone number!")
                 }
@@ -58,13 +55,14 @@ class FirstFragment : Fragment(), TextView.OnEditorActionListener{
 
     }
 
-    private fun proceedForVerification(countryCode: String, phoneNumber: String){
+    private fun proceedForVerification(countryCode: String, phoneNumber: String, countryName: String){
         val dialog = AlertDialog.Builder(activity)
-        dialog.setTitle("+$countryCode$phoneNumber")
+        dialog.setTitle("+$countryCode $phoneNumber")
         dialog.setMessage("Confirm verify the above phone number?")
         dialog.setPositiveButton("VERIFY") { _: DialogInterface, _: Int ->
+            Log.i("phone number format===", getPhoneNumber())
             val action =
-                FirstFragmentDirections.actionFirstFragmentToSecondFragment("+$countryCode$phoneNumber")
+                FirstFragmentDirections.actionFirstFragmentToSecondFragment(phoneNumber, "+$countryCode", countryName)
             Navigation.findNavController(binding.root).navigate(action)
         }
         dialog.setNegativeButton("CANCEL") { dialog: DialogInterface, _: Int ->
@@ -94,28 +92,30 @@ class FirstFragment : Fragment(), TextView.OnEditorActionListener{
         dialog.show()
     }
 
+    private fun getCountryName(): String{
+        return binding.countryCodePicker.selectedCountryName.toString()
+    }
+
     private fun getCountryCode(): String{
-        return code.selectedCountryCode.toString()
+        return  binding.countryCodePicker.selectedCountryCode.toString()
     }
 
     private fun getPhoneNumber(): String{
-        return number.text.toString()
+        return binding.editTextPhone.text.toString()
     }
 
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE){
             val cc = getCountryCode()
             val phone = getPhoneNumber()
-            proceedForVerification(cc, phone)
+            val countryName = getCountryName()
+            if (isDataConnected(context)) {
+                proceedForVerification(cc, phone, countryName)
+            }else{
+                showErrorDialog("Please check your internet connection!")
+            }
             return true
         }
         return false
     }
-
-    private fun View.showKeyboard() {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-    }
-
-
 }

@@ -3,13 +3,12 @@ package com.example.talks.signup.screens.secondFragment
 import `in`.aabhasjindal.otptextview.OTPListener
 import `in`.aabhasjindal.otptextview.OtpTextView
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
@@ -24,17 +23,23 @@ import com.google.firebase.auth.FirebaseAuth
 @Suppress("NAME_SHADOWING")
 class SecondFragment : Fragment() {
 
+    // view binding instance
     private lateinit var binding: FragmentSecondBinding
 
+    // view model instance
     private lateinit var viewModel: SecondFragmentViewModel
 
+    // firebase auth instance
     private lateinit var auth: FirebaseAuth
 
+    // arguments
     private val args: SecondFragmentArgs by navArgs()
 
     private lateinit var otpTextView: OtpTextView
     private lateinit var resendOTPTextView: TextView
     private lateinit var phoneNumber: String
+    private lateinit var countryCode: String
+    private lateinit var countryName: String
     private lateinit var dialog: WaitingDialog
 
     @SuppressLint("SetTextI18n")
@@ -44,9 +49,12 @@ class SecondFragment : Fragment() {
         binding = FragmentSecondBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(SecondFragmentViewModel::class.java)
 
+        countryCode = args.countryCode
+        countryName = args.countryName
         phoneNumber = args.phoneNumber
         val waitingText = binding.waitingInstructionsTextView
-        waitingText.text = "Waiting to automatically detect an SMS sent to \'$phoneNumber\'"
+        waitingText.text =
+            "Waiting to automatically detect an SMS sent to \'$countryCode $phoneNumber\'"
         otpTextView = binding.otpView
 
         dialog = activity?.let { WaitingDialog(it) }!!
@@ -56,8 +64,10 @@ class SecondFragment : Fragment() {
         auth = FirebaseAuth.getInstance()
         auth.setLanguageCode("en")
 
+        Log.i("phone number===", phoneNumber)
+
         context?.let {
-            viewModel.sendVerificationCode(phoneNumber, it, auth, dialog)
+            viewModel.sendVerificationCode(countryCode, phoneNumber, it, auth, dialog)
         }
 
         // OTP Handler
@@ -65,6 +75,7 @@ class SecondFragment : Fragment() {
             override fun onInteractionListener() {
                 // do nothing
             }
+
             override fun onOTPComplete(otp: String?) {
                 viewModel.otpAuth(otp, otpTextView)
             }
@@ -83,11 +94,13 @@ class SecondFragment : Fragment() {
         }
 
         viewModel.isUserLoggedIn.observe(viewLifecycleOwner, {
-            if (it){
+            if (it) {
                 dialog.dismiss()
+                val action = SecondFragmentDirections
+                    .actionSecondFragmentToThirdFragment(countryCode, phoneNumber, countryName)
                 Navigation.findNavController(binding.root)
-                    .navigate(R.id.action_secondFragment_to_thirdFragment)
-            }else{
+                    .navigate(action)
+            } else {
                 dialog.dismiss()
             }
         })
@@ -95,7 +108,7 @@ class SecondFragment : Fragment() {
         return binding.root
     }
 
-    private fun startCountdownForResendOTP(phoneNumber: String){
+    private fun startCountdownForResendOTP(phoneNumber: String) {
         object : CountDownTimer(60000, 1000) {
 
             @SuppressLint("SetTextI18n")
@@ -109,8 +122,8 @@ class SecondFragment : Fragment() {
                 resendOTPTextView.text = "Resend OTP"
                 resendOTPTextView.isClickable = true
                 resendOTPTextView.setOnClickListener {
-                    context?.let {
-                            it1 -> viewModel.sendVerificationCode(phoneNumber, it1, auth, dialog)
+                    context?.let { it1 ->
+                        viewModel.sendVerificationCode(countryCode, phoneNumber, it1, auth, dialog)
                     }
                     start()
                 }
@@ -118,9 +131,9 @@ class SecondFragment : Fragment() {
         }.start()
     }
 
-    private fun View.showKeyboard() {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
-    }
+//    private fun View.showKeyboard() {
+//        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+//        imm.toggleSoftInput(InputMethodManager.SHOW_FORCED, 0)
+//    }
 
 }

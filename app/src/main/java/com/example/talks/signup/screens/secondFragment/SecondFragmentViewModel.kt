@@ -31,6 +31,7 @@ class SecondFragmentViewModel : ViewModel() {
 
     private var storedVerificationId = ""
     private var phoneNumber = ""
+    private var countryCode = ""
     private lateinit var auth: FirebaseAuth
     private lateinit var context: Context
     private lateinit var dialog: WaitingDialog
@@ -40,12 +41,14 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     fun sendVerificationCode(
+        countryCode: String,
         phoneNumber: String,
         context: Context,
         auth: FirebaseAuth,
         dialog: WaitingDialog
     ) {
         this.auth = auth
+        this.countryCode = countryCode
         this.phoneNumber = phoneNumber
         this.context = context
         this.dialog = dialog
@@ -53,7 +56,7 @@ class SecondFragmentViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val options = context.let {
                 PhoneAuthOptions.newBuilder(auth)
-                    .setPhoneNumber(phoneNumber)
+                    .setPhoneNumber("$countryCode $phoneNumber")
                     .setTimeout(60L, TimeUnit.SECONDS)
                     .setActivity(it as Activity)
                     .setCallbacks(callbacks)

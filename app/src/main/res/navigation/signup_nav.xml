@@ -52,6 +52,12 @@
             app:exitAnim="@anim/to_left"
             app:popUpTo="@id/thirdFragment"
             app:popUpToInclusive="true" />
+        <argument
+            android:name="country_code"
+            app:argType="string" />
+        <argument
+            android:name="country_name"
+            app:argType="string" />
     </fragment>
     <fragment
         android:id="@+id/confirmation_screen"
@@ -74,6 +80,15 @@
             android:id="@+id/action_thirdFragment_to_galleryFragment"
             app:destination="@id/galleryFragment"
             app:popUpToInclusive="false" />
+        <argument
+            android:name="country_code"
+            app:argType="string" />
+        <argument
+            android:name="phone_number"
+            app:argType="string" />
+        <argument
+            android:name="country_name"
+            app:argType="string" />
     </fragment>
     <dialog
         android:id="@+id/galleryFragment"

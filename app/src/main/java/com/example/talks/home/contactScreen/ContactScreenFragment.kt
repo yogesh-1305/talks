@@ -6,10 +6,12 @@ import android.content.pm.PackageManager.PERMISSION_GRANTED
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.talks.R
@@ -22,6 +24,7 @@ class ContactScreenFragment : Fragment() {
     private lateinit var contactList : MutableList<Contact>
     private lateinit var adapter: ContactAdapter
     private lateinit var recyclerView: RecyclerView
+    private lateinit var viewModel: ContactViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +36,14 @@ class ContactScreenFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentContactScreenBinding.inflate(inflater, container, false)
+        viewModel = ViewModelProvider(this).get(ContactViewModel::class.java)
+
+        contactList = ArrayList()
+        viewModel.checkUsers()
+
+        viewModel.users.observe(viewLifecycleOwner,{
+            val users = it
+        })
 
 
         return binding.root
@@ -40,7 +51,7 @@ class ContactScreenFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        contactList = ArrayList()
+
         recyclerView = binding.contactsRecyclerView
         val scrollBar = binding.bubbleScrollBar
         recyclerView.setHasFixedSize(true)
