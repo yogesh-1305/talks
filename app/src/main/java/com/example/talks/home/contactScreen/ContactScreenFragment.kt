@@ -87,8 +87,10 @@ class ContactScreenFragment : Fragment() {
         while (phones.moveToNext()) {
             val contactName =
                 phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
-            val phoneNumber =
+            var phoneNumber =
                 phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+
+            phoneNumber = phoneNumber.replace("\\s".toRegex(),"")
             val contact = Contact(phoneNumber, contactName)
             contactList.add(contact)
             adapter.notifyDataSetChanged()

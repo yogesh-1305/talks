@@ -107,4 +107,6 @@ dependencies {
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
     // Dexter for Runtime permissions
     implementation 'com.karumi:dexter:6.2.2'
+    // E2E Encryption
+    implementation 'com.virgilsecurity.sdk:sdk-android:7.3.2'
 }

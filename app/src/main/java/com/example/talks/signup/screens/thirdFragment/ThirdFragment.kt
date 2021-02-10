@@ -92,15 +92,20 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         }
 
         viewModel.existingUserData.observe(viewLifecycleOwner, {
-            val name = it.getUserName()
-            val mail = it.getUserEmail()
-            retrievedImageUrl = it.getUserProfileImage()
-            binding.thirdFragmentNameEditText.setText(name)
-            binding.editTextTextEmailAddress.setText(mail)
-            Glide.with(binding.root).load(retrievedImageUrl).placeholder(R.drawable.talks)
-                .into(binding.thirdFragmentUserImage)
-            waitingDialog.dismiss()
+            if(it != null) {
+                val name = it.getUserName()
+                val mail = it.getUserEmail()
+                retrievedImageUrl = it.getUserProfileImage()
+                binding.thirdFragmentNameEditText.setText(name)
+                binding.editTextTextEmailAddress.setText(mail)
+                Glide.with(binding.root).load(retrievedImageUrl).placeholder(R.drawable.talks)
+                    .into(binding.thirdFragmentUserImage)
+                waitingDialog.dismiss()
+            }else{
+                waitingDialog.dismiss()
+            }
         })
+
 
         binding.button.setOnClickListener {
             validateEmailAndUpdateUserDetails()

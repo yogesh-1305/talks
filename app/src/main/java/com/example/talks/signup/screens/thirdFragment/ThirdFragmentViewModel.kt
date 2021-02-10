@@ -36,20 +36,17 @@ class ThirdFragmentViewModel : ViewModel() {
     }
 
     fun getUserFromDatabase(phoneNumber: String, countryName: String, countryCode: String) {
-        val databaseName = fireStore.collection("user_database ($countryName $countryCode)")
+        val databaseName = fireStore.collection("user_database")
         val users = databaseName.document("($countryCode) $phoneNumber")
         users.get()
             .addOnSuccessListener {
                 val user = it.toObject<FirebaseUser>()
                 if (user != null) {
-                    // ask to update details of existing user
-//                    userAlreadyExist.value = true
                     retrieveDetailsOfExistingUser(user)
                 }
-//                else {
-//                    // ask to enter details for new user and create new user
-////                    userAlreadyExist.value = false
-//                }
+                else {
+                 retrieveDetailsOfExistingUser(null)
+                }
             }.addOnFailureListener {
                 Log.i("failure check===", it.message.toString())
             }
@@ -67,7 +64,7 @@ class ThirdFragmentViewModel : ViewModel() {
         val countryCode = user?.getCountryCode()
         val phoneNumber = user?.getUserPhoneNumber()
         if (user != null) {
-            val databaseName = fireStore.collection("user_database ($countryName $countryCode)")
+            val databaseName = fireStore.collection("user_database")
             val users = databaseName.document("($countryCode) $phoneNumber")
             users.set(user)
                 .addOnSuccessListener {
@@ -80,7 +77,7 @@ class ThirdFragmentViewModel : ViewModel() {
         }
     }
 
-    private fun retrieveDetailsOfExistingUser(user: FirebaseUser) {
+    private fun retrieveDetailsOfExistingUser(user: FirebaseUser?) {
         existingUserData.value = user
     }
 
