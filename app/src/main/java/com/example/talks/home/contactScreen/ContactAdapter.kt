@@ -4,11 +4,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.example.talks.database.TalksContact
 import com.example.talks.databinding.ContactListItemViewBinding
 import com.trendyol.bubblescrollbarlib.BubbleScrollBar
 import com.trendyol.bubblescrollbarlib.BubbleTextProvider
 
-class ContactAdapter(private val contacts: List<Contact>) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>() {
+class ContactAdapter(private val contacts: List<TalksContact>) : RecyclerView.Adapter<ContactAdapter.ContactViewHolder>() {
 
     class ContactViewHolder(val binding: ContactListItemViewBinding): RecyclerView.ViewHolder(binding.root)
 
@@ -20,8 +21,8 @@ class ContactAdapter(private val contacts: List<Contact>) : RecyclerView.Adapter
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val view = holder.binding
         val contact = contacts[position]
-        view.contactName.text = contact.contact_name
-        view.contactNumber.text = contact.phone
+        view.contactName.text = contact.userName
+        view.contactNumber.text = contact.number
     }
 
     override fun getItemCount(): Int {

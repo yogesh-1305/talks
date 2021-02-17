@@ -14,7 +14,7 @@ class UploadingDialog internal constructor(private val activity: Activity) {
         )
         val inflater = activity.layoutInflater
         builder.setView(inflater.inflate(R.layout.uploading_dialog, null))
-        builder.setCancelable(true)
+        builder.setCancelable(false)
         dialog = builder.create()
         dialog!!.show()
     }

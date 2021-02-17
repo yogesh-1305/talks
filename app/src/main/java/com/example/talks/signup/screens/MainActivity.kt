@@ -1,17 +1,26 @@
 package com.example.talks.signup.screens
 
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.Navigation
+import coil.ImageLoader
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.example.talks.R
-import com.example.talks.encryption.AesEncrypt
-import com.example.talks.home.HomeScreenActivity
+import com.example.talks.home.activity.HomeScreenActivity
 import com.example.talks.signup.screens.thirdFragment.ThirdFragment
-import com.google.common.base.Strings
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.theartofdev.edmodo.cropper.CropImage
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -26,36 +35,43 @@ class MainActivity : AppCompatActivity() {
             navigateToHomeScreenActivity()
         }
 
-        val string = "DB5583F3E615C496FC6AA1A5BEA33"
-        val s1 = string.subSequence(1,4).toString()
-            val key = AesEncrypt().encrypt(s1, string)
-            val key2 = AesEncrypt().decrypt(key, string)
-            Log.i("key===", key.toString())
-            Log.i("key2===", key2.toString())
-            Log.i("string===", string)
+//        val string = "DB5583F3E615C496FC6AA1A5BEA33"
+//        val s1 = string.subSequence(1,4).toString()
+//            val key = Encryption().encrypt(s1, string)
+//            val key2 = Encryption().decrypt(key, string)
+//            Log.i("key===", key.toString())
+//            Log.i("key2===", key2.toString())
+//            Log.i("string===", string)
 
     }
 
     override fun onBackPressed() {
         super.onBackPressed()
-        moveTaskToBack(true)
+        Log.i("back===", "pressed")
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(data != null){
+        if (data != null) {
             val result = CropImage.getActivityResult(data)
-            val imageUri = result.uri
-            ThirdFragment.getImageUriFromMainActivity(imageUri)
-//            val frag = GalleryFragment.newInstance()
+            if (result!=null) {
+                val imageUri = result.uri
+                ThirdFragment.getImageUriFromMainActivity(imageUri)
+                onResume()
+            }
         }
     }
 
-    private fun isCurrentUserLoggedIn(auth: FirebaseAuth): Boolean{
+    override fun onResume() {
+        super.onResume()
+        Log.i("==="," ")
+    }
+
+    private fun isCurrentUserLoggedIn(auth: FirebaseAuth): Boolean {
         return auth.currentUser != null
     }
 
-    private fun navigateToHomeScreenActivity(){
+    private fun navigateToHomeScreenActivity() {
         startActivity(Intent(applicationContext, HomeScreenActivity::class.java))
         finish()
     }

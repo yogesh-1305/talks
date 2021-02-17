@@ -60,22 +60,10 @@
             app:argType="string" />
     </fragment>
     <fragment
-        android:id="@+id/confirmation_screen"
-        android:name="com.example.talks.signup.screens.ConfirmationScreen"
-        android:label="fragment_confirmation_screen"
-        tools:layout="@layout/fragment_confirmation_screen" />
-    <fragment
         android:id="@+id/thirdFragment"
         android:name="com.example.talks.signup.screens.thirdFragment.ThirdFragment"
         android:label="fragment_third"
         tools:layout="@layout/fragment_third" >
-        <action
-            android:id="@+id/action_thirdFragment_to_confirmation_screen"
-            app:destination="@id/confirmation_screen"
-            app:enterAnim="@anim/from_right"
-            app:exitAnim="@anim/to_left"
-            app:popUpTo="@id/confirmation_screen"
-            app:popUpToInclusive="true" />
         <action
             android:id="@+id/action_thirdFragment_to_galleryFragment"
             app:destination="@id/galleryFragment"

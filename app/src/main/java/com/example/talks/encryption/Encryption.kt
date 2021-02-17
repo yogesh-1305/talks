@@ -8,7 +8,7 @@ import java.util.*
 import javax.crypto.Cipher
 import javax.crypto.spec.SecretKeySpec
 
-class AesEncrypt internal constructor(){
+class Encryption internal constructor(){
 
     private var secretKey: SecretKeySpec? = null
     private lateinit var key: ByteArray
