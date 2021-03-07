@@ -14,4 +14,8 @@ class UserRepository(private val userDao: UserDao) {
     suspend fun addContactList(contact: TalksContact){
         userDao.addContact(contact)
     }
+
+    suspend fun updateUser(contact: TalksContact){
+        userDao.updateUser(contact)
+    }
 }

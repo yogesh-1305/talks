@@ -9,26 +9,34 @@ import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
 
-    val readAllUserData : LiveData<List<User>>
-    private val repository : UserRepository
-    val readAllContacts : LiveData<List<TalksContact>>
+    lateinit var readAllUserData: LiveData<List<User>>
+    private val repository: UserRepository
+    lateinit var readAllContacts: LiveData<List<TalksContact>>
 
     init {
         val userDao = UserDatabase.getDatabase(application).userDao()
         repository = UserRepository(userDao)
-        readAllUserData = repository.readAllUserData
-        readAllContacts = repository.readContacts
+        viewModelScope.launch(Dispatchers.IO) {
+            readAllUserData = repository.readAllUserData
+            readAllContacts = repository.readContacts
+        }
     }
 
-    fun addUser(user: User){
+    fun addUser(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addUser(user)
         }
     }
 
-    fun addContact(contact: TalksContact){
+    fun addContact(contact: TalksContact) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addContactList(contact)
+        }
+    }
+
+    fun updateUser(contact: TalksContact) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateUser(contact)
         }
     }
 

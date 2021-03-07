@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".signup.screens.thirdFragment.ThirdFragment">
+    tools:context=".signup.thirdFragment.ThirdFragment">
 
     <TextView
         android:id="@+id/textView12"
