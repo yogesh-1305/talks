@@ -4,16 +4,19 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Base64
 import android.util.Log
 import android.view.Menu
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -23,92 +26,53 @@ import androidx.navigation.ui.setupWithNavController
 import com.example.talks.R
 import com.example.talks.database.TalksContact
 import com.example.talks.database.UserViewModel
+import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.encryption.Encryption
-import com.google.android.material.navigation.NavigationView
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class HomeScreenActivity : AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
     private lateinit var navController: NavController
-    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private lateinit var listener: NavController.OnDestinationChangedListener
     private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
+    private var contactList = HashMap<String, String>()
 
     private lateinit var viewModel: HomeActivityViewModel
     private var contacts = ArrayList<String>()
 
     private lateinit var databaseViewModel: UserViewModel
 
+    private lateinit var binding: ActivityHomeScreenBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_screen)
+        binding = ActivityHomeScreenBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
         viewModel = ViewModelProvider(this).get(HomeActivityViewModel::class.java)
         databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
 
-        databaseViewModel.readAllUserData.observe(this, {
-            Log.i("database user===", it.toString())
-        })
-        databaseViewModel.readAllContacts.observe(this,{
-            Log.i("contacts db===", it.toString())
-        })
-
         if (isPermissionGranted()) {
             readContacts()
         }
 
+        bottomNavigationView = binding.homeBottomNav
         navController = findNavController(R.id.fragment_home_nav)
-        drawerLayout = findViewById(R.id.drawer_layout)
-        val navigationView = findViewById<NavigationView>(R.id.navigation_view)
-
-        appBarConfiguration = AppBarConfiguration(navController.graph, drawerLayout)
-        navigationView.setupWithNavController(navController)
+        bottomNavigationView.setupWithNavController(navController)
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.homeScreenFragment,
+                R.id.contactScreenFragment,
+                R.id.settingsFragment
+            )
+        )
         setupActionBarWithNavController(navController, appBarConfiguration)
-
-        listener =
-            NavController.OnDestinationChangedListener { controller, destination, arguments ->
-                when (destination.id) {
-                    R.id.homeScreenFragment -> {
-                        Toast.makeText(
-                            applicationContext,
-                            controller.toString(),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    R.id.contactScreenFragment -> {
-                        Toast.makeText(
-                            applicationContext,
-                            controller.toString(),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                    R.id.settingsFragment -> {
-                        Toast.makeText(
-                            applicationContext,
-                            controller.toString(),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-            }
-    }
-
-    override fun onSupportNavigateUp(): Boolean {
-        val navController = findNavController(R.id.fragment_home_nav)
-        return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        navController.removeOnDestinationChangedListener(listener)
-    }
-
-    override fun onResume() {
-        super.onResume()
-        navController.addOnDestinationChangedListener(listener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -123,13 +87,18 @@ class HomeScreenActivity : AppCompatActivity() {
             val user = it
             for (data in user) {
 
-                val number = data.getUserPhoneNumber()
-                val name = data.getUserName()
-                val image = Encryption().decrypt(data.getUserProfileImage(), encryptionKey)
-                val uid = data.getUid()
+                lifecycleScope.launch(Dispatchers.IO) {
 
-                val contact = TalksContact(number, name, "$image", "$uid")
-                databaseViewModel.addContact(contact)
+                    val number = data.getUserPhoneNumber()
+                    val name = contactList[data.getUserPhoneNumber()]
+                    val image = Encryption().decrypt(data.getUserProfileImage(), encryptionKey)
+                    val uid = data.getUid()
+                    Log.i("server image======", image.toString()+ name)
+
+                    val contact = TalksContact(number, "$name", "$image", "$uid")
+                    databaseViewModel.addContact(contact)
+                    databaseViewModel.updateUser(contact)
+                }
             }
         })
     }
@@ -155,6 +124,7 @@ class HomeScreenActivity : AppCompatActivity() {
             phoneNumber = phoneNumber.replace("\\s".toRegex(), "").trim()
             phoneNumber = formatPhoneNumber(phoneNumber)
             contacts.add(phoneNumber)
+            contactList[phoneNumber] = contactName
         }
 
     }

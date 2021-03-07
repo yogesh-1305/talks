@@ -18,4 +18,7 @@ interface UserDao {
     @Query("SELECT * FROM talks_contacts ORDER BY userName ASC")
     fun readContacts(): LiveData<List<TalksContact>>
 
+    @Update
+    suspend fun updateUser(contact: TalksContact)
+
 }

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".signup.screens.firstFragment.FirstFragment">
+    tools:context=".signup.firstFragment.FirstFragment">
 
     <com.hbb20.CountryCodePicker
         android:id="@+id/countryCodePicker"
@@ -41,7 +41,7 @@
         android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
-        android:text="Talks will send an SMS message to verify your phone number."
+        android:text="Talks will send an SMS messageSchema to verify your phone number."
         android:textAlignment="center"
         android:textColor="#13231A"
         android:textSize="14sp"

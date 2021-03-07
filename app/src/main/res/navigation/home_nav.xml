@@ -10,13 +10,8 @@
         android:label="@string/app_name"
         tools:layout="@layout/fragment_home_screen" >
         <action
-            android:id="@+id/action_homeScreenFragment_to_contactScreenFragment2"
-            app:destination="@id/contactScreenFragment"
-            app:enterAnim="@anim/nav_default_enter_anim" />
-        <action
-            android:id="@+id/action_homeScreenFragment_to_settingsFragment2"
-            app:destination="@id/settingsFragment"
-            app:enterAnim="@anim/nav_default_enter_anim" />
+            android:id="@+id/action_homeScreenFragment_to_chatActivity"
+            app:destination="@id/chatActivity" />
     </fragment>
     <fragment
         android:id="@+id/contactScreenFragment"
@@ -24,17 +19,29 @@
         android:label="Contacts"
         tools:layout="@layout/fragment_contact_screen" >
         <action
-            android:id="@+id/action_contactScreenFragment_to_homeScreenFragment2"
-            app:destination="@id/homeScreenFragment"
-            app:enterAnim="@anim/nav_default_enter_anim" />
+            android:id="@+id/action_contactScreenFragment_to_chatActivity"
+            app:destination="@id/chatActivity" />
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.example.talks.home.SettingsFragment"
-        android:label="SettingsFragment" >
-        <action
-            android:id="@+id/action_settingsFragment_to_homeScreenFragment2"
-            app:destination="@id/homeScreenFragment"
-            app:enterAnim="@anim/nav_default_enter_anim" />
-    </fragment>
+        android:label="SettingsFragment" />
+    <activity
+        android:id="@+id/chatActivity"
+        android:name="com.example.talks.chat.ChatActivity"
+        android:label="activity_chat"
+        tools:layout="@layout/activity_chat" >
+        <argument
+            android:name="phoneNumber"
+            app:argType="string" />
+        <argument
+            android:name="userName"
+            app:argType="string" />
+        <argument
+            android:name="userImage"
+            app:argType="string" />
+        <argument
+            android:name="userID"
+            app:argType="string" />
+    </activity>
 </navigation>
