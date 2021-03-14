@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/chatListImage"
+        android:layout_width="55dp"
+        android:layout_height="55dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/talks"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/chatListName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/aclonica"
+        android:text="TextView"
+        app:layout_constraintBottom_toTopOf="@+id/chatListLatestMessage"
+        app:layout_constraintEnd_toStartOf="@+id/chatListTimeStamp"
+        app:layout_constraintStart_toEndOf="@+id/chatListImage"
+        app:layout_constraintTop_toTopOf="@+id/chatListImage" />
+
+    <TextView
+        android:id="@+id/chatListLatestMessage"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:fontFamily="@font/advent_pro"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="@+id/chatListImage"
+        app:layout_constraintEnd_toStartOf="@+id/chatListMuteImage"
+        app:layout_constraintStart_toEndOf="@+id/chatListImage"
+        app:layout_constraintTop_toBottomOf="@+id/chatListName" />
+
+    <TextView
+        android:id="@+id/chatListTimeStamp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/chatListName" />
+
+    <TextView
+        android:id="@+id/chatListUnreadMessageCount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp"
+        tools:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/chatListPinImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/chatListUnreadMessageCount"
+        app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp"
+        app:srcCompat="@drawable/emoji_emotions_24px" />
+
+    <ImageView
+        android:id="@+id/chatListMuteImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/chatListPinImage"
+        app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp"
+        app:srcCompat="@drawable/emoji_emotions_24px" />
+
+    <View
+        android:id="@+id/view"
+        android:layout_width="0dp"
+        android:layout_height="1dp"
+        android:background="#050303"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

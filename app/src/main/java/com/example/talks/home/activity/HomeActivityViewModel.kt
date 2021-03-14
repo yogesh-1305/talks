@@ -1,6 +1,5 @@
 package com.example.talks.home.activity
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -17,8 +16,8 @@ import kotlinx.coroutines.launch
 class HomeActivityViewModel : ViewModel() {
     private var fireStore: FirebaseFirestore = Firebase.firestore
 
-    val users: MutableLiveData<List<ServerUser>> by lazy {
-        MutableLiveData<List<ServerUser>>()
+    val users: MutableLiveData<MutableList<ServerUser>> by lazy {
+        MutableLiveData<MutableList<ServerUser>>()
     }
 
     fun getUsersFromServer(contacts: List<String>) {
@@ -37,7 +36,6 @@ class HomeActivityViewModel : ViewModel() {
 
                             if (contacts.contains(user.getUserPhoneNumber())) {
                                 usersList.add(user)
-                                Log.i("user phone check===", user.getUserPhoneNumber())
                             }
 
                         }
@@ -48,16 +46,18 @@ class HomeActivityViewModel : ViewModel() {
         }
     }
 
-    fun getCurrentUserData(uid: String, databaseViewModel: UserViewModel) {
+    fun getCurrentUserData(currentUserId: String?, databaseViewModel: UserViewModel) {
         viewModelScope.launch(Dispatchers.IO) {
-            fireStore.collection("user_database").document(uid)
-                .get().addOnSuccessListener {
-                    val currentUser = it.toObject<ServerUser>()
-                    if (currentUser != null) {
-                        val localUser = TalksContact(currentUser.getUserPhoneNumber(),currentUser.getUserName(), currentUser.getUserProfileImage(),uid)
-                        databaseViewModel.updateUser(localUser)
+            if (currentUserId != null) {
+                fireStore.collection("user_database").document(currentUserId)
+                    .get().addOnSuccessListener {
+                        val currentUser = it.toObject<ServerUser>()
+                        if (currentUser != null) {
+                            val localUser = TalksContact(currentUser.getUserPhoneNumber(),currentUser.getUserName(), currentUser.getUserProfileImage(),currentUserId)
+                            databaseViewModel.updateUser(localUser)
+                        }
                     }
-                }
+            }
         }
     }
 

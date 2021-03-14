@@ -13,8 +13,8 @@
             android:title="Contacts"
             android:icon="@drawable/people_icon"/>
         <item
-            android:id="@+id/settingsFragment"
-            android:title="Settings"
+            android:id="@+id/profileScreenFragment"
+            android:title="Me"
             android:icon="@drawable/ic_baseline_settings_24"/>
 
     </group>

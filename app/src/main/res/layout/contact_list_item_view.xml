@@ -8,7 +8,7 @@
     android:layout_height="wrap_content">
 
     <de.hdodenhof.circleimageview.CircleImageView
-        android:id="@+id/contact_image"
+        android:id="@+id/contactImage"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_marginStart="16dp"
@@ -20,25 +20,25 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
-        android:id="@+id/contact_name"
+        android:id="@+id/contactName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:fontFamily="@font/aclonica"
         android:text="TextView"
-        app:layout_constraintBottom_toTopOf="@+id/contact_number"
-        app:layout_constraintStart_toEndOf="@+id/contact_image"
-        app:layout_constraintTop_toTopOf="@+id/contact_image" />
+        app:layout_constraintBottom_toTopOf="@+id/chatListLatestMessage"
+        app:layout_constraintStart_toEndOf="@+id/contactImage"
+        app:layout_constraintTop_toTopOf="@+id/contactImage" />
 
     <TextView
-        android:id="@+id/contact_number"
+        android:id="@+id/contactNumber"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
         android:fontFamily="@font/advent_pro"
         android:text="TextView"
-        app:layout_constraintBottom_toBottomOf="@+id/contact_image"
-        app:layout_constraintStart_toEndOf="@+id/contact_image"
-        app:layout_constraintTop_toBottomOf="@+id/contact_name" />
+        app:layout_constraintBottom_toBottomOf="@+id/contactImage"
+        app:layout_constraintStart_toEndOf="@+id/contactImage"
+        app:layout_constraintTop_toBottomOf="@+id/contactName" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

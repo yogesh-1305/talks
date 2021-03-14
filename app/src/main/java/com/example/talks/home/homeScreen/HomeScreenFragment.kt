@@ -5,6 +5,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.talks.R
+import com.example.talks.database.UserViewModel
 import com.example.talks.databinding.FragmentHomeScreenBinding
 import com.google.android.material.snackbar.Snackbar
 
@@ -12,6 +13,7 @@ class HomeScreenFragment : Fragment() {
 
     private var binding: FragmentHomeScreenBinding? = null
     private var viewModel: HomeScreenViewModel? = null
+    private lateinit var databaseViewModel: UserViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
@@ -25,6 +27,8 @@ class HomeScreenFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentHomeScreenBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(HomeScreenViewModel::class.java)
+        databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java
+        )
         return binding!!.root
     }
 

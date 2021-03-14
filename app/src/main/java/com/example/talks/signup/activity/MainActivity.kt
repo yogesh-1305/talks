@@ -50,14 +50,18 @@ class MainActivity : AppCompatActivity() {
         viewModel.users.observe(this, {
             val listOfUsers = it
             for (data in listOfUsers) {
-                val number = data.getUserPhoneNumber()
-                val name = contactList[data.getUserPhoneNumber()]
-                Log.i("db username===", name.toString())
-                val image = Encryption().decrypt(data.getUserProfileImage(), encryptionKey)
-                val uid = data.getUid()
+                if (data.getUserPhoneNumber() == auth.currentUser?.phoneNumber) {
+                    listOfUsers.remove(data)
+                } else {
+                    val number = data.getUserPhoneNumber()
+                    val name = contactList[data.getUserPhoneNumber()]
+                    Log.i("db username===", name.toString())
+                    val image = Encryption().decrypt(data.getUserProfileImage(), encryptionKey)
+                    val uid = data.getUid()
 
-                val contact = TalksContact(number, "$name", "$image", "$uid")
-                databaseViewModel.addContact(contact)
+                    val contact = TalksContact(number, "$name", "$image", "$uid")
+                    databaseViewModel.addContact(contact)
+                }
             }
         })
 

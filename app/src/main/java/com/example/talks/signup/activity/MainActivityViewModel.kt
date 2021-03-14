@@ -14,8 +14,8 @@ import kotlinx.coroutines.launch
 class MainActivityViewModel : ViewModel() {
     private var fireStore: FirebaseFirestore = Firebase.firestore
 
-    val users: MutableLiveData<List<ServerUser>> by lazy {
-        MutableLiveData<List<ServerUser>>()
+    val users: MutableLiveData<MutableList<ServerUser>> by lazy {
+        MutableLiveData<MutableList<ServerUser>>()
     }
 
     fun getUsersFromServer(contactPhoneNumberList: List<String>) {

@@ -9,17 +9,17 @@ import kotlinx.coroutines.launch
 
 class UserViewModel(application: Application) : AndroidViewModel(application) {
 
-    lateinit var readAllUserData: LiveData<List<User>>
+    var readAllUserData: LiveData<List<User>>
     private val repository: UserRepository
-    lateinit var readAllContacts: LiveData<List<TalksContact>>
+    var readAllContacts: LiveData<List<TalksContact>>
+    var readChatListItem: LiveData<List<ChatListItem>>
 
     init {
         val userDao = UserDatabase.getDatabase(application).userDao()
         repository = UserRepository(userDao)
-        viewModelScope.launch(Dispatchers.IO) {
-            readAllUserData = repository.readAllUserData
-            readAllContacts = repository.readContacts
-        }
+        readAllUserData = repository.readAllUserData
+        readAllContacts = repository.readContacts
+        readChatListItem = repository.readChatListItem
     }
 
     fun addUser(user: User) {
@@ -37,6 +37,18 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
     fun updateUser(contact: TalksContact) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateUser(contact)
+        }
+    }
+
+    fun addChatListItem(chatListItem: ChatListItem) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addChatListItem(chatListItem)
+        }
+    }
+
+    fun updateChatListItem(chatListItem: ChatListItem) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateChatListItem(chatListItem)
         }
     }
 

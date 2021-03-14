@@ -4,23 +4,18 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.pm.PackageManager
 import android.database.Cursor
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Base64
 import android.util.Log
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
-import androidx.drawerlayout.widget.DrawerLayout
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.talks.R
@@ -29,6 +24,8 @@ import com.example.talks.database.UserViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.encryption.Encryption
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.firebase.FirebaseApp
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -47,6 +44,7 @@ class HomeScreenActivity : AppCompatActivity() {
     private lateinit var databaseViewModel: UserViewModel
 
     private lateinit var binding: ActivityHomeScreenBinding
+    private lateinit var auth: FirebaseAuth
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,6 +52,9 @@ class HomeScreenActivity : AppCompatActivity() {
         setContentView(binding.root)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        FirebaseApp.initializeApp(this)
+        auth = FirebaseAuth.getInstance()
 
         viewModel = ViewModelProvider(this).get(HomeActivityViewModel::class.java)
         databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
@@ -73,19 +74,12 @@ class HomeScreenActivity : AppCompatActivity() {
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onStart() {
-        super.onStart()
 
         viewModel.getUsersFromServer(contacts)
         viewModel.users.observe(this, {
-            val user = it
-            for (data in user) {
+            val listOfUsers = it
+
+            for (data in listOfUsers) {
 
                 lifecycleScope.launch(Dispatchers.IO) {
 
@@ -93,7 +87,7 @@ class HomeScreenActivity : AppCompatActivity() {
                     val name = contactList[data.getUserPhoneNumber()]
                     val image = Encryption().decrypt(data.getUserProfileImage(), encryptionKey)
                     val uid = data.getUid()
-                    Log.i("server image======", image.toString()+ name)
+                    Log.i("server image======", image.toString() + name)
 
                     val contact = TalksContact(number, "$name", "$image", "$uid")
                     databaseViewModel.addContact(contact)
@@ -102,6 +96,16 @@ class HomeScreenActivity : AppCompatActivity() {
             }
         })
     }
+
+    override fun onStart() {
+        super.onStart()
+        viewModel.getCurrentUserData(auth.currentUser?.uid, databaseViewModel)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        return super.onCreateOptionsMenu(menu)
+    }
+
 
     @SuppressLint("Recycle")
     private fun readContacts() {
