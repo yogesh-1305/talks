@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.Navigation
 import com.example.talks.R
 import com.example.talks.database.UserViewModel
 import com.example.talks.databinding.FragmentHomeScreenBinding
@@ -11,7 +12,7 @@ import com.google.android.material.snackbar.Snackbar
 
 class HomeScreenFragment : Fragment() {
 
-    private var binding: FragmentHomeScreenBinding? = null
+    private lateinit var binding: FragmentHomeScreenBinding
     private var viewModel: HomeScreenViewModel? = null
     private lateinit var databaseViewModel: UserViewModel
 
@@ -27,9 +28,12 @@ class HomeScreenFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentHomeScreenBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(HomeScreenViewModel::class.java)
-        databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java
-        )
-        return binding!!.root
+        databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+
+        binding.contactsButton.setOnClickListener{
+            Navigation.findNavController(binding.root).navigate(R.id.action_homeScreenFragment_to_contactListActivity)
+        }
+        return binding.root
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -47,11 +51,6 @@ class HomeScreenFragment : Fragment() {
             }
         }
         return super.onOptionsItemSelected(item)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        binding = null
     }
 
 }

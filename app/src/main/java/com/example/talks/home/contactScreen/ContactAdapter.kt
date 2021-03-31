@@ -1,20 +1,16 @@
 package com.example.talks.home.contactScreen
 
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.util.Base64
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.navigation.Navigation
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.ContactHelper
-import com.example.talks.R
+import com.example.talks.chat.ChatActivity
 import com.example.talks.database.TalksContact
 import com.example.talks.databinding.ContactListItemViewBinding
-import java.util.*
 
 class ContactAdapter(private val contacts: List<TalksContact>, val context: Context?) :
     RecyclerView.Adapter<ContactAdapter.ContactViewHolder>() {
@@ -45,11 +41,11 @@ class ContactAdapter(private val contacts: List<TalksContact>, val context: Cont
         view.listItemLayout.setOnClickListener {
             val name = contact.userName
             val number = contact.number
-            val image = contactImage
             val uid = contact.uId
-            val contactHelper = TalksContact(number, name, image, uid)
+            val contactHelper = TalksContact(number, name, contactImage, uid)
             ContactHelper.setContact(contactHelper)
-            Navigation.findNavController(view.root).navigate(R.id.action_contactScreenFragment_to_chatActivity)
+            val intent = Intent(context, ChatActivity::class.java)
+            context?.startActivity(intent)
         }
     }
 
@@ -57,13 +53,6 @@ class ContactAdapter(private val contacts: List<TalksContact>, val context: Cont
         return contacts.size
     }
 
-    private fun base64ToBitmap(image: String?): Bitmap? {
-        if (image != null) {
-            val decodedString = Base64.decode(image, Base64.DEFAULT)
-            return BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
-        }
-        return null
-    }
 }
 
 

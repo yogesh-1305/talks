@@ -2,6 +2,7 @@ package com.example.talks.home.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Bundle
@@ -18,11 +19,14 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.R
 import com.example.talks.database.TalksContact
 import com.example.talks.database.UserViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.encryption.Encryption
+import com.example.talks.home.profileScreen.ProfileSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -33,18 +37,22 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
     private lateinit var navController: NavController
-    private lateinit var bottomNavigationView: BottomNavigationView
     private lateinit var appBarConfiguration: AppBarConfiguration
-    private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
-    private var contactList = HashMap<String, String>()
+    private lateinit var destinationChangedListener: NavController.OnDestinationChangedListener
+
+    private lateinit var bottomNavigationView: BottomNavigationView
 
     private lateinit var viewModel: HomeActivityViewModel
-    private var contacts = ArrayList<String>()
-
     private lateinit var databaseViewModel: UserViewModel
 
     private lateinit var binding: ActivityHomeScreenBinding
     private lateinit var auth: FirebaseAuth
+
+    private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
+    private var contactList = HashMap<String, String>()
+    private var contacts = ArrayList<String>()
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -70,7 +78,6 @@ class HomeScreenActivity : AppCompatActivity() {
             setOf(
                 R.id.homeScreenFragment,
                 R.id.contactScreenFragment,
-                R.id.settingsFragment
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -95,11 +102,44 @@ class HomeScreenActivity : AppCompatActivity() {
                 }
             }
         })
+
+        destinationChangedListener =
+            NavController.OnDestinationChangedListener { _, destination, _ ->
+
+                if (destination.id == R.id.homeScreenFragment) {
+                    binding.toolbarUsername.text = "Chats"
+                } else if (destination.id == R.id.contactScreenFragment) {
+                    binding.toolbarUsername.text = "Room"
+                }
+
+            }
     }
 
     override fun onStart() {
         super.onStart()
         viewModel.getCurrentUserData(auth.currentUser?.uid, databaseViewModel)
+
+        databaseViewModel.readAllUserData.observe(this, {
+            val user1 = it[0]
+            val image1 = Encryption().decrypt(user1.profileImage, encryptionKey)
+            Glide.with(this).load(image1).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .into(binding.toolbarDP)
+        })
+
+        binding.toolbarDP.setOnClickListener{
+            val intent = Intent(this, ProfileSettingsActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        navController.addOnDestinationChangedListener(destinationChangedListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        navController.removeOnDestinationChangedListener(destinationChangedListener)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {

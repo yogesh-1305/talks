@@ -7,25 +7,21 @@
     <fragment
         android:id="@+id/homeScreenFragment"
         android:name="com.example.talks.home.homeScreen.HomeScreenFragment"
-        android:label="@string/app_name"
+        android:label=""
         tools:layout="@layout/fragment_home_screen" >
         <action
             android:id="@+id/action_homeScreenFragment_to_chatActivity"
             app:destination="@id/chatActivity" />
+        <action
+            android:id="@+id/action_homeScreenFragment_to_contactListActivity"
+            app:destination="@id/contactListActivity" />
     </fragment>
     <fragment
         android:id="@+id/contactScreenFragment"
-        android:name="com.example.talks.home.contactScreen.ContactScreenFragment"
-        android:label="Contacts"
-        tools:layout="@layout/fragment_contact_screen" >
-        <action
-            android:id="@+id/action_contactScreenFragment_to_chatActivity"
-            app:destination="@id/chatActivity" />
+        android:name="com.example.talks.home.videoRoom.VideoRoomFragment"
+        android:label=""
+        tools:layout="@layout/fragment_video_room" >
     </fragment>
-    <fragment
-        android:id="@+id/settingsFragment"
-        android:name="com.example.talks.home.SettingsFragment"
-        android:label="SettingsFragment" />
     <activity
         android:id="@+id/chatActivity"
         android:name="com.example.talks.chat.ChatActivity"
@@ -44,9 +40,9 @@
             android:name="userID"
             app:argType="string" />
     </activity>
-    <fragment
-        android:id="@+id/profileScreenFragment"
-        android:name="com.example.talks.home.profileScreen.ProfileScreenFragment"
-        android:label="fragment_profile_screen"
-        tools:layout="@layout/fragment_profile_screen" />
+    <activity
+        android:id="@+id/contactListActivity"
+        android:name="com.example.talks.home.contactScreen.ContactListActivity"
+        android:label=""
+        tools:layout="@layout/activity_contact_list" />
 </navigation>

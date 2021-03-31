@@ -19,7 +19,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Talks"
         tools:ignore="AllowBackup">
-        <activity android:name=".chat.ChatActivity"></activity>
+        <activity android:name=".home.profileScreen.ProfileSettingsActivity"
+            android:screenOrientation="sensorPortrait"/>
+        <activity android:name=".home.contactScreen.ContactListActivity" />
+        <activity android:name=".chat.ChatActivity" />
         <activity android:name=".home.activity.HomeScreenActivity" />
         <activity
             android:name=".signup.activity.MainActivity"

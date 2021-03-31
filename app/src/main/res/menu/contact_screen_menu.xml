@@ -8,8 +8,13 @@
         android:icon="@drawable/ic_baseline_search_24"/>
 
     <item
-        android:id="@+id/contact_screen_search_button2"
-        android:title="Search"
-        app:showAsAction="always"
+        android:id="@+id/contact_screen_refresh_button"
+        android:title="Refresh Contacts"
         android:icon="@drawable/people_icon"/>
+
+    <item
+        android:id="@+id/contact_screen_newContact"
+        android:title="Add New Contacts"
+        android:icon="@drawable/people_icon"/>
+
 </menu>
