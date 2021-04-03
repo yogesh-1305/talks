@@ -27,4 +27,9 @@
         <item name="android:fontFamily">@font/advent_pro</item>
         <item name="android:iconTint">@color/white</item>
     </style>
+
+    <style name="Theme.Talks.SlidrActivityTheme">
+        <item name="android:windowIsTranslucent">true</item>
+        <item name="android:windowBackground">@android:color/transparent</item>
+    </style>
 </resources>
