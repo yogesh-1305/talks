@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/offWhite"
+    android:background="@color/white"
     app:layoutDescription="@xml/fragment_profile_scene">
 
     <androidx.cardview.widget.CardView
@@ -68,21 +68,375 @@
         app:layout_constraintTop_toBottomOf="@+id/profileScreenName"
         app:layout_constraintVertical_bias="1.0">
 
-        <androidx.coordinatorlayout.widget.CoordinatorLayout
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:background="#00000000"
+            android:orientation="vertical">
 
-            <LinearLayout
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardLayout1"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardElevation="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/aclonica"
+                        android:paddingHorizontal="15dp"
+                        android:text="Edit Profile"
+                        android:textColor="@color/teal_700" />
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="8dp"
+                        app:cardCornerRadius="0dp"
+                        app:cardElevation="0dp"
+                        android:background="@drawable/button_layout"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/button_layout"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/darkModeText"
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_marginVertical="12dp"
+                                android:layout_marginStart="16dp"
+                                android:fontFamily="@font/alfa_slab_one"
+                                android:text="Dark Mode"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toStartOf="@+id/darkModeSwitch"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/darkModeSwitch"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginEnd="16dp"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:id="@+id/editPhoneNumberCard"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="0dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/button_layout"
+                            android:orientation="horizontal"
+                            android:paddingVertical="8dp">
+
+                            <TextView
+                                android:id="@+id/phoneNumberInProfile"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:fontFamily="@font/alfa_slab_one"
+                                tools:text="+918954667361"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/textView7"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:text="@string/tap_to_change_phone"
+                                app:layout_constraintStart_toStartOf="@+id/phoneNumberInProfile"
+                                app:layout_constraintTop_toBottomOf="@+id/phoneNumberInProfile" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="0dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="@drawable/button_layout"
+                            android:paddingVertical="8dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/usernameInProfile"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:fontFamily="@font/alfa_slab_one"
+                                tools:text="Yogesh Singh"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/textView8"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/tap_to_change_username"
+                                app:layout_constraintStart_toStartOf="@+id/usernameInProfile"
+                                app:layout_constraintTop_toBottomOf="@+id/usernameInProfile" />
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.cardview.widget.CardView>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        app:cardCornerRadius="0dp"
+                        app:cardElevation="0dp"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintHorizontal_bias="0.5"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:paddingVertical="8dp"
+                            android:background="@drawable/button_layout"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:id="@+id/bioInProfile"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="16dp"
+                                android:fontFamily="@font/alfa_slab_one"
+                                android:text="@string/bio"
+                                app:layout_constraintStart_toStartOf="parent"
+                                app:layout_constraintTop_toTopOf="parent" />
+
+                            <TextView
+                                android:id="@+id/textView9"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="8dp"
+                                android:text="@string/tap_to_change_bio"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintStart_toStartOf="@+id/bioInProfile"
+                                app:layout_constraintTop_toBottomOf="@+id/bioInProfile" />
+
+
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+                    </androidx.cardview.widget.CardView>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardLayout2"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardElevation="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/aclonica"
+                        android:paddingHorizontal="15dp"
+                        android:text="Settings"
+                        android:textColor="@color/teal_700" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:drawableLeft="@drawable/bell_icon"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_layout"
+                        android:text="@string/sound_and_notification"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        app:rippleColor="@color/offWhite" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@drawable/button_layout"
+                        android:drawableLeft="@drawable/lock_icon"
+                        android:drawablePadding="10dp"
+                        android:text="@string/privacy_and_security"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        app:rippleColor="@color/offWhite" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/storage"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:drawablePadding="10dp"
+                        android:elevation="0dp"
+                        android:background="@drawable/button_layout"
+                        android:drawableLeft="@drawable/storage_icon"/>
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/chat"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_layout"
+                        android:elevation="0dp"
+                        android:drawableLeft="@drawable/chat_icon"/>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/folder"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_layout"
+                        android:elevation="0dp"
+                        android:drawableLeft="@drawable/folder_icon"/>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/devices"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_layout"
+                        android:elevation="0dp"
+                        android:drawableLeft="@drawable/devices_icon"/>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/languages"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_layout"
+                        android:elevation="0dp"
+                        android:drawableLeft="@drawable/languages_icon"/>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardLayout3"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                app:cardElevation="0dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:fontFamily="@font/aclonica"
+                        android:paddingHorizontal="15dp"
+                        android:text="Help"
+                        android:textColor="@color/teal_700" />
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/ask_a_ques"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_layout"
+                        android:elevation="0dp"
+                        android:drawableLeft="@drawable/question_icon"/>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/talks_faq"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_layout"
+                        android:elevation="0dp"
+                        android:drawableLeft="@drawable/faq_icon"/>
+
+                    <Button
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:text="@string/privacy_and_security"
+                        android:textAlignment="textStart"
+                        android:textAllCaps="false"
+                        android:drawablePadding="10dp"
+                        android:background="@drawable/button_layout"
+                        android:elevation="0dp"
+                        android:drawableLeft="@drawable/shield_icon"/>
+
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
+                android:gravity="center"
+                android:paddingVertical="10dp"
+                android:text="Talks for Android v1.0.0 (1122)" />
 
-                <include layout="@layout/profile_setting_layout_1" />
-
-            </LinearLayout>
-
-        </androidx.coordinatorlayout.widget.CoordinatorLayout>
-
+        </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
 
