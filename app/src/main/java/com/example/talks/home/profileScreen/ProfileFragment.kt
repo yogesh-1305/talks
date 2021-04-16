@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.*
 import androidx.fragment.app.Fragment
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -24,6 +25,8 @@ class ProfileFragment : Fragment() {
     private lateinit var databaseViewModel: UserViewModel
     private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
     var image = ""
+    var userName = ""
+    var phoneNumber = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,20 +42,38 @@ class ProfileFragment : Fragment() {
 
         databaseViewModel.readAllUserData.observe(viewLifecycleOwner, {
             val user1 = it[0]
+            userName = user1.userName
+            phoneNumber = user1.phoneNumber
             image = Encryption().decrypt(user1.profileImage, encryptionKey).toString()
             Glide.with(this).load(image).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.profileScreenImage)
-            binding.phoneNumberInProfile.text = user1.phoneNumber
-            binding.usernameInProfile.text = user1.userName
+            binding.phoneNumberInProfile.text = phoneNumber
+            binding.usernameInProfile.text = userName
+            binding.profileScreenName.text = userName
         })
 
         binding.profileScreenBackButton.setOnClickListener {
             activity?.finish()
         }
 
-        binding.editPhoneNumberCard.setOnClickListener {
+        binding.editPhoneNumberCard.setOnClickListener{
+            Toast.makeText(context, "Feature coming Soon", Toast.LENGTH_SHORT).show()
+        }
+
+        binding.editUserNameButton.setOnClickListener {
+            val editName = 1
+            val action =
+                ProfileFragmentDirections.actionProfileFragment2ToProfileEditFragment(editName, userName)
             Navigation.findNavController(binding.root)
-                .navigate(R.id.action_profileFragment2_to_profileEditFragment)
+                .navigate(action)
+        }
+
+        binding.editBioButton.setOnClickListener{
+            val editBio = 2
+            val action =
+                ProfileFragmentDirections.actionProfileFragment2ToProfileEditFragment(editBio, "bio")
+            Navigation.findNavController(binding.root)
+                .navigate(action)
         }
         return binding.root
     }

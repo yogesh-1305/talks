@@ -29,8 +29,11 @@ interface UserDao {
     @Query("SELECT * FROM chat_list ORDER BY timestamp ASC")
     fun readChatList(): LiveData<List<ChatListItem>>
 
+    @Query("UPDATE user_data SET userName = :userName")
+    suspend fun updateUserName(userName : String)
 
     // Update
+
     @Update
     suspend fun updateUser(contact: TalksContact)
 

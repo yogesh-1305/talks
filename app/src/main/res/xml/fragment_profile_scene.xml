@@ -36,7 +36,7 @@
         <Constraint
             android:layout_height="0dp"
             motion:layout_constraintTop_toTopOf="@id/topCardView"
-            android:layout_width="50dp"
+            android:layout_width="35dp"
             android:id="@+id/profileScreenImage"
             motion:layout_constraintStart_toEndOf="@+id/profileScreenBackButton"
             android:layout_marginStart="8dp"

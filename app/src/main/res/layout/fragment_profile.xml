@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
     app:layoutDescription="@xml/fragment_profile_scene">
 
     <androidx.cardview.widget.CardView
@@ -13,7 +12,7 @@
         android:layout_height="0dp"
         app:cardBackgroundColor="@color/teal_700"
         app:cardCornerRadius="0dp"
-        app:cardElevation="0dp"
+        app:cardElevation="2dp"
         app:layout_constraintBottom_toTopOf="@+id/nestedScrollView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
@@ -26,8 +25,12 @@
         android:id="@+id/profileScreenImage"
         android:layout_width="200dp"
         android:layout_height="200dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="16dp"
         android:src="@drawable/talks"
+        app:civ_border_color="@color/offWhite"
+        app:civ_border_width="2dp"
+        android:elevation="2dp"
+        app:civ_border_overlay="true"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -39,9 +42,12 @@
         android:layout_marginTop="8dp"
         android:background="#00FFFFFF"
         android:padding="14dp"
+        android:elevation="2dp"
         android:src="@drawable/ic_baseline_arrow_back_24"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="@string/app_name"
+        app:tint="@color/white" />
 
     <TextView
         android:id="@+id/profileScreenName"
@@ -49,8 +55,9 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="12dp"
         android:fontFamily="@font/aclonica"
-        android:text="Yogesh Singh"
+        android:text="@string/app_name"
         android:textSize="18sp"
+        android:elevation="2dp"
         app:layout_constraintEnd_toEndOf="@+id/profileScreenImage"
         app:layout_constraintHorizontal_bias="0.489"
         app:layout_constraintStart_toStartOf="@+id/profileScreenImage"
@@ -96,7 +103,7 @@
                         android:layout_marginTop="10dp"
                         android:fontFamily="@font/aclonica"
                         android:paddingHorizontal="15dp"
-                        android:text="Edit Profile"
+                        android:text="@string/edit_profile"
                         android:textColor="@color/teal_700" />
 
                     <androidx.cardview.widget.CardView
@@ -114,6 +121,7 @@
                         <androidx.constraintlayout.widget.ConstraintLayout
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
+                            android:elevation="2dp"
                             android:background="@drawable/button_layout"
                             android:orientation="horizontal">
 
@@ -124,7 +132,9 @@
                                 android:layout_marginVertical="12dp"
                                 android:layout_marginStart="16dp"
                                 android:fontFamily="@font/alfa_slab_one"
-                                android:text="Dark Mode"
+                                android:text="@string/dark_mode"
+                                android:textSize="16sp"
+                                android:elevation="2dp"
                                 app:layout_constraintBottom_toBottomOf="parent"
                                 app:layout_constraintEnd_toStartOf="@+id/darkModeSwitch"
                                 app:layout_constraintStart_toStartOf="parent"
@@ -167,6 +177,7 @@
                                 android:layout_marginStart="16dp"
                                 android:fontFamily="@font/alfa_slab_one"
                                 tools:text="+918954667361"
+                                android:textSize="16sp"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -192,6 +203,7 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/editUserNameButton"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:background="@drawable/button_layout"
@@ -205,6 +217,7 @@
                                 android:layout_marginStart="16dp"
                                 android:fontFamily="@font/alfa_slab_one"
                                 tools:text="Yogesh Singh"
+                                android:textSize="16sp"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
 
@@ -230,6 +243,7 @@
                         app:layout_constraintTop_toTopOf="parent">
 
                         <androidx.constraintlayout.widget.ConstraintLayout
+                            android:id="@+id/editBioButton"
                             android:layout_width="match_parent"
                             android:layout_height="match_parent"
                             android:paddingVertical="8dp"
@@ -242,6 +256,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginStart="16dp"
                                 android:fontFamily="@font/alfa_slab_one"
+                                android:textSize="16sp"
                                 android:text="@string/bio"
                                 app:layout_constraintStart_toStartOf="parent"
                                 app:layout_constraintTop_toTopOf="parent" />
@@ -285,7 +300,7 @@
                         android:layout_marginTop="10dp"
                         android:fontFamily="@font/aclonica"
                         android:paddingHorizontal="15dp"
-                        android:text="Settings"
+                        android:text="@string/settings"
                         android:textColor="@color/teal_700" />
 
                     <Button
@@ -297,7 +312,8 @@
                         android:text="@string/sound_and_notification"
                         android:textAlignment="textStart"
                         android:textAllCaps="false"
-                        app:rippleColor="@color/offWhite" />
+                        app:rippleColor="@color/offWhite"
+                        tools:ignore="RtlHardcoded" />
 
                     <Button
                         android:layout_width="match_parent"
@@ -308,7 +324,8 @@
                         android:text="@string/privacy_and_security"
                         android:textAlignment="textStart"
                         android:textAllCaps="false"
-                        app:rippleColor="@color/offWhite" />
+                        app:rippleColor="@color/offWhite"
+                        tools:ignore="RtlHardcoded" />
 
                     <Button
                         android:layout_width="match_parent"
@@ -319,7 +336,8 @@
                         android:drawablePadding="10dp"
                         android:elevation="0dp"
                         android:background="@drawable/button_layout"
-                        android:drawableLeft="@drawable/storage_icon"/>
+                        android:drawableLeft="@drawable/storage_icon"
+                        tools:ignore="RtlHardcoded"/>
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
@@ -329,7 +347,8 @@
                         android:drawablePadding="10dp"
                         android:background="@drawable/button_layout"
                         android:elevation="0dp"
-                        android:drawableLeft="@drawable/chat_icon"/>
+                        android:drawableLeft="@drawable/chat_icon"
+                        tools:ignore="RtlHardcoded"/>
 
                     <Button
                         android:layout_width="match_parent"
@@ -340,7 +359,8 @@
                         android:drawablePadding="10dp"
                         android:background="@drawable/button_layout"
                         android:elevation="0dp"
-                        android:drawableLeft="@drawable/folder_icon"/>
+                        android:drawableLeft="@drawable/folder_icon"
+                        tools:ignore="RtlHardcoded"/>
 
                     <Button
                         android:layout_width="match_parent"
@@ -351,7 +371,8 @@
                         android:drawablePadding="10dp"
                         android:background="@drawable/button_layout"
                         android:elevation="0dp"
-                        android:drawableLeft="@drawable/devices_icon"/>
+                        android:drawableLeft="@drawable/devices_icon"
+                        tools:ignore="RtlHardcoded"/>
 
                     <Button
                         android:layout_width="match_parent"
@@ -362,7 +383,8 @@
                         android:drawablePadding="10dp"
                         android:background="@drawable/button_layout"
                         android:elevation="0dp"
-                        android:drawableLeft="@drawable/languages_icon"/>
+                        android:drawableLeft="@drawable/languages_icon"
+                        tools:ignore="RtlHardcoded"/>
 
                 </LinearLayout>
             </androidx.cardview.widget.CardView>
@@ -389,7 +411,7 @@
                         android:layout_marginTop="10dp"
                         android:fontFamily="@font/aclonica"
                         android:paddingHorizontal="15dp"
-                        android:text="Help"
+                        android:text="@string/help"
                         android:textColor="@color/teal_700" />
 
                     <Button
@@ -401,7 +423,8 @@
                         android:drawablePadding="10dp"
                         android:background="@drawable/button_layout"
                         android:elevation="0dp"
-                        android:drawableLeft="@drawable/question_icon"/>
+                        android:drawableLeft="@drawable/question_icon"
+                        tools:ignore="RtlHardcoded"/>
 
                     <Button
                         android:layout_width="match_parent"
@@ -412,18 +435,20 @@
                         android:drawablePadding="10dp"
                         android:background="@drawable/button_layout"
                         android:elevation="0dp"
-                        android:drawableLeft="@drawable/faq_icon"/>
+                        android:drawableLeft="@drawable/faq_icon"
+                        tools:ignore="RtlHardcoded"/>
 
                     <Button
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/privacy_and_security"
+                        android:text="@string/privacy_policy"
                         android:textAlignment="textStart"
                         android:textAllCaps="false"
                         android:drawablePadding="10dp"
                         android:background="@drawable/button_layout"
                         android:elevation="0dp"
-                        android:drawableLeft="@drawable/shield_icon"/>
+                        android:drawableLeft="@drawable/shield_icon"
+                        tools:ignore="RtlHardcoded"/>
 
 
                 </LinearLayout>
@@ -434,7 +459,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:paddingVertical="10dp"
-                android:text="Talks for Android v1.0.0 (1122)" />
+                android:text="@string/app_version" />
 
         </LinearLayout>
 

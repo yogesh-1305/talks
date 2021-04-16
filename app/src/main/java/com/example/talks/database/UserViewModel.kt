@@ -40,6 +40,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateUserName(userName: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateUserName(userName)
+        }
+    }
+
     fun addChatListItem(chatListItem: ChatListItem) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addChatListItem(chatListItem)

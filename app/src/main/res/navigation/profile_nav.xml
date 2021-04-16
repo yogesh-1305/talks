@@ -11,11 +11,23 @@
         tools:layout="@layout/fragment_profile" >
         <action
             android:id="@+id/action_profileFragment2_to_profileEditFragment"
-            app:destination="@id/profileEditFragment" />
+            app:destination="@id/profileEditFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
     </fragment>
     <fragment
         android:id="@+id/profileEditFragment"
-        android:name="com.example.talks.ProfileEditFragment"
+        android:name="com.example.talks.home.profileScreen.editingScreen.ProfileEditFragment"
         android:label="fragment_profile_edit"
-        tools:layout="@layout/fragment_profile_edit" />
+        tools:layout="@layout/fragment_profile_edit" >
+        <argument
+            android:name="EditType"
+            app:argType="integer"
+            android:defaultValue="0" />
+        <argument
+            android:name="dataString"
+            app:argType="string" />
+    </fragment>
 </navigation>
