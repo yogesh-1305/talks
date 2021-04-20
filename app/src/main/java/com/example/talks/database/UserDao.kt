@@ -2,7 +2,6 @@ package com.example.talks.database
 
 import androidx.lifecycle.LiveData
 import androidx.room.*
-import java.sql.Blob
 
 @Dao
 interface UserDao {
@@ -31,6 +30,9 @@ interface UserDao {
 
     @Query("UPDATE user_data SET userName = :userName")
     suspend fun updateUserName(userName : String)
+
+    @Query("UPDATE user_data SET profileImage = :userImage")
+    suspend fun updateUserImage(userImage : String)
 
     // Update
 

@@ -1,10 +1,7 @@
 package com.example.talks.chat
 
 import android.annotation.SuppressLint
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Base64
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -12,7 +9,7 @@ import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.example.talks.ContactHelper
+import com.example.talks.Helper
 import com.example.talks.R
 import com.example.talks.database.UserViewModel
 import com.example.talks.databinding.ActivityChatBinding
@@ -43,7 +40,7 @@ class ChatActivity : AppCompatActivity() {
 
         databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
         viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
-        val contact = ContactHelper.getContact()
+        val contact = Helper.getContact()
         chatUserName.isSelected = true
 
         if (contact != null) {

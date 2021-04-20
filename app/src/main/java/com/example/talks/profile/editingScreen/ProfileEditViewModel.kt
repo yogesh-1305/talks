@@ -1,11 +1,10 @@
-package com.example.talks.home.profileScreen.editingScreen
+package com.example.talks.profile.editingScreen
 
 import android.util.Log
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talks.database.UserDatabase
 import com.example.talks.database.UserViewModel
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -16,7 +15,12 @@ class ProfileEditViewModel : ViewModel() {
 
     private var fireStore: FirebaseFirestore = Firebase.firestore
 
+    val isUserUpdated: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
     fun setUsername(name: String, uid: String, userDatabase: UserViewModel) {
+        isUserUpdated.value = false
         viewModelScope.launch(Dispatchers.IO) {
             fireStore.collection("user_database")
                 .document(uid).update("userName", name)
@@ -24,6 +28,7 @@ class ProfileEditViewModel : ViewModel() {
                     if (it.isSuccessful) {
                         Log.i("name===", "updated")
                         userDatabase.updateUserName(name)
+                        isUserUpdated.value = true
                     }
                 }
         }

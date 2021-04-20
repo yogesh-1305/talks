@@ -1,9 +1,9 @@
 package com.example.talks
 
-import android.graphics.Bitmap
+import android.net.Uri
 import com.example.talks.database.TalksContact
 
-class ContactHelper {
+class Helper {
     companion object {
         private var contact: TalksContact? = null
 
@@ -13,6 +13,16 @@ class ContactHelper {
 
         fun setContact(contact: TalksContact?){
             this.contact = contact
+        }
+
+        private var image: Uri? = null
+
+        fun imageFromGallery(image: Uri?){
+            this.image = image
+        }
+
+        fun getImage() : Uri?{
+            return this.image
         }
     }
 

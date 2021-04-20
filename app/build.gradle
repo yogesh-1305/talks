@@ -110,4 +110,6 @@ dependencies {
     //imageViewer
     implementation 'com.github.stfalcon:stfalcon-imageviewer:1.0.1'
     implementation 'com.r0adkll:slidableactivity:2.1.0'
+    //image compressor
+    implementation 'id.zelory:compressor:3.0.1'
 }

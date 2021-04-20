@@ -1,14 +1,9 @@
-package com.example.talks.home.profileScreen
+package com.example.talks.profile
 
 import android.os.Bundle
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.FragmentActivity
-import com.example.talks.R
 import com.example.talks.databinding.ActivityProfileSettingsBinding
-import com.r0adkll.slidr.Slidr
-import com.r0adkll.slidr.model.SlidrConfig
 import com.r0adkll.slidr.model.SlidrInterface
-import com.r0adkll.slidr.model.SlidrPosition
 
 
 class ProfileSettingsActivity : FragmentActivity() {
@@ -19,6 +14,6 @@ class ProfileSettingsActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityProfileSettingsBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        Slidr.attach(this)
     }
+
 }

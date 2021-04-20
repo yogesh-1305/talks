@@ -24,6 +24,10 @@ class UserRepository(private val userDao: UserDao) {
         userDao.updateUserName(userName)
     }
 
+    suspend fun updateUserImage(userImage : String){
+        userDao.updateUserImage(userImage)
+    }
+
     suspend fun addChatListItem(chatListItem: ChatListItem){
         userDao.addChatListItem(chatListItem)
     }

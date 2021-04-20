@@ -18,8 +18,19 @@
     </string>
     <string name="attachment_summary_off">Only download attachments when manually requested</string>
 
+
+
+    <!--    first fragment-->
+    <string name="enterPhoneNumber">Enter your phone number</string>
+    <string name="verificationInfoText">Talks will send an SMS message to verify your phone number</string>
+    <string name="editTextHint">phone number</string>
+    <string name="careerChargesText">career SMS charges may apply</string>
+    <string name="proceedForVerificationButtonText">Verify</string>
+
+
     <!-- edit profile fragment -->
     <string name="edit_profile">Edit Profile</string>
+    <string name="changeDP">Change Photo</string>
     <string name="dark_mode">Dark Mode</string>
     <string name="tap_to_change_phone">Tap to change phone number</string>
     <string name="tap_to_change_username">Tap to change username</string>

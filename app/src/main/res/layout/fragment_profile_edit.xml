@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".home.profileScreen.editingScreen.ProfileEditFragment">
+    tools:context=".profile.editingScreen.ProfileEditFragment">
 
 
     <androidx.appcompat.widget.Toolbar
@@ -23,13 +23,15 @@
         app:navigationIcon="@drawable/ic_baseline_arrow_back_24" />
 
     <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/textInputLayoutInProfileEdit"
+        android:id="@+id/firstFragPhoneImputLayout"
         style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginEnd="8dp"
+        android:focusable="auto"
+        android:focusedByDefault="true"
         android:hapticFeedbackEnabled="true"
         android:hint="edit username"
         app:boxStrokeColor="@color/teal_700"
@@ -50,6 +52,10 @@
             android:id="@+id/textInputEditText"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:cursorVisible="true" />
+            android:contextClickable="true"
+            android:cursorVisible="true"
+            android:defaultFocusHighlightEnabled="true"
+            android:focusedByDefault="true"
+            android:textIsSelectable="true" />
     </com.google.android.material.textfield.TextInputLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

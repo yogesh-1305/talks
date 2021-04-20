@@ -18,6 +18,11 @@ import com.example.talks.home.activity.HomeScreenActivity
 import com.example.talks.signup.thirdFragment.ThirdFragment
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import com.karumi.dexter.Dexter
+import com.karumi.dexter.MultiplePermissionsReport
+import com.karumi.dexter.PermissionToken
+import com.karumi.dexter.listener.PermissionRequest
+import com.karumi.dexter.listener.multi.MultiplePermissionsListener
 import com.theartofdev.edmodo.cropper.CropImage
 
 class MainActivity : AppCompatActivity() {
@@ -38,13 +43,35 @@ class MainActivity : AppCompatActivity() {
         FirebaseApp.initializeApp(this)
         val auth = FirebaseAuth.getInstance()
 
+        /* If user is already logged in -> navigate to home screen
+        * else ask fro permissions and start signup process*/
         if (isCurrentUserLoggedIn(auth)) {
             navigateToHomeScreenActivity()
         } else {
-            if (isContactPermissionGranted()) {
-                readContacts()
-                viewModel.getUsersFromServer(contactPhoneNumberList)
-            }
+            Dexter.withContext(this)
+                .withPermissions(
+                    Manifest.permission.READ_CONTACTS,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ).withListener(object : MultiplePermissionsListener {
+                    override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
+                        if (p0 != null) {
+                            if (p0.areAllPermissionsGranted()) {
+                                readContacts()
+                                viewModel.getUsersFromServer(contactPhoneNumberList)
+                            } else {
+                                readContacts()
+                                viewModel.getUsersFromServer(contactPhoneNumberList)
+                            }
+                        }
+                    }
+
+                    override fun onPermissionRationaleShouldBeShown(
+                        p0: MutableList<PermissionRequest>?,
+                        p1: PermissionToken?
+                    ) {
+                        p1?.continuePermissionRequest()
+                    }
+                }).check()
         }
 
         viewModel.users.observe(this, {
@@ -110,17 +137,17 @@ class MainActivity : AppCompatActivity() {
         Log.i("back===", "pressed")
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (data != null) {
-            val result = CropImage.getActivityResult(data)
-            if (result != null) {
-                val imageUri = result.uri
-                ThirdFragment.getImageUriFromMainActivity(imageUri)
-                onResume()
-            }
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, data)
+//        if (data != null) {
+//            val result = CropImage.getActivityResult(data)
+//            if (result != null) {
+//                val imageUri = result.uri
+//                ThirdFragment.getImageUriFromMainActivity(imageUri)
+//                onResume()
+//            }
+//        }
+//    }
 
     override fun onResume() {
         super.onResume()
@@ -160,7 +187,7 @@ class MainActivity : AppCompatActivity() {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 111){
+        if (requestCode == 111) {
             readContacts()
             viewModel.getUsersFromServer(contactPhoneNumberList)
         }

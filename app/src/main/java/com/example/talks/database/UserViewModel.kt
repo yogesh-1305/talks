@@ -46,6 +46,12 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
+    fun updateUserImage(userImage : String){
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateUserImage(userImage)
+        }
+    }
+
     fun addChatListItem(chatListItem: ChatListItem) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addChatListItem(chatListItem)

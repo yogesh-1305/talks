@@ -19,7 +19,7 @@ import com.example.talks.databinding.FragmentGalleryBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import java.util.*
 
-class GalleryFragment() : BottomSheetDialogFragment() {
+class GalleryFragment() : Fragment() {
 
     private lateinit var binding: FragmentGalleryBinding
     private lateinit var imagesList: MutableList<String>

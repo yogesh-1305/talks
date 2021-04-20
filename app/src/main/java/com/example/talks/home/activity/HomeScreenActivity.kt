@@ -26,7 +26,7 @@ import com.example.talks.database.TalksContact
 import com.example.talks.database.UserViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.encryption.Encryption
-import com.example.talks.home.profileScreen.ProfileSettingsActivity
+import com.example.talks.profile.ProfileSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
