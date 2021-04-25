@@ -40,7 +40,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
     // Firebase Initialize
     private lateinit var auth: FirebaseAuth
-    private lateinit var userUid : String
+    private lateinit var userUid: String
 
     // View Binding
     private lateinit var binding: FragmentThirdBinding
@@ -100,14 +100,19 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                     Log.i("TAG==", "IMAGE helper is null  $retrievedImageUrl")
                     binding.progressBar.visibility = View.GONE
 
-                }else{
-                    Glide.with(this).load(Helper.getImage())
-                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                        .into(binding.thirdFragmentUserImage)
-                    Log.i("TAG==", "IMAGE helper $retrievedImageUrl")
-                    binding.progressBar.visibility = View.GONE
-
                 }
+//                else {
+//                    Glide.with(this).load(Helper.getImage())
+//                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+//                        .into(binding.thirdFragmentUserImage)
+//                    Log.i("TAG==", "IMAGE helper $retrievedImageUrl")
+//                    binding.progressBar.visibility = View.GONE
+//
+//                }
+            } else {
+                Glide.with(this).load(R.drawable.ic_baseline_person_color)
+                    .into(binding.thirdFragmentUserImage)
+                binding.progressBar.visibility = View.GONE
             }
         })
 
@@ -173,9 +178,10 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     override fun onResume() {
         super.onResume()
         val image = Helper.getImage()
+        Log.i("TAG==", "IMAGE helper not null  $retrievedImageUrl")
         Glide.with(binding.root).load(image)
-            .placeholder(R.drawable.ic_baseline_person_color)
             .into(binding.thirdFragmentUserImage)
+        binding.progressBar.visibility = View.GONE
     }
 
     private fun getNameFromEditText(): String {
