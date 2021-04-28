@@ -1,16 +1,12 @@
 package com.example.talks.signup.secondFragment
 
-import `in`.aabhasjindal.otptextview.OtpTextView
 import android.app.Activity
-import android.app.AlertDialog
 import android.content.Context
-import android.content.DialogInterface
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talks.utils.WaitingDialog
 import com.google.firebase.FirebaseException
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.PhoneAuthCredential
@@ -33,7 +29,6 @@ class SecondFragmentViewModel : ViewModel() {
     private var countryCode = ""
     private lateinit var auth: FirebaseAuth
     private lateinit var context: Context
-    private lateinit var dialog: WaitingDialog
 
     val isUserLoggedIn: MutableLiveData<Boolean> by lazy {
         MutableLiveData<Boolean>()
@@ -43,14 +38,12 @@ class SecondFragmentViewModel : ViewModel() {
         countryCode: String,
         phoneNumber: String,
         context: Context,
-        auth: FirebaseAuth,
-        dialog: WaitingDialog
+        auth: FirebaseAuth
     ) {
         this.auth = auth
         this.countryCode = countryCode
         this.phoneNumber = phoneNumber
         this.context = context
-        this.dialog = dialog
 
         viewModelScope.launch(Dispatchers.IO) {
             val options = context.let {
@@ -86,7 +79,6 @@ class SecondFragmentViewModel : ViewModel() {
     }
 
     private fun signInWithPhoneAuthCredentials(p0: PhoneAuthCredential) {
-        dialog.startDialog()
         viewModelScope.launch(Dispatchers.IO) {
             auth.signInWithCredential(p0)
                 .addOnCompleteListener {
@@ -97,37 +89,18 @@ class SecondFragmentViewModel : ViewModel() {
                     } else {
                         isUserLoggedIn.value = false
                         Log.i("sign in failed-----", it.toString())
-                        showAlertDialogForIncorrectOtp()
-
                     }
 
                 }
         }
     }
 
-    fun otpAuth(otp: String?, otpTextView: OtpTextView) {
+    fun manualOTPAuth(otp: String?) {
         if (storedVerificationId != "") {
             val credential =
                 PhoneAuthProvider.getCredential(storedVerificationId, otp.toString())
             signInWithPhoneAuthCredentials(credential)
-
-        } else {
-            if (smsCode.value != otp) {
-                otpTextView.showError()
-                showAlertDialogForIncorrectOtp()
-                otpTextView.otp = ""
-            }
         }
-    }
-
-    private fun showAlertDialogForIncorrectOtp() {
-        val dialog = AlertDialog.Builder(context)
-        dialog.setTitle("OOPS! Incorrect OTP.")
-        dialog.setMessage("Maybe you've mistaken entering the correct OTP. ")
-        dialog.setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
-            dialog.dismiss()
-        }
-        dialog.show()
     }
 
 }

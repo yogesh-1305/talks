@@ -107,7 +107,7 @@ class HomeScreenActivity : AppCompatActivity() {
             NavController.OnDestinationChangedListener { _, destination, _ ->
 
                 if (destination.id == R.id.homeScreenFragment) {
-                    binding.toolbarUsername.text = "Chats"
+                    binding.toolbarUsername.text = "Talks"
                 } else if (destination.id == R.id.contactScreenFragment) {
                     binding.toolbarUsername.text = "Room"
                 }
@@ -122,6 +122,7 @@ class HomeScreenActivity : AppCompatActivity() {
         databaseViewModel.readAllUserData.observe(this, {
             val user1 = it[0]
             val image1 = Encryption().decrypt(user1.profileImage, encryptionKey)
+            Log.i("TAG IMAGE=====", image1.toString())
             Glide.with(this).load(image1).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.toolbarDP)
         })

@@ -19,6 +19,10 @@ class ProfileEditViewModel : ViewModel() {
         MutableLiveData<Boolean>()
     }
 
+    val isBioUpdated: MutableLiveData<Boolean> by lazy {
+        MutableLiveData<Boolean>()
+    }
+
     fun setUsername(name: String, uid: String, userDatabase: UserViewModel) {
         isUserUpdated.value = false
         viewModelScope.launch(Dispatchers.IO) {
@@ -34,8 +38,21 @@ class ProfileEditViewModel : ViewModel() {
         }
     }
 
-    fun setBio(name: String) {
-
+    fun setBio(bio: String, uid: String, userDatabase: UserViewModel) {
+        isBioUpdated.value = false
+        viewModelScope.launch(Dispatchers.IO) {
+            fireStore.collection("user_database")
+                .document(uid).update("userBio", bio)
+                .addOnCompleteListener {
+                    if (it.isSuccessful) {
+                        Log.i("bio===", "updated")
+                        userDatabase.updateUserBio(bio)
+                        isBioUpdated.value = true
+                    } else {
+                        isBioUpdated.value = false
+                    }
+                }
+        }
     }
 
 }

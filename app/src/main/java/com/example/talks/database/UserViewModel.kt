@@ -46,9 +46,15 @@ class UserViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateUserImage(userImage : String){
+    fun updateUserImage(userImage: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateUserImage(userImage)
+        }
+    }
+
+    fun updateUserBio(userBio: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateUserBio(userBio)
         }
     }
 

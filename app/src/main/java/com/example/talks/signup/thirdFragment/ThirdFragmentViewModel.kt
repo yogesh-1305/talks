@@ -68,7 +68,9 @@ class ThirdFragmentViewModel : ViewModel() {
                             0,
                             user.getUserPhoneNumber(),
                             user.getUserName(),
-                            user.getUserProfileImage()
+                            user.getUserProfileImage(),
+                            user.getUserBio(),
+                            "$user.getUid()"
                         )
                         addUserToLocalDatabase(localUser, userViewModel)
 

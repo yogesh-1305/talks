@@ -81,17 +81,18 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
         // Firebase Initialize
         auth = FirebaseAuth.getInstance()
-        userUid = auth.currentUser?.uid.toString()
+        userUid = auth.currentUser.uid
 
+        ////////////////////////////////////////////////////////////////////////////////////
         Log.i("TAG==", "UID  $userUid")
         viewModel.getUserFromDatabase(userUid)
-
         viewModel.existingUserData.observe(viewLifecycleOwner, {
             if (it != null) {
                 retrievedImageUrl =
                     Encryption().decrypt(it.getUserProfileImage(), encryptionKey).toString()
+
                 binding.thirdFragmentNameEditText.setText(it.getUserName())
-                Log.i("TAG==", "IMAGE  $retrievedImageUrl")
+                binding.thirdFragmentBioEditText.setText(it.getUserBio())
 
                 if (Helper.getImage() == null) {
                     Glide.with(this).load(retrievedImageUrl)
@@ -101,14 +102,6 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                     binding.progressBar.visibility = View.GONE
 
                 }
-//                else {
-//                    Glide.with(this).load(Helper.getImage())
-//                        .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-//                        .into(binding.thirdFragmentUserImage)
-//                    Log.i("TAG==", "IMAGE helper $retrievedImageUrl")
-//                    binding.progressBar.visibility = View.GONE
-//
-//                }
             } else {
                 Glide.with(this).load(R.drawable.ic_baseline_person_color)
                     .into(binding.thirdFragmentUserImage)
@@ -116,11 +109,13 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             }
         })
 
+        ////////////////////////////////////////////////////////////////////////////////////
+
         viewModel.readLocalUserData(userViewModel).observe(viewLifecycleOwner, {
             if (it.isNotEmpty()) {
                 Log.i("local user===", it.toString())
                 GlobalScope.launch {
-                    delay(3000L)
+                    delay(1000L)
                     dialog.dismiss()
                     val intent = Intent(context, HomeScreenActivity::class.java)
                     startActivity(intent)
@@ -131,12 +126,15 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             }
         })
 
+        ////////////////////////////////////////////////////////////////////////////////////
+
         binding.thirdFragmentUserImage.setOnClickListener {
             if (isPermissionGranted()) {
-                val intent = Intent(context, GalleryActivity::class.java)
-                activity?.startActivity(intent)
+                navigateToGallery()
             }
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////
 
         binding.button.setOnClickListener {
             if (getNameFromEditText().isNotEmpty()) {
@@ -153,6 +151,8 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             }
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////
+
         viewModel.profileImageUrl.observe(viewLifecycleOwner, {
             if (it != null) {
                 val image = Encryption().encrypt(it, encryptionKey)
@@ -163,12 +163,15 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                     getNameFromEditText(),
                     "$image",
                     true,
-                    this.userUid
+                    userUid,
+                    getBioFromEditText()
                 )
-                viewModel.addUserToFirebaseFireStore(user, this.userUid, userViewModel)
+                viewModel.addUserToFirebaseFireStore(user, userUid, userViewModel)
             }
         }
         )
+
+        ////////////////////////////////////////////////////////////////////////////////////
 
         binding.thirdFragmentNameEditText.setOnEditorActionListener(this)
 
@@ -179,13 +182,18 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         super.onResume()
         val image = Helper.getImage()
         Log.i("TAG==", "IMAGE helper not null  $retrievedImageUrl")
-        Glide.with(binding.root).load(image)
+        Glide.with(binding.root).load(image).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
             .into(binding.thirdFragmentUserImage)
+
         binding.progressBar.visibility = View.GONE
     }
 
     private fun getNameFromEditText(): String {
         return binding.thirdFragmentNameEditText.text.toString()
+    }
+
+    private fun getBioFromEditText(): String {
+        return binding.thirdFragmentBioEditText.text.toString()
     }
 
     private fun startUploadProcess() {
@@ -196,6 +204,19 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             lifecycleScope.launch {
                 viewModel.uploadImageToStorage(image, userUid)
             }
+        } else {
+            val encryptedImage = Encryption().encrypt(retrievedImageUrl, encryptionKey)
+            val user = ServerUser(
+                countryName,
+                countryCode,
+                "$countryCode$phoneNumber",
+                getNameFromEditText(),
+                "$encryptedImage",
+                true,
+                userUid,
+                getBioFromEditText()
+            )
+            viewModel.addUserToFirebaseFireStore(user, userUid, userViewModel)
         }
     }
 
@@ -242,8 +263,13 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         grantResults: IntArray
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-//        if (requestCode == 112 && permissions.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-//            navigateToGallery()
-//        }
+        if (requestCode == 112 && permissions.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
+            navigateToGallery()
+        }
+    }
+
+    private fun navigateToGallery() {
+        val intent = Intent(context, GalleryActivity::class.java)
+        activity?.startActivity(intent)
     }
 }

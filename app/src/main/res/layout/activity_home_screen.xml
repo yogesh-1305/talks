@@ -38,10 +38,10 @@
 
             <de.hdodenhof.circleimageview.CircleImageView
                 android:id="@+id/toolbarDP"
-                android:layout_width="35dp"
-                android:layout_height="35dp"
+                android:layout_width="45dp"
+                android:layout_height="0dp"
                 android:layout_marginStart="8dp"
-                android:elevation="10dp"
+                android:elevation="2dp"
                 android:src="@drawable/ic_baseline_home_24"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"

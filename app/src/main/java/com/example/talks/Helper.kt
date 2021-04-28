@@ -5,25 +5,34 @@ import com.example.talks.database.TalksContact
 
 class Helper {
     companion object {
+
+        ////////////////////////////////////////////////////////////////////////
         private var contact: TalksContact? = null
 
-        fun getContact(): TalksContact?{
+        fun getContact(): TalksContact? {
             return contact
         }
 
-        fun setContact(contact: TalksContact?){
+        fun setContact(contact: TalksContact?) {
             this.contact = contact
         }
 
+        ////////////////////////////////////////////////////////////////////////
         private var image: Uri? = null
 
-        fun imageFromGallery(image: Uri?){
+        fun imageFromGallery(image: Uri?) {
             this.image = image
         }
 
-        fun getImage() : Uri?{
+        fun getImage(): Uri? {
             return this.image
         }
+
+        fun setImageToNull() {
+            image = null
+        }
+
+        ////////////////////////////////////////////////////////////////////////
     }
 
 

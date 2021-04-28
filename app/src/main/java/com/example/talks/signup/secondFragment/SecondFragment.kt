@@ -3,6 +3,8 @@ package com.example.talks.signup.secondFragment
 import `in`.aabhasjindal.otptextview.OTPListener
 import `in`.aabhasjindal.otptextview.OtpTextView
 import android.annotation.SuppressLint
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.os.Bundle
 import android.os.CountDownTimer
 import android.util.Log
@@ -67,7 +69,7 @@ class SecondFragment : Fragment() {
         Log.i("phone number===", phoneNumber)
 
         context?.let {
-            viewModel.sendVerificationCode(countryCode, phoneNumber, it, auth, dialog)
+            viewModel.sendVerificationCode(countryCode, phoneNumber, it, auth)
         }
 
         viewModel.smsCode.observe(viewLifecycleOwner,{
@@ -81,7 +83,7 @@ class SecondFragment : Fragment() {
             }
 
             override fun onOTPComplete(otp: String?) {
-                viewModel.otpAuth(otp, otpTextView)
+                viewModel.manualOTPAuth(otp)
             }
         }
 
@@ -106,6 +108,7 @@ class SecondFragment : Fragment() {
                     .navigate(action)
             } else {
                 dialog.dismiss()
+                showAlertDialogForIncorrectOtp()
             }
         })
 
@@ -127,7 +130,7 @@ class SecondFragment : Fragment() {
                 resendOTPTextView.isClickable = true
                 resendOTPTextView.setOnClickListener {
                     context?.let { it1 ->
-                        viewModel.sendVerificationCode(countryCode, phoneNumber, it1, auth, dialog)
+                        viewModel.sendVerificationCode(countryCode, phoneNumber, it1, auth)
                     }
                     start()
                 }
@@ -135,4 +138,13 @@ class SecondFragment : Fragment() {
         }.start()
     }
 
+    private fun showAlertDialogForIncorrectOtp() {
+        val dialog = AlertDialog.Builder(context)
+        dialog.setTitle("OOPS! Incorrect OTP.")
+        dialog.setMessage("Maybe you've mistaken entering the correct OTP. ")
+        dialog.setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
+            dialog.dismiss()
+        }
+        dialog.show()
+    }
 }

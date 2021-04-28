@@ -3,7 +3,11 @@ package com.example.talks.profile.editingScreen
 import android.app.AlertDialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.view.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
@@ -26,7 +30,7 @@ class ProfileEditFragment : Fragment() {
     private lateinit var inputLayout: TextInputLayout
     private lateinit var inputEditText: TextInputEditText
 
-//    private val args: ProfileEditFragmentArgs by navArgs()
+    private val args: ProfileEditFragmentArgs by navArgs()
 
     private var isUsernameEdited: Boolean = true
 
@@ -42,41 +46,51 @@ class ProfileEditFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(ProfileEditViewModel::class.java)
         toolbar = binding.profileEditToolbar
 
-//        inputLayout = binding.textInputLayoutInProfileEdit
+        inputLayout = binding.textInputLayoutInProfileEdit
         inputEditText = binding.textInputEditText
 
         auth = FirebaseAuth.getInstance()
         uId = auth.currentUser!!.uid
 
-//        if (args.EditType == 1) {
-//
-//            isUsernameEdited = true
-//            toolbar.title = "Edit username"
-//            inputLayout.hint = "Edit username"
-//            inputLayout.counterMaxLength = 15
-//            inputEditText.isSingleLine = true
-//            inputEditText.isSelected = true
-//            inputEditText.setText(args.dataString)
-//
-//        } else {
-//
-//            isUsernameEdited = false
-//            toolbar.title = "Edit bio"
-//            inputLayout.hint = "Edit bio"
-//            inputLayout.counterMaxLength = 50
-//            inputEditText.isSelected = true
-//            inputEditText.setText(args.dataString)
-//
-//        }
+        if (args.editType == 1) {
 
-        viewModel.isUserUpdated.observe(viewLifecycleOwner,{
-            if (it){
-                Navigation.findNavController(binding.root)
-                    .navigate(R.id.action_profileEditFragment_to_profileFragment2)
+            isUsernameEdited = true
+            toolbar.title = "Edit username"
+            inputLayout.hint = "Edit username"
+            inputLayout.counterMaxLength = 15
+            inputEditText.isSingleLine = true
+            inputEditText.isSelected = true
+            inputEditText.setText(args.editString)
+
+        } else {
+
+            isUsernameEdited = false
+            toolbar.title = "Edit bio"
+            inputLayout.hint = "Edit bio"
+            inputLayout.counterMaxLength = 50
+            inputEditText.isSelected = true
+            inputEditText.setText(args.editString)
+
+        }
+
+        viewModel.isUserUpdated.observe(viewLifecycleOwner, {
+            if (it) {
+                navigateToProfileFragment()
+            }
+        })
+
+        viewModel.isBioUpdated.observe(viewLifecycleOwner, {
+            if (it) {
+                navigateToProfileFragment()
             }
         })
 
         return binding.root
+    }
+
+    private fun navigateToProfileFragment() {
+        Navigation.findNavController(binding.root)
+            .navigate(R.id.action_profileEditFragment_to_profileFragment2)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -89,16 +103,23 @@ class ProfileEditFragment : Fragment() {
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.confirm_button -> {
-                    if (isUsernameEdited && inputEditText.text.toString().isNotBlank()) {
-                        if (NetworkManager().isDataConnected(context)) {
+                    if (NetworkManager().isDataConnected(context)) {
+
+                        binding.editProfileProgressBar.visibility = View.VISIBLE
+                        binding.textInputLayoutInProfileEdit.isEnabled = false
+
+                        if (isUsernameEdited && inputEditText.text.toString().trim().isNotBlank()) {
                             viewModel.setUsername(
                                 inputEditText.text.toString(),
                                 uId,
                                 databaseViewModel
                             )
-                        } else {
-                            showErrorDialog("Operation require internet connection!")
+                        } else if (!isUsernameEdited) {
+                            Toast.makeText(context, "bio tapped", Toast.LENGTH_SHORT).show()
+                            viewModel.setBio(inputEditText.text.toString(), uId, databaseViewModel)
                         }
+                    } else {
+                        "Please Check your Internet connection!".showErrorDialog()
                     }
                 }
             }
@@ -107,24 +128,24 @@ class ProfileEditFragment : Fragment() {
         toolbar.inflateMenu(R.menu.edit_profile_menu)
 
 
-//        binding.textInputEditText.addTextChangedListener {
-//            if (isUsernameEdited) {
-//                if (it.isNullOrEmpty()) {
-//                    inputLayout.helperText = "username cannot be empty*"
-//                } else {
-//                    inputLayout.helperText = null
-//                }
-//            }
-//        }
+        binding.textInputEditText.addTextChangedListener {
+            if (isUsernameEdited) {
+                if (it.isNullOrEmpty()) {
+                    inputLayout.helperText = "**username cannot be empty"
+                } else {
+                    inputLayout.helperText = null
+                }
+            }
+        }
     }
 
 
-    private fun showErrorDialog(message: String) {
-        val dialog = AlertDialog.Builder(activity)
-        dialog.setTitle(message)
-        dialog.setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
+    private fun String.showErrorDialog() {
+        val alertDialog = AlertDialog.Builder(activity)
+        alertDialog.setTitle(this)
+        alertDialog.setPositiveButton("OK") { dialog: DialogInterface, _: Int ->
             dialog.dismiss()
         }
-        dialog.show()
+        alertDialog.show()
     }
 }

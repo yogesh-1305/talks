@@ -6,6 +6,19 @@
     android:layout_height="match_parent"
     app:layoutDescription="@xml/fragment_profile_scene">
 
+    <ProgressBar
+        android:id="@+id/profileFragmentProgressBar"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:elevation="5dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="@+id/topCardView"
+        app:layout_constraintEnd_toEndOf="@+id/topCardView"
+        app:layout_constraintStart_toStartOf="@+id/topCardView"
+        app:layout_constraintTop_toTopOf="@+id/topCardView"
+        tools:visibility="visible" />
+
     <androidx.cardview.widget.CardView
         android:id="@+id/topCardView"
         android:layout_width="match_parent"

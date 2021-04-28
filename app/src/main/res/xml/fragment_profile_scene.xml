@@ -21,15 +21,16 @@
     </Transition>
 
     <ConstraintSet android:id="@+id/start">
-<!--        <Constraint-->
-<!--            android:layout_width="0dp"-->
-<!--            android:id="@+id/circleImageView2" />-->
-<!--        <Constraint-->
-<!--            motion:layout_constraintTop_toTopOf="parent"-->
-<!--            android:id="@+id/circleImageView3" />-->
-<!--        <Constraint-->
-<!--            motion:layout_constraintTop_toTopOf="parent"-->
-<!--            android:id="@+id/appBarLayout3" />-->
+        <Constraint
+            android:id="@+id/profileFragmentProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="5dp"
+            android:visibility="invisible"
+            motion:layout_constraintBottom_toBottomOf="@+id/topCardView"
+            motion:layout_constraintEnd_toEndOf="parent"
+            motion:layout_constraintStart_toStartOf="parent"
+            motion:layout_constraintTop_toTopOf="@+id/topCardView" />
     </ConstraintSet>
 
     <ConstraintSet android:id="@+id/end">
@@ -76,5 +77,16 @@
             motion:layout_constraintStart_toStartOf="parent"
             android:id="@+id/profileScreenBackButton"
             motion:layout_constraintBottom_toBottomOf="@+id/topCardView" />
+        <Constraint
+            android:id="@+id/profileFragmentProgressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:elevation="5dp"
+            android:visibility="invisible"
+            motion:layout_constraintBottom_toBottomOf="@+id/topCardView"
+            motion:layout_constraintEnd_toEndOf="@id/profileScreenImage"
+            motion:layout_constraintStart_toStartOf="@id/profileScreenImage"
+            motion:layout_constraintTop_toTopOf="@+id/topCardView"
+            motion:transitionEasing="linear" />
     </ConstraintSet>
 </MotionScene>

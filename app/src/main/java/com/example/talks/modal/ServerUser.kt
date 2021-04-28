@@ -9,6 +9,7 @@ class ServerUser() {
     private var userProfileImage: String = ""
     private var isActive: Boolean = true
     private var uid: String? = ""
+    private var userBio: String = ""
 
     constructor(
         userCountryName: String,
@@ -17,7 +18,8 @@ class ServerUser() {
         userName: String,
         userProfileImage: String,
         isActive: Boolean,
-        uid: String?
+        uid: String?,
+        userBio: String
     ) : this() {
         this.countryName = userCountryName
         this.userCountryCode = userCountryCode
@@ -26,6 +28,7 @@ class ServerUser() {
         this.userProfileImage = userProfileImage
         this.isActive = isActive
         this.uid = uid
+        this.userBio = userBio
     }
 
     fun getUserName(): String {
@@ -40,14 +43,21 @@ class ServerUser() {
     fun isActive(): Boolean{
         return this.isActive
     }
-    fun getCountryCode(): String{
+
+    fun getCountryCode(): String {
         return this.userCountryCode
     }
-    fun getCountryName(): String{
+
+    fun getCountryName(): String {
         return this.countryName
     }
-    fun getUid(): String?{
+
+    fun getUid(): String? {
         return this.uid
+    }
+
+    fun getUserBio(): String {
+        return this.userBio
     }
 
 }

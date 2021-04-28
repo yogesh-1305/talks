@@ -67,6 +67,46 @@
             android:cursorVisible="true"
             android:defaultFocusHighlightEnabled="true"
             android:focusedByDefault="true"
+            android:imeOptions="actionNext"
+            android:singleLine="true"
+            android:textIsSelectable="true" />
+    </com.google.android.material.textfield.TextInputLayout>
+
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/thirdFragBioInputLayout"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="32dp"
+        android:focusable="auto"
+        android:focusedByDefault="true"
+        android:hapticFeedbackEnabled="true"
+        android:hint="bio (optional)"
+        app:boxStrokeColor="@color/teal_700"
+        app:counterEnabled="true"
+        app:counterMaxLength="50"
+        app:counterTextColor="@color/offWhite"
+        app:endIconCheckable="true"
+        app:endIconMode="clear_text"
+        app:errorEnabled="true"
+        app:helperTextTextColor="#D50000"
+        app:hintTextColor="@color/teal_700"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/thirdFragPhoneInputLayout"
+        app:startIconDrawable="@drawable/chat_icon">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/third_fragment_bio_editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:contextClickable="true"
+            android:cursorVisible="true"
+            android:defaultFocusHighlightEnabled="true"
+            android:focusedByDefault="true"
             android:imeOptions="actionDone"
             android:singleLine="true"
             android:textIsSelectable="true" />
@@ -81,9 +121,9 @@
         android:layout_marginEnd="32dp"
         android:text="Proceed"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/thirdFragPhoneInputLayout" />
+        app:layout_constraintTop_toBottomOf="@+id/thirdFragBioInputLayout" />
 
     <TextView
         android:id="@+id/textView13"
