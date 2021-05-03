@@ -42,7 +42,7 @@
     </activity>
     <activity
         android:id="@+id/contactListActivity"
-        android:name="com.example.talks.home.contactScreen.ContactListActivity"
+        android:name="com.example.talks.contactScreen.ContactListActivity"
         android:label=""
         tools:layout="@layout/activity_contact_list" />
 </navigation>

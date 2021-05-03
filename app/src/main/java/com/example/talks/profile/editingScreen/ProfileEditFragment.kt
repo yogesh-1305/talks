@@ -13,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.example.talks.R
-import com.example.talks.database.UserViewModel
+import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentProfileEditBinding
 import com.example.talks.networkManager.NetworkManager
 import com.google.android.material.textfield.TextInputEditText
@@ -23,7 +23,7 @@ import com.google.firebase.auth.FirebaseAuth
 class ProfileEditFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileEditBinding
-    private lateinit var databaseViewModel: UserViewModel
+    private lateinit var databaseViewModel: TalksViewModel
     private lateinit var viewModel: ProfileEditViewModel
 
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
@@ -42,7 +42,7 @@ class ProfileEditFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentProfileEditBinding.inflate(inflater, container, false)
-        databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
         viewModel = ViewModelProvider(this).get(ProfileEditViewModel::class.java)
         toolbar = binding.profileEditToolbar
 

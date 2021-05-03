@@ -4,7 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talks.database.UserViewModel
+import com.example.talks.database.TalksViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -52,7 +52,7 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun updateImageToDatabase(image: String?, uid: String?, databaseViewModel: UserViewModel) {
+    fun updateImageToDatabase(image: String?, uid: String?, databaseViewModel: TalksViewModel) {
         fireStore.collection("user_database").document(uid!!).update("userProfileImage", image)
             .addOnCompleteListener {
                 if (it.isSuccessful) {

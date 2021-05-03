@@ -23,12 +23,14 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.Helper
 import com.example.talks.R
-import com.example.talks.database.UserViewModel
+import com.example.talks.calendar.CalendarManager
+import com.example.talks.database.TalksContact
+import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentThirdBinding
 import com.example.talks.encryption.Encryption
+import com.example.talks.fileManager.FileManager
 import com.example.talks.gallery.GalleryActivity
 import com.example.talks.home.activity.HomeScreenActivity
-import com.example.talks.modal.ServerUser
 import com.example.talks.utils.UploadingDialog
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
@@ -46,7 +48,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     private lateinit var binding: FragmentThirdBinding
 
     // View Models
-    private lateinit var userViewModel: UserViewModel
+    private lateinit var talksViewModel: TalksViewModel
     private lateinit var viewModel: ThirdFragmentViewModel
 
     //args
@@ -69,16 +71,23 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentThirdBinding.inflate(inflater, container, false)
+
+        ////////////////////////////////////////////////////////////////////////////////////
         // User viewModel to access the Room Database
-        userViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        talksViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
         viewModel = ViewModelProvider(this).get(ThirdFragmentViewModel::class.java)
+
+        ////////////////////////////////////////////////////////////////////////////////////
         // loading dialogs
         dialog = UploadingDialog(activity as Activity)
+
+        ////////////////////////////////////////////////////////////////////////////////////
         // nav args
         countryName = args.countryName
         countryCode = args.countryCode
         phoneNumber = args.phoneNumber
 
+        ////////////////////////////////////////////////////////////////////////////////////
         // Firebase Initialize
         auth = FirebaseAuth.getInstance()
         userUid = auth.currentUser.uid
@@ -89,10 +98,10 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         viewModel.existingUserData.observe(viewLifecycleOwner, {
             if (it != null) {
                 retrievedImageUrl =
-                    Encryption().decrypt(it.getUserProfileImage(), encryptionKey).toString()
+                    Encryption().decrypt(it.contactImageUrl, encryptionKey).toString()
 
-                binding.thirdFragmentNameEditText.setText(it.getUserName())
-                binding.thirdFragmentBioEditText.setText(it.getUserBio())
+                binding.thirdFragmentNameEditText.setText(it.contactName)
+                binding.thirdFragmentBioEditText.setText(it.contact_bio)
 
                 if (Helper.getImage() == null) {
                     Glide.with(this).load(retrievedImageUrl)
@@ -111,9 +120,16 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
         ////////////////////////////////////////////////////////////////////////////////////
 
-        viewModel.readLocalUserData(userViewModel).observe(viewLifecycleOwner, {
+        viewModel.readLocalUserData(talksViewModel).observe(viewLifecycleOwner, {
             if (it.isNotEmpty()) {
                 Log.i("local user===", it.toString())
+
+                val image = Helper.getImage()
+                val date = CalendarManager.getDate()
+
+                FileManager().createDirectoryInExternalStorage()
+                FileManager().saveProfileImageInExternalStorage(this, image, date)
+
                 GlobalScope.launch {
                     delay(1000L)
                     dialog.dismiss()
@@ -156,17 +172,18 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         viewModel.profileImageUrl.observe(viewLifecycleOwner, {
             if (it != null) {
                 val image = Encryption().encrypt(it, encryptionKey)
-                val user = ServerUser(
-                    countryName,
-                    countryCode,
+                val user = TalksContact(
                     "$countryCode$phoneNumber",
-                    getNameFromEditText(),
-                    "$image",
                     true,
+                    null,
+                    getNameFromEditText(),
+                    image,
+                    null,
                     userUid,
+                    "active",
                     getBioFromEditText()
                 )
-                viewModel.addUserToFirebaseFireStore(user, userUid, userViewModel)
+                viewModel.addUserToFirebaseFireStore(user, userUid, talksViewModel)
             }
         }
         )
@@ -206,17 +223,28 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             }
         } else {
             val encryptedImage = Encryption().encrypt(retrievedImageUrl, encryptionKey)
-            val user = ServerUser(
-                countryName,
-                countryCode,
+            val user = TalksContact(
                 "$countryCode$phoneNumber",
+                true,
+                null,
                 getNameFromEditText(),
                 "$encryptedImage",
-                true,
+                null,
                 userUid,
+                "active",
                 getBioFromEditText()
             )
-            viewModel.addUserToFirebaseFireStore(user, userUid, userViewModel)
+//            val user = ServerUser(
+//                countryName,
+//                countryCode,
+//                "$countryCode$phoneNumber",
+//                getNameFromEditText(),
+//                "$encryptedImage",
+//                true,
+//                userUid,
+//                getBioFromEditText()
+//            )
+            viewModel.addUserToFirebaseFireStore(user, userUid, talksViewModel)
         }
     }
 

@@ -6,9 +6,9 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.talks.database.TalksContact
+import com.example.talks.database.TalksViewModel
 import com.example.talks.database.User
-import com.example.talks.database.UserViewModel
-import com.example.talks.modal.ServerUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -25,8 +25,8 @@ class ThirdFragmentViewModel : ViewModel() {
     private var fireStore: FirebaseFirestore = Firebase.firestore
     private var storageRef = FirebaseStorage.getInstance()
 
-    val existingUserData: MutableLiveData<ServerUser> by lazy {
-        MutableLiveData<ServerUser>()
+    val existingUserData: MutableLiveData<TalksContact> by lazy {
+        MutableLiveData<TalksContact>()
     }
     val profileImageUrl: MutableLiveData<String?> by lazy {
         MutableLiveData<String?>()
@@ -38,7 +38,7 @@ class ThirdFragmentViewModel : ViewModel() {
             val users = databaseName.document("$userUid")
             users.get()
                 .addOnSuccessListener {
-                    val user = it.toObject<ServerUser>()
+                    val user = it.toObject<TalksContact>()
                     if (user != null) {
                         existingUserData.value = user
 
@@ -53,47 +53,44 @@ class ThirdFragmentViewModel : ViewModel() {
     }
 
     fun addUserToFirebaseFireStore(
-        user: ServerUser?,
+        user: TalksContact,
         userUid: String?,
-        userViewModel: UserViewModel
+        talksViewModel: TalksViewModel
     ) {
-        if (user != null) {
-            viewModelScope.launch(Dispatchers.IO) {
-                val databaseName = fireStore.collection("user_database")
-                val users = databaseName.document("$userUid")
-                users.set(user)
-                    .addOnSuccessListener {
-                        Log.i("success login====", "------------")
-                        val localUser = User(
-                            0,
-                            user.getUserPhoneNumber(),
-                            user.getUserName(),
-                            user.getUserProfileImage(),
-                            user.getUserBio(),
-                            "$user.getUid()"
-                        )
-                        addUserToLocalDatabase(localUser, userViewModel)
+        viewModelScope.launch(Dispatchers.IO) {
+            val databaseName = fireStore.collection("user_database")
+            val users = databaseName.document("$userUid")
+            users.set(user)
+                .addOnSuccessListener {
+                    Log.i("success login====", "------------")
+                    val localUser = User(
+                        0,
+                        user.contactNumber,
+                        "${user.contactName}",
+                        user.contactImageUrl,
+                        user.contactImageBitmap,
+                        user.contact_bio,
+                        user.uId
+                    )
+                    addUserToLocalDatabase(localUser, talksViewModel)
 
-                    }.addOnFailureListener {
-                        Log.i("failed login====", it.toString())
-                    }
-            }
-        } else {
-            Log.i("user null===", "$user")
+                }.addOnFailureListener {
+                    Log.i("failed login====", it.toString())
+                }
         }
     }
 
-    private fun addUserToLocalDatabase(user: User, userViewModel: UserViewModel) {
-        Log.i("database-------", user.phoneNumber)
-        userViewModel.addUser(user)
+    private fun addUserToLocalDatabase(user: User, talksViewModel: TalksViewModel) {
+        Log.i("database-------", user.phoneNumber.toString())
+        talksViewModel.addUser(user)
     }
 
-    fun readLocalUserData(userViewModel: UserViewModel): LiveData<List<User>> {
-        return userViewModel.readAllUserData
+    fun readLocalUserData(talksViewModel: TalksViewModel): LiveData<List<User>> {
+        return talksViewModel.readAllUserData
     }
 
     fun uploadImageToStorage(image: Uri?, userId: String) {
-        if (image != null){
+        if (image != null) {
             viewModelScope.launch(Dispatchers.IO) {
                 val reference = storageRef.getReference(userId).child("profile_image")
                 val uploadTask = reference.putFile(image)

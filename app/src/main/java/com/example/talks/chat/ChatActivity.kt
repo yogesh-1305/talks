@@ -11,26 +11,31 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.Helper
 import com.example.talks.R
-import com.example.talks.database.UserViewModel
+import com.example.talks.database.Message
+import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityChatBinding
-import com.example.talks.modal.MessageSchema
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreSettings
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.firestore.ktx.firestoreSettings
+import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_chat.*
 import java.text.SimpleDateFormat
 import java.util.*
 
 class ChatActivity : AppCompatActivity() {
 
-    private lateinit var databaseViewModel: UserViewModel
+    private lateinit var databaseViewModel: TalksViewModel
     private lateinit var viewModel: ChatViewModel
     private lateinit var binding: ActivityChatBinding
 
     private var auth = FirebaseAuth.getInstance()
-    private var uid = auth.currentUser?.uid
+    private var senderID = auth.currentUser?.uid
 
     private var isTextEmpty = true
     private var messageToBeSent = ""
-    private var userUid = ""
+    private var receiverID = ""
 
     @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,17 +43,28 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        val fireStore: FirebaseFirestore = Firebase.firestore
+        var settings = firestoreSettings {
+            isPersistenceEnabled = true
+        }
+        fireStore.firestoreSettings = settings
+        settings = FirebaseFirestoreSettings.Builder()
+            .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
+            .build()
+        fireStore.firestoreSettings = settings
+
+        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
         viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
         val contact = Helper.getContact()
         chatUserName.isSelected = true
 
         if (contact != null) {
-            Glide.with(this).load(contact.imageUrl).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            Glide.with(this).load(contact.contactImageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.circleImageView)
-            binding.chatUserName.text = contact.userName
+            binding.chatUserName.text = contact.contactName
             binding.contactStatus.text = "Active"
-            userUid = contact.uId
+            receiverID = "${contact.uId}"
         }
 
         binding.chatActivityBackButton.setOnClickListener {
@@ -78,12 +94,21 @@ class ChatActivity : AppCompatActivity() {
                     Toast.makeText(this, "mic process", Toast.LENGTH_SHORT).show()
                 }
                 else -> {
-                    Toast.makeText(this, messageToBeSent, Toast.LENGTH_SHORT).show()
                     if (contact != null) {
                         val time = getTime()
                         val date = getDate()
-                        val message = MessageSchema(messageToBeSent, time, date, userUid, false)
-                        viewModel.sendMessage(uid, userUid, message)
+                        val message = Message(
+                            0,
+                            messageToBeSent,
+                            "sent",
+                            false,
+                            time,
+                            date,
+                            "$senderID",
+                            receiverID
+                        )
+                        viewModel.sendMessage(senderID, receiverID, message, fireStore)
+                        Toast.makeText(this, messageToBeSent, Toast.LENGTH_SHORT).show()
                     }
 
                 }

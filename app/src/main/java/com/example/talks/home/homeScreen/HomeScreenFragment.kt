@@ -6,7 +6,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.example.talks.R
-import com.example.talks.database.UserViewModel
+import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentHomeScreenBinding
 import com.google.android.material.snackbar.Snackbar
 
@@ -14,7 +14,7 @@ class HomeScreenFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeScreenBinding
     private var viewModel: HomeScreenViewModel? = null
-    private lateinit var databaseViewModel: UserViewModel
+    private lateinit var databaseViewModel: TalksViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
@@ -28,7 +28,7 @@ class HomeScreenFragment : Fragment() {
         // Inflate the layout for this fragment
         binding = FragmentHomeScreenBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(HomeScreenViewModel::class.java)
-        databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
         binding.contactsButton.setOnClickListener{
             Navigation.findNavController(binding.root).navigate(R.id.action_homeScreenFragment_to_contactListActivity)

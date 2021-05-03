@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talks.database.UserViewModel
+import com.example.talks.database.TalksViewModel
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -23,7 +23,7 @@ class ProfileEditViewModel : ViewModel() {
         MutableLiveData<Boolean>()
     }
 
-    fun setUsername(name: String, uid: String, userDatabase: UserViewModel) {
+    fun setUsername(name: String, uid: String, talksDatabase: TalksViewModel) {
         isUserUpdated.value = false
         viewModelScope.launch(Dispatchers.IO) {
             fireStore.collection("user_database")
@@ -31,14 +31,14 @@ class ProfileEditViewModel : ViewModel() {
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
                         Log.i("name===", "updated")
-                        userDatabase.updateUserName(name)
+                        talksDatabase.updateUserName(name)
                         isUserUpdated.value = true
                     }
                 }
         }
     }
 
-    fun setBio(bio: String, uid: String, userDatabase: UserViewModel) {
+    fun setBio(bio: String, uid: String, talksDatabase: TalksViewModel) {
         isBioUpdated.value = false
         viewModelScope.launch(Dispatchers.IO) {
             fireStore.collection("user_database")
@@ -46,7 +46,7 @@ class ProfileEditViewModel : ViewModel() {
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
                         Log.i("bio===", "updated")
-                        userDatabase.updateUserBio(bio)
+                        talksDatabase.updateUserBio(bio)
                         isBioUpdated.value = true
                     } else {
                         isBioUpdated.value = false

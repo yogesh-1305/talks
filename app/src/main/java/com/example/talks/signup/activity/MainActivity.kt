@@ -12,10 +12,9 @@ import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
 import com.example.talks.R
 import com.example.talks.database.TalksContact
-import com.example.talks.database.UserViewModel
+import com.example.talks.database.TalksViewModel
 import com.example.talks.encryption.Encryption
 import com.example.talks.home.activity.HomeScreenActivity
-import com.example.talks.signup.thirdFragment.ThirdFragment
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.karumi.dexter.Dexter
@@ -23,22 +22,21 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
-import com.theartofdev.edmodo.cropper.CropImage
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainActivityViewModel
-    private lateinit var databaseViewModel: UserViewModel
+    private lateinit var databaseViewModel: TalksViewModel
 
     private var contactPhoneNumberList = ArrayList<String>()
-    private var contactList = HashMap<String, String>()
+    private var contactNameList = HashMap<String, String>()
     private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
-        databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
         FirebaseApp.initializeApp(this)
         val auth = FirebaseAuth.getInstance()
@@ -51,16 +49,15 @@ class MainActivity : AppCompatActivity() {
             Dexter.withContext(this)
                 .withPermissions(
                     Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ).withListener(object : MultiplePermissionsListener {
                     override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
                         if (p0 != null) {
                             if (p0.areAllPermissionsGranted()) {
                                 readContacts()
-                                viewModel.getUsersFromServer(contactPhoneNumberList)
                             } else {
                                 readContacts()
-                                viewModel.getUsersFromServer(contactPhoneNumberList)
                             }
                         }
                     }
@@ -74,6 +71,12 @@ class MainActivity : AppCompatActivity() {
                 }).check()
         }
 
+        databaseViewModel.readContactPhoneNumbers.observe(this, {
+            if (it != null) {
+                viewModel.getUsersFromServer(it, contactNameList, databaseViewModel)
+            }
+        })
+
         viewModel.users.observe(this, {
             val listOfUsers = it
             for (data in listOfUsers) {
@@ -81,13 +84,13 @@ class MainActivity : AppCompatActivity() {
                     listOfUsers.remove(data)
                 } else {
                     val number = data.getUserPhoneNumber()
-                    val name = contactList[data.getUserPhoneNumber()]
+                    val name = contactNameList[data.getUserPhoneNumber()]
                     Log.i("db username===", name.toString())
                     val image = Encryption().decrypt(data.getUserProfileImage(), encryptionKey)
                     val uid = data.getUid()
 
-                    val contact = TalksContact(number, "$name", "$image", "$uid")
-                    databaseViewModel.addContact(contact)
+//                    val contact = TalksContact(number, "$name", "$image", "$uid")
+//                    databaseViewModel.addContact(contact)
                 }
             }
         })
@@ -115,7 +118,12 @@ class MainActivity : AppCompatActivity() {
             phoneNumber = phoneNumber.replace("\\s".toRegex(), "").trim()
             phoneNumber = formatPhoneNumber(phoneNumber)
             contactPhoneNumberList.add(phoneNumber)
-            contactList[phoneNumber] = contactName
+            contactNameList[phoneNumber] = contactName
+            val contact = TalksContact(
+                phoneNumber, null, contactName, null,
+                null, null, null, null, null
+            )
+            databaseViewModel.addContact(contact)
         }
     }
 
@@ -136,18 +144,6 @@ class MainActivity : AppCompatActivity() {
         super.onBackPressed()
         Log.i("back===", "pressed")
     }
-
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, data)
-//        if (data != null) {
-//            val result = CropImage.getActivityResult(data)
-//            if (result != null) {
-//                val imageUri = result.uri
-//                ThirdFragment.getImageUriFromMainActivity(imageUri)
-//                onResume()
-//            }
-//        }
-//    }
 
     override fun onResume() {
         super.onResume()
@@ -189,7 +185,6 @@ class MainActivity : AppCompatActivity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 111) {
             readContacts()
-            viewModel.getUsersFromServer(contactPhoneNumberList)
         }
     }
 }

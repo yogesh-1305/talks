@@ -5,15 +5,15 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import com.example.talks.R
-import com.example.talks.database.UserViewModel
+import com.example.talks.contactScreen.ContactViewModel
+import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentVideoRoomBinding
-import com.example.talks.home.contactScreen.ContactViewModel
 
 class VideoRoomFragment : Fragment() {
 
     private lateinit var binding: FragmentVideoRoomBinding
     private lateinit var viewModel: ContactViewModel
-    private lateinit var databaseViewModel: UserViewModel
+    private lateinit var databaseViewModel: TalksViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,

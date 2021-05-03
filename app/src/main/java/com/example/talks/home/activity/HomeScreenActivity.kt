@@ -5,15 +5,14 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -23,15 +22,21 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.R
 import com.example.talks.database.TalksContact
-import com.example.talks.database.UserViewModel
+import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.encryption.Encryption
+import com.example.talks.fileManager.FileManager
 import com.example.talks.profile.ProfileSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
 
 class HomeScreenActivity : AppCompatActivity() {
 
@@ -43,7 +48,7 @@ class HomeScreenActivity : AppCompatActivity() {
     private lateinit var bottomNavigationView: BottomNavigationView
 
     private lateinit var viewModel: HomeActivityViewModel
-    private lateinit var databaseViewModel: UserViewModel
+    private lateinit var databaseViewModel: TalksViewModel
 
     private lateinit var binding: ActivityHomeScreenBinding
     private lateinit var auth: FirebaseAuth
@@ -52,7 +57,7 @@ class HomeScreenActivity : AppCompatActivity() {
     private var contactList = HashMap<String, String>()
     private var contacts = ArrayList<String>()
 
-
+    private lateinit var messagesDatabase: SQLiteDatabase
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,15 +66,21 @@ class HomeScreenActivity : AppCompatActivity() {
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
+        val fireStore: FirebaseFirestore = Firebase.firestore
+
+        FileManager().createDirectoryInExternalStorage()
+
         FirebaseApp.initializeApp(this)
         auth = FirebaseAuth.getInstance()
 
         viewModel = ViewModelProvider(this).get(HomeActivityViewModel::class.java)
-        databaseViewModel = ViewModelProvider(this).get(UserViewModel::class.java)
+        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
         if (isPermissionGranted()) {
             readContacts()
         }
+
+        viewModel.getChatList(fireStore, auth.currentUser!!.uid)
 
         bottomNavigationView = binding.homeBottomNav
         navController = findNavController(R.id.fragment_home_nav)
@@ -82,24 +93,9 @@ class HomeScreenActivity : AppCompatActivity() {
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
 
-        viewModel.getUsersFromServer(contacts)
-        viewModel.users.observe(this, {
-            val listOfUsers = it
-
-            for (data in listOfUsers) {
-
-                lifecycleScope.launch(Dispatchers.IO) {
-
-                    val number = data.getUserPhoneNumber()
-                    val name = contactList[data.getUserPhoneNumber()]
-                    val image = Encryption().decrypt(data.getUserProfileImage(), encryptionKey)
-                    val uid = data.getUid()
-                    Log.i("server image======", image.toString() + name)
-
-                    val contact = TalksContact(number, "$name", "$image", "$uid")
-                    databaseViewModel.addContact(contact)
-                    databaseViewModel.updateUser(contact)
-                }
+        databaseViewModel.readContactPhoneNumbers.observe(this, {
+            if (it != null) {
+                viewModel.getUsersFromServer(it, contactList, databaseViewModel, encryptionKey)
             }
         })
 
@@ -122,12 +118,13 @@ class HomeScreenActivity : AppCompatActivity() {
         databaseViewModel.readAllUserData.observe(this, {
             val user1 = it[0]
             val image1 = Encryption().decrypt(user1.profileImage, encryptionKey)
-            Log.i("TAG IMAGE=====", image1.toString())
+//            Log.i("TAG IMAGE=====", image1.toString())
+
             Glide.with(this).load(image1).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.toolbarDP)
         })
 
-        binding.toolbarDP.setOnClickListener{
+        binding.toolbarDP.setOnClickListener {
             val intent = Intent(this, ProfileSettingsActivity::class.java)
             startActivity(intent)
         }
@@ -170,6 +167,11 @@ class HomeScreenActivity : AppCompatActivity() {
             phoneNumber = formatPhoneNumber(phoneNumber)
             contacts.add(phoneNumber)
             contactList[phoneNumber] = contactName
+            val contact = TalksContact(
+                phoneNumber, null, contactName, null,
+                null, null, null, null, null
+            )
+            databaseViewModel.addContact(contact)
         }
 
     }
@@ -203,5 +205,12 @@ class HomeScreenActivity : AppCompatActivity() {
         } else {
             true
         }
+    }
+
+    @SuppressLint("SimpleDateFormat")
+    private fun getDate(): String {
+        val today = Date()
+        val format = SimpleDateFormat("ddmmyyyy")
+        return format.format(today)
     }
 }

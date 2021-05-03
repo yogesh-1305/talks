@@ -3,62 +3,76 @@ package com.example.talks.chat
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talks.modal.MessageSchema
+import com.example.talks.database.Message
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.firestoreSettings
-import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class ChatViewModel : ViewModel() {
-    private val fireStore: FirebaseFirestore = Firebase.firestore
 
-    fun sendMessage(currentUserUid: String?, uId: String, message: MessageSchema) {
+    fun sendMessage(
+        senderID: String?,
+        receiverID: String,
+        message: Message,
+        fireStore: FirebaseFirestore
+    ) {
+
         viewModelScope.launch(Dispatchers.IO) {
-            if (currentUserUid != null) {
-                fireStore.collection("chat_database").document(currentUserUid)
-                    .collection(uId).document()
+
+            Log.i("current user check null ===", senderID.toString())
+
+            if (senderID != null) {
+                fireStore.collection("chat_database").document(senderID)
+                    .collection(receiverID).document()
                     .set(message).addOnSuccessListener {
-                        setMessageToReceiverEnd(uId, currentUserUid, message)
+                        setMessageToReceiverEnd(fireStore, receiverID, senderID, message)
+                        Log.i("message check===", message.messageText)
+                        Log.i("current user check===", senderID)
                     }
             }
         }
     }
 
     private fun setMessageToReceiverEnd(
-        receiverId: String,
-        currentUserUid: String,
-        message: MessageSchema
+        fireStore: FirebaseFirestore,
+        receiverID: String,
+        senderID: String,
+        message: Message
     ) {
-        fireStore.collection("chat_database").document(receiverId)
-            .collection(currentUserUid).document().set(message).addOnSuccessListener {
-                setLatestMessage(currentUserUid, receiverId, message)
+        fireStore.collection("chat_database").document(receiverID)
+            .collection(senderID).document().set(message).addOnSuccessListener {
+                setLatestMessage(fireStore, senderID, receiverID, message)
             }
 
     }
 
-    private fun setLatestMessage(currentUserUid: String?, uId: String, message: MessageSchema) {
+    private fun setLatestMessage(
+        fireStore: FirebaseFirestore,
+        senderID: String?,
+        receiverID: String,
+        message: Message
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (currentUserUid != null) {
-                fireStore.collection("chat_database").document(currentUserUid)
-                    .collection(uId).document("latest_message").set(message)
+            if (senderID != null) {
+                fireStore.collection("chat_database").document(senderID)
+                    .collection(receiverID).document("latest_message").set(message)
                     .addOnSuccessListener {
-                        setLatestMessageToReceiverEnd(currentUserUid, uId, message)
+                        setLatestMessageToReceiverEnd(fireStore, senderID, receiverID, message)
                     }
             }
         }
     }
 
     private fun setLatestMessageToReceiverEnd(
-        currentUserUid: String?,
-        uId: String,
-        message: MessageSchema
+        fireStore: FirebaseFirestore,
+        senderID: String?,
+        receiverID: String,
+        message: Message
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (currentUserUid != null) {
-                fireStore.collection("chat_database").document(uId)
-                    .collection(currentUserUid).document("latest_message").set(message)
+            if (senderID != null) {
+                fireStore.collection("chat_database").document(receiverID)
+                    .collection(senderID).document("latest_message").set(message)
             }
 
         }
