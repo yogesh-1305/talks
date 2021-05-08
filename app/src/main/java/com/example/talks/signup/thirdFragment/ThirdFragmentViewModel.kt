@@ -9,9 +9,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
 import com.example.talks.database.User
+import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -25,8 +25,8 @@ class ThirdFragmentViewModel : ViewModel() {
     private var fireStore: FirebaseFirestore = Firebase.firestore
     private var storageRef = FirebaseStorage.getInstance()
 
-    val existingUserData: MutableLiveData<TalksContact> by lazy {
-        MutableLiveData<TalksContact>()
+    val existingUserData: MutableLiveData<User> by lazy {
+        MutableLiveData<User>()
     }
     val profileImageUrl: MutableLiveData<String?> by lazy {
         MutableLiveData<String?>()
@@ -34,49 +34,47 @@ class ThirdFragmentViewModel : ViewModel() {
 
     fun getUserFromDatabase(userUid: String?) {
         viewModelScope.launch(Dispatchers.IO) {
-            val databaseName = fireStore.collection("user_database")
-            val users = databaseName.document("$userUid")
-            users.get()
-                .addOnSuccessListener {
-                    val user = it.toObject<TalksContact>()
-                    if (user != null) {
-                        existingUserData.value = user
+            val dbRef = Firebase.database.getReference("talks_database")
+            if (userUid != null) {
+                dbRef.child(userUid).get().addOnSuccessListener {
+                    val userName = it.child("contactUserName").value.toString()
+                    val userImage = it.child("contactImageUrl").value.toString()
+                    val userBio = it.child("contact_bio").value.toString()
 
-                    } else {
-                        existingUserData.value = null
-
-                    }
-                }.addOnFailureListener {
-                    Log.i("failure check===", it.message.toString())
+                    val user = User(
+                        0, "",
+                        userName, userImage, "", userBio, ""
+                    )
+                    existingUserData.value = user
                 }
+            }
         }
     }
 
-    fun addUserToFirebaseFireStore(
+    fun addUserToFirebaseDatabase(
         user: TalksContact,
         userUid: String?,
         talksViewModel: TalksViewModel
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val databaseName = fireStore.collection("user_database")
-            val users = databaseName.document("$userUid")
-            users.set(user)
-                .addOnSuccessListener {
-                    Log.i("success login====", "------------")
+            val dbRef = Firebase.database.getReference("talks_database")
+            if (userUid != null) {
+                dbRef.child(userUid).setValue(user).addOnSuccessListener {
+                    Log.i("user Added to db===", user.contactNumber)
                     val localUser = User(
                         0,
                         user.contactNumber,
-                        "${user.contactName}",
+                        "${user.contactUserName}",
                         user.contactImageUrl,
                         user.contactImageBitmap,
                         user.contact_bio,
                         user.uId
                     )
                     addUserToLocalDatabase(localUser, talksViewModel)
-
                 }.addOnFailureListener {
                     Log.i("failed login====", it.toString())
                 }
+            }
         }
     }
 
@@ -103,16 +101,16 @@ class ThirdFragmentViewModel : ViewModel() {
 
     private fun getDownloadUrl(uploadTask: UploadTask, reference: StorageReference) {
         uploadTask.continueWithTask {
-            if (!it.isSuccessful){
+            if (!it.isSuccessful) {
                 it.exception?.let {
                     throw it
                 }
             }
             reference.downloadUrl
-        }.addOnCompleteListener{
-            if (it.isSuccessful){
+        }.addOnCompleteListener {
+            if (it.isSuccessful) {
                 profileImageUrl.value = it.result.toString()
-            }else{
+            } else {
                 profileImageUrl.value = it.exception?.message.toString()
             }
         }

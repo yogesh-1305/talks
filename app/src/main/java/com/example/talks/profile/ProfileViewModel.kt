@@ -53,7 +53,7 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun updateImageToDatabase(image: String?, uid: String?, databaseViewModel: TalksViewModel) {
-        fireStore.collection("user_database").document(uid!!).update("userProfileImage", image)
+        fireStore.collection("user_database").document(uid!!).update("contactImageUrl", image)
             .addOnCompleteListener {
                 if (it.isSuccessful) {
                     if (image != null) {

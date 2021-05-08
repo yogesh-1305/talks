@@ -9,6 +9,7 @@ import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
 import com.example.talks.encryption.Encryption
 import com.example.talks.modal.ServerUser
+import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.toObject
@@ -36,23 +37,22 @@ class HomeActivityViewModel : ViewModel() {
 
         viewModelScope.launch(Dispatchers.IO) {
 
-            fireStore.collection("user_database").get()
+            Firebase.database.getReference("talks_database").get()
                 .addOnSuccessListener {
                     Log.i("contacts Snapshot====", it.toString())
 
-                    for (document in it) {
+                    for (data in it.children) {
 
-                        val contactNumber = document.getString("contactNumber")
-                        val contactUserName = document.getString("contactUserName")
-                        val contactImageUrl = document.getString("contactImageUrl")
-                        val contactBio = document.getString("contact_bio")
-                        val contactStatus = document.getString("status")
-                        val contactId = document.getString("uid")
-                        val contactImageBitmap = document.getString("contactImageBitmap")
-
-                        Log.i("user List====", databaseContactList.toString())
-                        if (databaseContactList.contains(contactNumber!!)) {
-                            Log.i("contacts====", contactNumber.toString())
+                        val contactNumber = data.child("contactNumber").value.toString()
+                        val contactUserName = data.child("contactUserName").value.toString()
+                        val contactImageUrl = data.child("contactImageUrl").value.toString()
+                        val contactBio = data.child("contact_bio").value.toString()
+                        val contactStatus = data.child("status").value.toString()
+                        val contactId = data.child("uid").value.toString()
+                        val contactImageBitmap = data.child("contactImageBitmap").value.toString()
+//                        Log.i("contact number in homeVM****", data.toString())
+                        if (databaseContactList.contains(contactNumber)) {
+                            Log.i("contacts====", contactNumber)
                             val decryptedImage =
                                 Encryption().decrypt(contactImageUrl, encryptionKey)
                             val user = TalksContact(
@@ -68,9 +68,7 @@ class HomeActivityViewModel : ViewModel() {
                             )
                             databaseViewModel.updateUser(user)
                         }
-
                     }
-
                 }
         }
     }

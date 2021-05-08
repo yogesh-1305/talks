@@ -9,6 +9,7 @@ import com.example.talks.R
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentHomeScreenBinding
 import com.google.android.material.snackbar.Snackbar
+import com.google.firebase.auth.FirebaseAuth
 
 class HomeScreenFragment : Fragment() {
 
@@ -30,8 +31,12 @@ class HomeScreenFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(HomeScreenViewModel::class.java)
         databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
-        binding.contactsButton.setOnClickListener{
-            Navigation.findNavController(binding.root).navigate(R.id.action_homeScreenFragment_to_contactListActivity)
+        val auth = FirebaseAuth.getInstance().currentUser.uid
+        viewModel!!.readChatListFromFireStore(auth, databaseViewModel)
+
+        binding.contactsButton.setOnClickListener {
+            Navigation.findNavController(binding.root)
+                .navigate(R.id.action_homeScreenFragment_to_contactListActivity)
         }
         return binding.root
     }

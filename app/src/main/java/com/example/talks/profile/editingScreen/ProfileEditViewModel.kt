@@ -27,7 +27,7 @@ class ProfileEditViewModel : ViewModel() {
         isUserUpdated.value = false
         viewModelScope.launch(Dispatchers.IO) {
             fireStore.collection("user_database")
-                .document(uid).update("userName", name)
+                .document(uid).update("contactUserName", name)
                 .addOnCompleteListener {
                     if (it.isSuccessful) {
                         Log.i("name===", "updated")

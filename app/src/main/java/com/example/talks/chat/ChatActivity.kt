@@ -2,11 +2,14 @@ package com.example.talks.chat
 
 import android.annotation.SuppressLint
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.Helper
@@ -15,12 +18,8 @@ import com.example.talks.database.Message
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityChatBinding
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.FirebaseFirestoreSettings
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.firestoreSettings
-import com.google.firebase.ktx.Firebase
 import kotlinx.android.synthetic.main.activity_chat.*
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -31,7 +30,7 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatBinding
 
     private var auth = FirebaseAuth.getInstance()
-    private var senderID = auth.currentUser?.uid
+    private var senderID = auth.currentUser?.phoneNumber
 
     private var isTextEmpty = true
     private var messageToBeSent = ""
@@ -43,16 +42,6 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val fireStore: FirebaseFirestore = Firebase.firestore
-        var settings = firestoreSettings {
-            isPersistenceEnabled = true
-        }
-        fireStore.firestoreSettings = settings
-        settings = FirebaseFirestoreSettings.Builder()
-            .setCacheSizeBytes(FirebaseFirestoreSettings.CACHE_SIZE_UNLIMITED)
-            .build()
-        fireStore.firestoreSettings = settings
-
         databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
         viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
         val contact = Helper.getContact()
@@ -63,8 +52,33 @@ class ChatActivity : AppCompatActivity() {
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.circleImageView)
             binding.chatUserName.text = contact.contactName
-            binding.contactStatus.text = "Active"
-            receiverID = "${contact.uId}"
+            binding.contactStatus.text = "active"
+            receiverID = contact.contactNumber
+        }
+
+        viewModel.readMessagesFromServer(senderID, receiverID, databaseViewModel)
+
+        val layoutManager = LinearLayoutManager(this)
+        layoutManager.stackFromEnd = true
+        layoutManager.isSmoothScrollbarEnabled = true
+
+
+        val recyclerView = binding.chatRecyclerView
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = layoutManager
+
+        lifecycleScope.launch {
+            databaseViewModel.readMessages("$receiverID@talks.net")
+                .observe(this@ChatActivity, { list ->
+                    Log.i("messages list check+++", list.toString())
+                    if (list.isNotEmpty()) {
+                        val adapter = ChatAdapter(this@ChatActivity, list)
+                        recyclerView.adapter = adapter
+                    } else {
+                        Toast.makeText(applicationContext, "list is empty", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                })
         }
 
         binding.chatActivityBackButton.setOnClickListener {
@@ -94,20 +108,28 @@ class ChatActivity : AppCompatActivity() {
                     Toast.makeText(this, "mic process", Toast.LENGTH_SHORT).show()
                 }
                 else -> {
+                    binding.messageEditText.text = null
                     if (contact != null) {
                         val time = getTime()
                         val date = getDate()
                         val message = Message(
-                            0,
+                            receiverID,
+                            "",
                             messageToBeSent,
                             "sent",
                             false,
                             time,
                             date,
-                            "$senderID",
-                            receiverID
+                            true
                         )
-                        viewModel.sendMessage(senderID, receiverID, message, fireStore)
+                        viewModel.sendMessage(
+                            senderID,
+                            receiverID,
+                            messageToBeSent,
+                            time,
+                            date,
+                            databaseViewModel
+                        )
                         Toast.makeText(this, messageToBeSent, Toast.LENGTH_SHORT).show()
                     }
 
@@ -119,7 +141,7 @@ class ChatActivity : AppCompatActivity() {
     @SuppressLint("SimpleDateFormat")
     private fun getDate(): String {
         val today = Date()
-        val format = SimpleDateFormat("dd-mm-yyyy")
+        val format = SimpleDateFormat("dd-MM-yyyy")
         return format.format(today)
     }
 

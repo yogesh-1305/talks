@@ -9,6 +9,10 @@ class TalksRepository(private val talksDao: TalksDao) {
     val readChatListItem: LiveData<List<ChatListItem>> = talksDao.readChatList()
     val readContactPhoneNumbers: LiveData<List<String>> = talksDao.readContactPhoneNumbers()
 
+    suspend fun readMessages(chatID: String): LiveData<List<Message>> {
+        return talksDao.readMessages(chatID)
+    }
+
     suspend fun addUser(user: User) {
         talksDao.addUser(user)
     }
@@ -37,8 +41,8 @@ class TalksRepository(private val talksDao: TalksDao) {
         talksDao.updateUserBio(userBio)
     }
 
-    suspend fun addChatListItem(chatListItem: ChatListItem) {
-        talksDao.addChatListItem(chatListItem)
+    suspend fun addChatListItem(item: ChatListItem) {
+        talksDao.addChatListItem(item)
     }
 
     suspend fun updateChatListItem(chatListItem: ChatListItem) {

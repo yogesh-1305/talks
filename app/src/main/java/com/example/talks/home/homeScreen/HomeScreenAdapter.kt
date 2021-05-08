@@ -30,10 +30,11 @@ class HomeScreenAdapter(private val chatList: List<ChatListItem>, val context: C
         val item = chatList[position]
 
         if (context != null) {
-            Glide.with(context).load(item.image).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            Glide.with(context).load(item.contactImageUrl)
+                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(view.chatListImage)
         }
-        view.chatListName.text = item.name
+        view.chatListName.text = item.contactName
     }
 
     override fun getItemCount(): Int {

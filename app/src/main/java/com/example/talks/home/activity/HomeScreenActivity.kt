@@ -9,6 +9,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.Menu
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -56,6 +57,7 @@ class HomeScreenActivity : AppCompatActivity() {
     private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
     private var contactList = HashMap<String, String>()
     private var contacts = ArrayList<String>()
+    private var serverFetchExecuted = false
 
     private lateinit var messagesDatabase: SQLiteDatabase
 
@@ -95,7 +97,11 @@ class HomeScreenActivity : AppCompatActivity() {
 
         databaseViewModel.readContactPhoneNumbers.observe(this, {
             if (it != null) {
-                viewModel.getUsersFromServer(it, contactList, databaseViewModel, encryptionKey)
+                if (!serverFetchExecuted) {
+                    viewModel.getUsersFromServer(it, contactList, databaseViewModel, encryptionKey)
+                    Toast.makeText(this, "loop check2", Toast.LENGTH_SHORT).show()
+                    serverFetchExecuted = true
+                }
             }
         })
 

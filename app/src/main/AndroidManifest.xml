@@ -12,6 +12,7 @@
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
     <application
+        android:name=".TalksApplication"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
@@ -19,6 +20,10 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Talks"
         tools:ignore="AllowBackup">
+        <service
+            android:name=".service.TalksService"
+            android:enabled="true" />
+
         <activity android:name=".gallery.GalleryActivity" />
         <activity
             android:name="com.example.talks.profile.ProfileSettingsActivity"

@@ -98,10 +98,10 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         viewModel.existingUserData.observe(viewLifecycleOwner, {
             if (it != null) {
                 retrievedImageUrl =
-                    Encryption().decrypt(it.contactImageUrl, encryptionKey).toString()
+                    Encryption().decrypt(it.profileImage, encryptionKey).toString()
 
-                binding.thirdFragmentNameEditText.setText(it.contactName)
-                binding.thirdFragmentBioEditText.setText(it.contact_bio)
+                binding.thirdFragmentNameEditText.setText(it.userName)
+                binding.thirdFragmentBioEditText.setText(it.userBio)
 
                 if (Helper.getImage() == null) {
                     Glide.with(this).load(retrievedImageUrl)
@@ -175,15 +175,15 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 val user = TalksContact(
                     "$countryCode$phoneNumber",
                     true,
-                    null,
+                    "null",
                     getNameFromEditText(),
                     image,
-                    null,
+                    "null",
                     userUid,
                     "active",
                     getBioFromEditText()
                 )
-                viewModel.addUserToFirebaseFireStore(user, userUid, talksViewModel)
+                viewModel.addUserToFirebaseDatabase(user, userUid, talksViewModel)
             }
         }
         )
@@ -226,25 +226,15 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             val user = TalksContact(
                 "$countryCode$phoneNumber",
                 true,
-                null,
+                "null",
                 getNameFromEditText(),
                 "$encryptedImage",
-                null,
+                "null",
                 userUid,
                 "active",
                 getBioFromEditText()
             )
-//            val user = ServerUser(
-//                countryName,
-//                countryCode,
-//                "$countryCode$phoneNumber",
-//                getNameFromEditText(),
-//                "$encryptedImage",
-//                true,
-//                userUid,
-//                getBioFromEditText()
-//            )
-            viewModel.addUserToFirebaseFireStore(user, userUid, talksViewModel)
+            viewModel.addUserToFirebaseDatabase(user, userUid, talksViewModel)
         }
     }
 

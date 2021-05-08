@@ -14,7 +14,7 @@ interface TalksDao {
     suspend fun addContact(contact: TalksContact)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun addChatListItem(chatListItem: ChatListItem)
+    suspend fun addChatListItem(item: ChatListItem)
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addMessage(message: Message)
@@ -32,6 +32,9 @@ interface TalksDao {
 
     @Query("SELECT * FROM chat_list ORDER BY timestamp ASC")
     fun readChatList(): LiveData<List<ChatListItem>>
+
+    @Query("SELECT * FROM talks_messages WHERE chatId = :chatID")
+    fun readMessages(chatID: String): LiveData<List<Message>>
 
 
     // Update

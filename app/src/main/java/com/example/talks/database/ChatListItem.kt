@@ -5,12 +5,15 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "chat_list")
 data class ChatListItem (
-    @PrimaryKey(autoGenerate = false)
-    val id: Int,
-    val name: String,
-    val image: String,
-    val latestMessage: String,
-    val isActive: Boolean,
-    val hasUnreadMessages: Boolean,
-    val timestamp: String
+    @PrimaryKey val contactNumber: String,
+    val latestMessage: String?,
+    val unseenMessageCount: Int?,
+    val timestamp: String?,
+    val contactName: String?,
+    val contactUserName: String?,
+    val contactImageUrl: String?,
+    val contactImageBitmap: String?,
+    val uId: String?,
+    val status: String?,
+    val contact_bio: String?
 )

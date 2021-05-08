@@ -24,6 +24,11 @@ class TalksViewModel(application: Application) : AndroidViewModel(application) {
         readContactPhoneNumbers = repository.readContactPhoneNumbers
     }
 
+    suspend fun readMessages(chatID: String): LiveData<List<Message>> {
+        return repository.readMessages(chatID)
+
+    }
+
     fun addUser(user: User) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.addUser(user)
@@ -66,9 +71,9 @@ class TalksViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun addChatListItem(chatListItem: ChatListItem) {
+    fun addChatListItem(item: ChatListItem) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.addChatListItem(chatListItem)
+            repository.addChatListItem(item)
         }
     }
 

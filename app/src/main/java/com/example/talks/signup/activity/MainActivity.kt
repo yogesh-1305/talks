@@ -13,7 +13,6 @@ import androidx.lifecycle.ViewModelProvider
 import com.example.talks.R
 import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
-import com.example.talks.encryption.Encryption
 import com.example.talks.home.activity.HomeScreenActivity
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
@@ -31,6 +30,7 @@ class MainActivity : AppCompatActivity() {
     private var contactPhoneNumberList = ArrayList<String>()
     private var contactNameList = HashMap<String, String>()
     private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
+    private var dataFetchedOnce = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -73,28 +73,12 @@ class MainActivity : AppCompatActivity() {
 
         databaseViewModel.readContactPhoneNumbers.observe(this, {
             if (it != null) {
-                viewModel.getUsersFromServer(it, contactNameList, databaseViewModel)
-            }
-        })
-
-        viewModel.users.observe(this, {
-            val listOfUsers = it
-            for (data in listOfUsers) {
-                if (data.getUserPhoneNumber() == auth.currentUser?.phoneNumber) {
-                    listOfUsers.remove(data)
-                } else {
-                    val number = data.getUserPhoneNumber()
-                    val name = contactNameList[data.getUserPhoneNumber()]
-                    Log.i("db username===", name.toString())
-                    val image = Encryption().decrypt(data.getUserProfileImage(), encryptionKey)
-                    val uid = data.getUid()
-
-//                    val contact = TalksContact(number, "$name", "$image", "$uid")
-//                    databaseViewModel.addContact(contact)
+                if (!dataFetchedOnce) {
+                    viewModel.getUsersFromServer(it, contactNameList, databaseViewModel)
+                    dataFetchedOnce = true
                 }
             }
         })
-
 
     }
 
