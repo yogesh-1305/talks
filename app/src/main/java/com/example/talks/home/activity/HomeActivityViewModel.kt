@@ -5,10 +5,15 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talks.database.ChatListItem
+import com.example.talks.database.Message
 import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
 import com.example.talks.encryption.Encryption
+import com.example.talks.modal.DBMessage
 import com.example.talks.modal.ServerUser
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -94,7 +99,52 @@ class HomeActivityViewModel : ViewModel() {
         }
     }
 
-    fun getChatList(fireStore: FirebaseFirestore, currentUserID: String) {
+
+    fun readMessagesFromServer(userId: String?, talksVM: TalksViewModel) {
+        val dbRef = Firebase.database.getReference("talks_database_chats")
+        if (userId != null) {
+            dbRef.child(userId).addChildEventListener(object : ChildEventListener {
+                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                    val message = snapshot.getValue(DBMessage::class.java)
+                    val key = snapshot.key.toString()
+
+                    val chatId = message?.chatId
+                    val messageText = message?.messageText
+                    val messageStatus = message?.messageStatus
+                    val needsPush = message?.needsPush
+                    val sendTime = message?.sendTime
+                    val sendDate = message?.sendDate
+                    val sentByMe = message?.sentByMe
+
+                    val localMessage = Message(
+                        chatId.toString(), key, messageText.toString(),
+                        messageStatus.toString(),
+                        needsPush, sendTime.toString(),
+                        sendDate.toString(), sentByMe
+                    )
+
+                    talksVM.addMessage(localMessage)
+//                    talksVM.updateLastMessageInChatChannel(chatId.toString())
+
+                }
+
+                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onChildRemoved(snapshot: DataSnapshot) {
+                }
+
+                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                    TODO("Not yet implemented")
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    TODO("Not yet implemented")
+                }
+
+            })
+        }
     }
 
 

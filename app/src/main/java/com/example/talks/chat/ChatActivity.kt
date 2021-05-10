@@ -56,7 +56,7 @@ class ChatActivity : AppCompatActivity() {
             receiverID = contact.contactNumber
         }
 
-        viewModel.readMessagesFromServer(senderID, receiverID, databaseViewModel)
+//        viewModel.readMessagesFromServer(senderID, receiverID, databaseViewModel)
 
         val layoutManager = LinearLayoutManager(this)
         layoutManager.stackFromEnd = true
@@ -68,7 +68,7 @@ class ChatActivity : AppCompatActivity() {
         recyclerView.layoutManager = layoutManager
 
         lifecycleScope.launch {
-            databaseViewModel.readMessages("$receiverID@talks.net")
+            databaseViewModel.readMessages(receiverID)
                 .observe(this@ChatActivity, { list ->
                     Log.i("messages list check+++", list.toString())
                     if (list.isNotEmpty()) {

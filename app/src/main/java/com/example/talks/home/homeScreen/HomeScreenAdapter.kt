@@ -3,6 +3,7 @@ package com.example.talks.home.homeScreen
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
@@ -35,6 +36,12 @@ class HomeScreenAdapter(private val chatList: List<ChatListItem>, val context: C
                 .into(view.chatListImage)
         }
         view.chatListName.text = item.contactName
+        view.chatListLatestMessage.text = item.latestMessage
+
+        view.chatListItemLayout.setOnClickListener {
+            Toast.makeText(context, item.contactNumber, Toast.LENGTH_SHORT).show()
+        }
+
     }
 
     override fun getItemCount(): Int {

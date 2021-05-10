@@ -5,6 +5,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.talks.R
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentHomeScreenBinding
@@ -32,7 +33,17 @@ class HomeScreenFragment : Fragment() {
         databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
         val auth = FirebaseAuth.getInstance().currentUser.uid
-        viewModel!!.readChatListFromFireStore(auth, databaseViewModel)
+
+        val recyclerView = binding.homeScreenRecyclerView
+        recyclerView.setHasFixedSize(true)
+        recyclerView.layoutManager = LinearLayoutManager(context)
+
+        databaseViewModel.readChatListItem.observe(viewLifecycleOwner, {
+            if (it.isNotEmpty()) {
+                val adapter = HomeScreenAdapter(it, context)
+                recyclerView.adapter = adapter
+            }
+        })
 
         binding.contactsButton.setOnClickListener {
             Navigation.findNavController(binding.root)

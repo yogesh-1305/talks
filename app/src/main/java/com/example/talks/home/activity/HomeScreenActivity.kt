@@ -5,9 +5,9 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
-import android.database.sqlite.SQLiteDatabase
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -31,9 +31,6 @@ import com.example.talks.profile.ProfileSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.ktx.Firebase
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -59,16 +56,12 @@ class HomeScreenActivity : AppCompatActivity() {
     private var contacts = ArrayList<String>()
     private var serverFetchExecuted = false
 
-    private lateinit var messagesDatabase: SQLiteDatabase
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        val fireStore: FirebaseFirestore = Firebase.firestore
 
         FileManager().createDirectoryInExternalStorage()
 
@@ -82,7 +75,21 @@ class HomeScreenActivity : AppCompatActivity() {
             readContacts()
         }
 
-        viewModel.getChatList(fireStore, auth.currentUser!!.uid)
+        viewModel.readMessagesFromServer(auth.currentUser.phoneNumber, databaseViewModel)
+
+        databaseViewModel.getDistinctMessages.observe(this, {
+            for (contactNumber in it) {
+                databaseViewModel.createChatChannel(contactNumber)
+
+
+            }
+        })
+
+        databaseViewModel.lastAddedMessage.observe(this, {
+            val userID = it.chatId
+            Log.i("last message ***", it.messageText.toString())
+            databaseViewModel.updateLastMessageInChatChannel(userID)
+        })
 
         bottomNavigationView = binding.homeBottomNav
         navController = findNavController(R.id.fragment_home_nav)
