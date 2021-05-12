@@ -34,7 +34,6 @@ class ChatViewModel : ViewModel() {
             )
 
             databaseViewModel.addMessage(message)
-//            databaseViewModel.updateLastMessageInChatChannel(senderID.toString())
 
             dbRef.child(senderID.toString()).child(messageKey).setValue(message)
                 .addOnCompleteListener {

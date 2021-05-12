@@ -58,14 +58,15 @@ class ChatActivity : AppCompatActivity() {
 
 //        viewModel.readMessagesFromServer(senderID, receiverID, databaseViewModel)
 
-        val layoutManager = LinearLayoutManager(this)
-        layoutManager.stackFromEnd = true
-        layoutManager.isSmoothScrollbarEnabled = true
+        val layoutManager = LinearLayoutManager(this).apply {
+            stackFromEnd = true
+            isSmoothScrollbarEnabled = true
+        }
 
-
-        val recyclerView = binding.chatRecyclerView
-        recyclerView.setHasFixedSize(true)
-        recyclerView.layoutManager = layoutManager
+        val recyclerView = binding.chatRecyclerView.apply {
+            setHasFixedSize(true)
+            setLayoutManager(layoutManager)
+        }
 
         lifecycleScope.launch {
             databaseViewModel.readMessages(receiverID)

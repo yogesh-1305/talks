@@ -16,6 +16,7 @@ class TalksViewModel(application: Application) : AndroidViewModel(application) {
     var readContactPhoneNumbers: LiveData<List<String>>
     var getDistinctMessages: LiveData<List<String>>
     var lastAddedMessage: LiveData<Message>
+    var chatChannels: LiveData<List<String>>
 
     init {
         val userDao = TalksDatabase.getDatabase(application).talksDao()
@@ -26,6 +27,7 @@ class TalksViewModel(application: Application) : AndroidViewModel(application) {
         readContactPhoneNumbers = repository.readContactPhoneNumbers
         getDistinctMessages = repository.getDistinctMessages
         lastAddedMessage = repository.lastAddedMessage
+        chatChannels = repository.getChatChannels
     }
 
     suspend fun readMessages(chatID: String): LiveData<List<Message>> {
@@ -75,16 +77,26 @@ class TalksViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun createChatChannel(contactNumber: String) {
+    fun createChatChannel(chatListItem: ChatListItem) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.createChatChannel(contactNumber)
+            repository.createChatChannel(chatListItem)
         }
     }
 
-    fun updateLastMessageInChatChannel(userID: String) {
+    fun updateChatChannelUserName(contactNumber: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateLastMessageInChatChannel(userID)
+            repository.updateChatChannelUserName(contactNumber)
         }
     }
 
+    fun updateChatChannel(
+        messageText: String,
+        sortTimestamp: String,
+        messageType: String,
+        contactNumber: String
+    ) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateChatChannel(messageText, sortTimestamp, messageType, contactNumber)
+        }
+    }
 }

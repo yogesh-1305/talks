@@ -10,13 +10,10 @@ class TalksRepository(private val talksDao: TalksDao) {
     val readContactPhoneNumbers: LiveData<List<String>> = talksDao.readContactPhoneNumbers()
     val getDistinctMessages: LiveData<List<String>> = talksDao.getDistinctMessages()
     val lastAddedMessage: LiveData<Message> = talksDao.getLastAddedMessage()
+    val getChatChannels: LiveData<List<String>> = talksDao.getChatChannels()
 
     suspend fun readMessages(chatID: String): LiveData<List<Message>> {
         return talksDao.readMessages(chatID)
-    }
-
-    suspend fun createChatChannel(contactNumber: String) {
-        talksDao.createChatChannel(contactNumber)
     }
 
     suspend fun addUser(user: User) {
@@ -47,7 +44,20 @@ class TalksRepository(private val talksDao: TalksDao) {
         talksDao.updateUserBio(userBio)
     }
 
-    suspend fun updateLastMessageInChatChannel(userID: String) {
-        talksDao.updateLastMessageInChatChannel(userID)
+    suspend fun createChatChannel(chatListItem: ChatListItem) {
+        talksDao.createChatChannel(chatListItem)
+    }
+
+    suspend fun updateChatChannelUserName(contactNumber: String) {
+        talksDao.updateChatChannelUserName(contactNumber)
+    }
+
+    suspend fun updateChatChannel(
+        messageText: String,
+        sortTimestamp: String,
+        messageType: String,
+        contactNumber: String
+    ) {
+        talksDao.updateChatChannel(messageText, sortTimestamp, messageType, contactNumber)
     }
 }

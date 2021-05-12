@@ -16,6 +16,9 @@ interface TalksDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addMessage(message: Message)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun createChatChannel(chatListItem: ChatListItem)
+
 
     // Fetch
     @Query("SELECT * FROM user_data ORDER BY id ASC")
@@ -27,20 +30,20 @@ interface TalksDao {
     @Query("SELECT contactNumber FROM talks_contacts ORDER BY contactName ASC")
     fun readContactPhoneNumbers(): LiveData<List<String>>
 
-    @Query("SELECT * FROM chat_list")
+    @Query("SELECT * FROM chat_list ORDER by sortTimestamp DESC")
     fun readChatList(): LiveData<List<ChatListItem>>
 
     @Query("SELECT * FROM talks_messages WHERE chatId = :chatID")
     fun readMessages(chatID: String): LiveData<List<Message>>
-
-    @Query("INSERT or IGNORE INTO chat_list ('contactNumber','contactName','contactImageUrl') SELECT contactNumber, contactName, contactImageUrl FROM talks_contacts WHERE contactNumber = :contactNumber")
-    fun createChatChannel(contactNumber: String)
 
     @Query("SELECT DISTINCT chatId FROM talks_messages")
     fun getDistinctMessages(): LiveData<List<String>>
 
     @Query("SELECT * from talks_messages ORDER by id DESC LIMIT 1")
     fun getLastAddedMessage(): LiveData<Message>
+
+    @Query("SELECT contactNumber FROM chat_list")
+    fun getChatChannels(): LiveData<List<String>>
 
     // Update
 
@@ -60,6 +63,14 @@ interface TalksDao {
     @Query("UPDATE user_data SET userBio = :userBio")
     suspend fun updateUserBio(userBio: String)
 
-    @Query("UPDATE chat_list SET latestMessage = (SELECT messageText from talks_messages WHERE chatId = :userID ORDER by id DESC LIMIT 1) WHERE contactNumber = :userID")
-    suspend fun updateLastMessageInChatChannel(userID: String)
+    @Query("UPDATE chat_list SET contactName = (SELECT contactName from talks_contacts WHERE contactNumber = :contactNumber) WHERE contactNumber = :contactNumber")
+    suspend fun updateChatChannelUserName(contactNumber: String)
+
+    @Query("UPDATE chat_list SET messageText = :messageText, sortTimeStamp = :sortTimestamp, messageType = :messageType WHERE contactNumber = :contactNumber")
+    suspend fun updateChatChannel(
+        messageText: String,
+        sortTimestamp: String,
+        messageType: String,
+        contactNumber: String
+    )
 }

@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import android.view.Menu
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +21,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.R
+import com.example.talks.database.ChatListItem
 import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
@@ -52,8 +52,9 @@ class HomeScreenActivity : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
 
     private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
-    private var contactList = HashMap<String, String>()
+    var contactList = HashMap<String, String>()
     private var contacts = ArrayList<String>()
+    private var chatChannelPhoneNumbers = ArrayList<String>()
     private var serverFetchExecuted = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,21 +75,37 @@ class HomeScreenActivity : AppCompatActivity() {
         if (isPermissionGranted()) {
             readContacts()
         }
+        for (number in contactList.keys) {
+            databaseViewModel.updateChatChannelUserName(number)
+        }
 
         viewModel.readMessagesFromServer(auth.currentUser.phoneNumber, databaseViewModel)
 
-        databaseViewModel.getDistinctMessages.observe(this, {
-            for (contactNumber in it) {
-                databaseViewModel.createChatChannel(contactNumber)
-
-
-            }
+        databaseViewModel.chatChannels.observe(this, {
+            chatChannelPhoneNumbers = it as ArrayList<String>
         })
 
-        databaseViewModel.lastAddedMessage.observe(this, {
-            val userID = it.chatId
-            Log.i("last message ***", it.messageText.toString())
-            databaseViewModel.updateLastMessageInChatChannel(userID)
+        databaseViewModel.lastAddedMessage.observe(this, { message ->
+            if (message != null) {
+                if (chatChannelPhoneNumbers.contains(message.chatId)) {
+                    // update the existing chat channel with last message and timestamp
+                    databaseViewModel.updateChatChannel(
+                        message.messageText.toString(), message.sendTime.toString(), "text",
+                        message.chatId
+                    )
+                } else {
+                    // create new chat channel
+                    val chatChannel =
+                        ChatListItem(
+                            message.chatId,
+                            contactList[message.chatId],
+                            message.messageText,
+                            "text",
+                            message.sendTime.toString()
+                        )
+                    databaseViewModel.createChatChannel(chatChannel)
+                }
+            }
         })
 
         bottomNavigationView = binding.homeBottomNav

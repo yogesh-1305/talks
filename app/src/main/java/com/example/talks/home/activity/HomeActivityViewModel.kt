@@ -1,6 +1,5 @@
 package com.example.talks.home.activity
 
-import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -44,7 +43,7 @@ class HomeActivityViewModel : ViewModel() {
 
             Firebase.database.getReference("talks_database").get()
                 .addOnSuccessListener {
-                    Log.i("contacts Snapshot====", it.toString())
+//                    Log.i("contacts Snapshot====", it.toString())
 
                     for (data in it.children) {
 
@@ -57,7 +56,7 @@ class HomeActivityViewModel : ViewModel() {
                         val contactImageBitmap = data.child("contactImageBitmap").value.toString()
 //                        Log.i("contact number in homeVM****", data.toString())
                         if (databaseContactList.contains(contactNumber)) {
-                            Log.i("contacts====", contactNumber)
+//                            Log.i("contacts====", contactNumber)
                             val decryptedImage =
                                 Encryption().decrypt(contactImageUrl, encryptionKey)
                             val user = TalksContact(
@@ -76,6 +75,31 @@ class HomeActivityViewModel : ViewModel() {
                     }
                 }
         }
+    }
+
+    fun getUserDataFromServer(phoneNumber: String) {
+        val dbRef = Firebase.database.getReference("talks_database")
+        dbRef.child(phoneNumber).addChildEventListener(object : ChildEventListener {
+            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildRemoved(snapshot: DataSnapshot) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                TODO("Not yet implemented")
+            }
+
+            override fun onCancelled(error: DatabaseError) {
+                TODO("Not yet implemented")
+            }
+        })
     }
 
     fun getCurrentUserData(currentUserId: String?, databaseViewModel: TalksViewModel) {
@@ -124,7 +148,6 @@ class HomeActivityViewModel : ViewModel() {
                     )
 
                     talksVM.addMessage(localMessage)
-//                    talksVM.updateLastMessageInChatChannel(chatId.toString())
 
                 }
 

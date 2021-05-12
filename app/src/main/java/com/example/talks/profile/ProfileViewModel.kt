@@ -5,6 +5,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talks.database.TalksViewModel
+import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -27,7 +28,7 @@ class ProfileViewModel : ViewModel() {
 
     fun updateProfileImageInStorage(image: Uri?, uid: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val reference = storageRef.getReference(uid).child("profile_image")
+            val reference = storageRef.getReference(uid).child("$uid profile_image")
             val uploadTask = reference.putFile(image!!)
             uploadTask.addOnSuccessListener {
                 getDownloadUrl(uploadTask, reference)
@@ -36,9 +37,9 @@ class ProfileViewModel : ViewModel() {
     }
 
     private fun getDownloadUrl(uploadTask: UploadTask, reference: StorageReference) {
-        uploadTask.continueWithTask {
-            if (!it.isSuccessful) {
-                it.exception?.let {
+        uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let {
                     throw it
                 }
             }
@@ -53,15 +54,21 @@ class ProfileViewModel : ViewModel() {
     }
 
     fun updateImageToDatabase(image: String?, uid: String?, databaseViewModel: TalksViewModel) {
-        fireStore.collection("user_database").document(uid!!).update("contactImageUrl", image)
-            .addOnCompleteListener {
-                if (it.isSuccessful) {
-                    if (image != null) {
-                        databaseViewModel.updateUserImage(image)
+        val dbRef = Firebase.database.getReference("talks_database")
+        if (uid != null) {
+            val imageUpdate: MutableMap<String, String> = HashMap()
+            imageUpdate["contactImageUrl"] = image.toString()
+
+            dbRef.child(uid).updateChildren(imageUpdate as Map<String, String>)
+                .addOnCompleteListener {
+                    if (it.isComplete) {
+                        if (image != null) {
+                            databaseViewModel.updateUserImage(image)
+                        }
                         imageUpdatedInLocalDatabase.value = true
                     }
                 }
-            }
+        }
     }
 
 }

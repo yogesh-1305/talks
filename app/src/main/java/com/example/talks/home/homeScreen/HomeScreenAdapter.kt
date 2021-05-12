@@ -7,6 +7,7 @@ import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.talks.R
 import com.example.talks.database.ChatListItem
 import com.example.talks.databinding.ChatListItemBinding
 
@@ -31,12 +32,17 @@ class HomeScreenAdapter(private val chatList: List<ChatListItem>, val context: C
         val item = chatList[position]
 
         if (context != null) {
-            Glide.with(context).load(item.contactImageUrl)
+            Glide.with(context).load(R.drawable.shield_icon)
                 .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(view.chatListImage)
         }
-        view.chatListName.text = item.contactName
-        view.chatListLatestMessage.text = item.latestMessage
+        if (item.contactName.isNullOrEmpty()) {
+            view.chatListName.text = item.contactNumber
+        } else {
+            view.chatListName.text = item.contactName
+        }
+        view.chatListLatestMessage.text = item.messageText
+        view.chatListTimeStamp.text = item.sortTimestamp
 
         view.chatListItemLayout.setOnClickListener {
             Toast.makeText(context, item.contactNumber, Toast.LENGTH_SHORT).show()
