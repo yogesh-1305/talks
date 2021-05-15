@@ -64,7 +64,7 @@ class SecondFragment : Fragment() {
         // Firebase initialization
         context?.let { FirebaseApp.initializeApp(it) }
         auth = FirebaseAuth.getInstance()
-        auth.languageCode = "en"
+//        auth.languageCode = "en"
 
         Log.i("phone number===", phoneNumber)
 

@@ -60,4 +60,8 @@ class TalksRepository(private val talksDao: TalksDao) {
     ) {
         talksDao.updateChatChannel(messageText, sortTimestamp, messageType, contactNumber)
     }
+
+    suspend fun readSingleContact(phoneNumber: String): LiveData<TalksContact> {
+        return talksDao.readSingleContact(phoneNumber)
+    }
 }

@@ -79,7 +79,7 @@ class HomeScreenActivity : AppCompatActivity() {
             databaseViewModel.updateChatChannelUserName(number)
         }
 
-        viewModel.readMessagesFromServer(auth.currentUser.phoneNumber, databaseViewModel)
+        viewModel.readMessagesFromServer(auth.currentUser?.phoneNumber, databaseViewModel)
 
         databaseViewModel.chatChannels.observe(this, {
             chatChannelPhoneNumbers = it as ArrayList<String>
@@ -104,6 +104,7 @@ class HomeScreenActivity : AppCompatActivity() {
                             message.sendTime.toString()
                         )
                     databaseViewModel.createChatChannel(chatChannel)
+                    databaseViewModel.updateChatChannelUserName(message.chatId)
                 }
             }
         })
@@ -114,7 +115,7 @@ class HomeScreenActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.homeScreenFragment,
-                R.id.contactScreenFragment,
+                R.id.videoRoomFragment,
             )
         )
         setupActionBarWithNavController(navController, appBarConfiguration)
@@ -134,7 +135,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
                 if (destination.id == R.id.homeScreenFragment) {
                     binding.toolbarUsername.text = "Talks"
-                } else if (destination.id == R.id.contactScreenFragment) {
+                } else if (destination.id == R.id.videoRoomFragment) {
                     binding.toolbarUsername.text = "Room"
                 }
 

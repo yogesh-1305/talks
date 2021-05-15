@@ -99,4 +99,8 @@ class TalksViewModel(application: Application) : AndroidViewModel(application) {
             repository.updateChatChannel(messageText, sortTimestamp, messageType, contactNumber)
         }
     }
+
+    suspend fun readSingleContact(phoneNumber: String): LiveData<TalksContact> {
+        return repository.readSingleContact(phoneNumber)
+    }
 }

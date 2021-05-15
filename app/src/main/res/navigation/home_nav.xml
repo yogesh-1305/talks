@@ -11,38 +11,32 @@
         tools:layout="@layout/fragment_home_screen" >
         <action
             android:id="@+id/action_homeScreenFragment_to_chatActivity"
-            app:destination="@id/chatActivity" />
+            app:destination="@id/chatActivity"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
+            app:popEnterAnim="@anim/from_left"
+            app:popExitAnim="@anim/to_right" />
         <action
             android:id="@+id/action_homeScreenFragment_to_contactListActivity"
             app:destination="@id/contactListActivity" />
-    </fragment>
-    <fragment
-        android:id="@+id/contactScreenFragment"
-        android:name="com.example.talks.home.videoRoom.VideoRoomFragment"
-        android:label=""
-        tools:layout="@layout/fragment_video_room" >
     </fragment>
     <activity
         android:id="@+id/chatActivity"
         android:name="com.example.talks.chat.ChatActivity"
         android:label="activity_chat"
-        tools:layout="@layout/activity_chat" >
+        tools:layout="@layout/activity_chat">
         <argument
             android:name="phoneNumber"
-            app:argType="string" />
-        <argument
-            android:name="userName"
-            app:argType="string" />
-        <argument
-            android:name="userImage"
-            app:argType="string" />
-        <argument
-            android:name="userID"
             app:argType="string" />
     </activity>
     <activity
         android:id="@+id/contactListActivity"
         android:name="com.example.talks.contactScreen.ContactListActivity"
         android:label=""
-        tools:layout="@layout/activity_contact_list" />
+        tools:layout="@layout/activity_contact_list"></activity>
+    <fragment
+        android:id="@+id/videoRoomFragment"
+        android:name="com.example.talks.videoRoom.VideoRoomFragment"
+        android:label="fragment_video_room"
+        tools:layout="@layout/fragment_video_room" />
 </navigation>

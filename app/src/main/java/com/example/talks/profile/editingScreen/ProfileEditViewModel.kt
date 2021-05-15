@@ -41,7 +41,7 @@ class ProfileEditViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val dbRef = Firebase.database.getReference("talks_database")
             val bioUpdate: MutableMap<String, String> = HashMap()
-            bioUpdate["contactUserName"] = bio
+            bioUpdate["contact_bio"] = bio
 
             dbRef.child(uid).updateChildren(bioUpdate as Map<String, String>)
                 .addOnCompleteListener {

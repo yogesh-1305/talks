@@ -64,11 +64,11 @@ dependencies {
     implementation 'com.google.firebase:firebase-analytics-ktx'
     // Firebase
     implementation 'com.google.firebase:firebase-auth-ktx'
-    implementation 'com.google.firebase:firebase-auth:20.0.4'
-    implementation 'com.google.firebase:firebase-storage:19.2.2'
-    implementation 'com.google.firebase:firebase-firestore:22.1.2'
+    implementation 'com.google.firebase:firebase-auth:21.0.1'
+    implementation 'com.google.firebase:firebase-storage:20.0.0'
+    implementation 'com.google.firebase:firebase-firestore:23.0.0'
     implementation 'com.google.firebase:firebase-firestore-ktx'
-    implementation 'com.google.firebase:firebase-database-ktx:19.7.0'
+    implementation 'com.google.firebase:firebase-database-ktx:20.0.0'
     //OTP Verification
     implementation 'com.github.aabhasr1:OtpView:v1.1.2-ktx'
     implementation 'com.github.aabhasr1:OtpView:v1.1.2'
@@ -115,4 +115,10 @@ dependencies {
     implementation 'com.r0adkll:slidableactivity:2.1.0'
     //image compressor
     implementation 'id.zelory:compressor:3.0.1'
+    //jitsi meet
+    implementation('org.jitsi.react:jitsi-meet-sdk:2.+') { transitive = true }
+    // emoji support
+    implementation 'com.vanniktech:emoji-google:0.6.0'
+
+
 }

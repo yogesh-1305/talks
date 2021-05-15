@@ -6,10 +6,10 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.example.talks.R
 import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
@@ -21,6 +21,7 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
@@ -43,42 +44,46 @@ class MainActivity : AppCompatActivity() {
 
         /* If user is already logged in -> navigate to home screen
         * else ask fro permissions and start signup process*/
-        if (isCurrentUserLoggedIn(auth)) {
-            navigateToHomeScreenActivity()
-        } else {
-            Dexter.withContext(this)
-                .withPermissions(
-                    Manifest.permission.READ_CONTACTS,
-                    Manifest.permission.READ_EXTERNAL_STORAGE,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ).withListener(object : MultiplePermissionsListener {
-                    override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
-                        if (p0 != null) {
-                            if (p0.areAllPermissionsGranted()) {
-                                readContacts()
-                            } else {
-                                readContacts()
+        lifecycleScope.launch {
+            if (isCurrentUserLoggedIn(auth)) {
+                navigateToHomeScreenActivity()
+            } else {
+                Dexter.withContext(applicationContext)
+                    .withPermissions(
+                        Manifest.permission.READ_CONTACTS,
+                        Manifest.permission.READ_EXTERNAL_STORAGE,
+                        Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    ).withListener(object : MultiplePermissionsListener {
+                        override fun onPermissionsChecked(p0: MultiplePermissionsReport?) {
+                            if (p0 != null) {
+                                if (p0.areAllPermissionsGranted()) {
+                                    readContacts()
+                                } else {
+                                    readContacts()
+                                }
                             }
                         }
-                    }
 
-                    override fun onPermissionRationaleShouldBeShown(
-                        p0: MutableList<PermissionRequest>?,
-                        p1: PermissionToken?
-                    ) {
-                        p1?.continuePermissionRequest()
-                    }
-                }).check()
+                        override fun onPermissionRationaleShouldBeShown(
+                            p0: MutableList<PermissionRequest>?,
+                            p1: PermissionToken?
+                        ) {
+                            p1?.continuePermissionRequest()
+                        }
+                    }).check()
+            }
         }
 
-        databaseViewModel.readContactPhoneNumbers.observe(this, {
-            if (it != null) {
-                if (!dataFetchedOnce) {
-                    viewModel.getUsersFromServer(it, contactNameList, databaseViewModel)
-                    dataFetchedOnce = true
+        lifecycleScope.launch {
+            databaseViewModel.readContactPhoneNumbers.observe(this@MainActivity, {
+                if (it != null) {
+                    if (!dataFetchedOnce) {
+                        viewModel.getUsersFromServer(it, contactNameList, databaseViewModel)
+                        dataFetchedOnce = true
+                    }
                 }
-            }
-        })
+            })
+        }
 
     }
 
@@ -93,21 +98,23 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun showContacts(phones: Cursor) {
-        while (phones.moveToNext()) {
-            val contactName =
-                phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
-            var phoneNumber =
-                phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+        lifecycleScope.launch {
+            while (phones.moveToNext()) {
+                val contactName =
+                    phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
+                var phoneNumber =
+                    phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
 
-            phoneNumber = phoneNumber.replace("\\s".toRegex(), "").trim()
-            phoneNumber = formatPhoneNumber(phoneNumber)
-            contactPhoneNumberList.add(phoneNumber)
-            contactNameList[phoneNumber] = contactName
-            val contact = TalksContact(
-                phoneNumber, null, contactName, null,
-                null, null, null, null, null
-            )
-            databaseViewModel.addContact(contact)
+                phoneNumber = phoneNumber.replace("\\s".toRegex(), "").trim()
+                phoneNumber = formatPhoneNumber(phoneNumber)
+                contactPhoneNumberList.add(phoneNumber)
+                contactNameList[phoneNumber] = contactName
+                val contact = TalksContact(
+                    phoneNumber, null, contactName, null,
+                    null, null, null, null, null
+                )
+                databaseViewModel.addContact(contact)
+            }
         }
     }
 
@@ -126,12 +133,10 @@ class MainActivity : AppCompatActivity() {
 
     override fun onBackPressed() {
         super.onBackPressed()
-        Log.i("back===", "pressed")
     }
 
     override fun onResume() {
         super.onResume()
-        Log.i("===", " ")
     }
 
     private fun isCurrentUserLoggedIn(auth: FirebaseAuth): Boolean {
@@ -168,7 +173,9 @@ class MainActivity : AppCompatActivity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 111) {
-            readContacts()
+            lifecycleScope.launch {
+                readContacts()
+            }
         }
     }
 }

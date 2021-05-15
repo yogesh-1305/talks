@@ -10,7 +10,6 @@ import com.example.talks.R
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentHomeScreenBinding
 import com.example.talks.home.activity.HomeScreenActivity
-import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 
 class HomeScreenFragment : Fragment() {
@@ -36,7 +35,7 @@ class HomeScreenFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(HomeScreenViewModel::class.java)
         databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
-        val auth = FirebaseAuth.getInstance().currentUser.uid
+        val auth = FirebaseAuth.getInstance().currentUser?.uid
         val contactMap = HomeScreenActivity().contactList
 
         val recyclerView = binding.homeScreenRecyclerView.apply {
@@ -67,10 +66,6 @@ class HomeScreenFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.home_screen_search_button) {
             view?.let {
-                Snackbar.make(it, "snack bar", Snackbar.LENGTH_INDEFINITE)
-                    .setAction("OK"){
-                        //  Dismiss Snack bar
-                    }.show()
             }
         }
         return super.onOptionsItemSelected(item)

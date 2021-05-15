@@ -7,7 +7,7 @@
     android:background="#00FFFFFF"
     android:padding="2dp">
 
-    <TextView
+    <com.vanniktech.emoji.EmojiTextView
         android:id="@+id/chat_received_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"

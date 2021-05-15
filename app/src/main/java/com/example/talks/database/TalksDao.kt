@@ -24,6 +24,9 @@ interface TalksDao {
     @Query("SELECT * FROM user_data ORDER BY id ASC")
     fun readUserData(): LiveData<List<User>>
 
+    @Query("SELECT * FROM talks_contacts WHERE contactNumber = :phoneNumber")
+    fun readSingleContact(phoneNumber: String): LiveData<TalksContact>
+
     @Query("SELECT * FROM talks_contacts WHERE isTalksUser = '1' ORDER BY contactName ASC")
     fun readContacts(): LiveData<List<TalksContact>>
 
@@ -63,7 +66,7 @@ interface TalksDao {
     @Query("UPDATE user_data SET userBio = :userBio")
     suspend fun updateUserBio(userBio: String)
 
-    @Query("UPDATE chat_list SET contactName = (SELECT contactName from talks_contacts WHERE contactNumber = :contactNumber) WHERE contactNumber = :contactNumber")
+    @Query("UPDATE chat_list SET contactName = (SELECT contactName from talks_contacts WHERE contactNumber = :contactNumber), chatListImageUrl = (SELECT contactImageUrl from talks_contacts WHERE contactNumber = :contactNumber) WHERE contactNumber = :contactNumber")
     suspend fun updateChatChannelUserName(contactNumber: String)
 
     @Query("UPDATE chat_list SET messageText = :messageText, sortTimeStamp = :sortTimestamp, messageType = :messageType WHERE contactNumber = :contactNumber")

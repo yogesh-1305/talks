@@ -90,7 +90,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         ////////////////////////////////////////////////////////////////////////////////////
         // Firebase Initialize
         auth = FirebaseAuth.getInstance()
-        userUid = auth.currentUser.uid
+        userUid = auth.currentUser!!.uid
 
         ////////////////////////////////////////////////////////////////////////////////////
         Log.i("TAG==", "UID  $userUid")

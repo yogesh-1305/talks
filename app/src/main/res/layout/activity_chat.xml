@@ -2,6 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/chatActivityRootView"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".chat.ChatActivity">
@@ -26,7 +29,7 @@
                 android:layout_height="0dp"
                 android:layout_marginTop="5dp"
                 android:layout_marginBottom="5dp"
-                android:src="@drawable/ic_launcher_background"
+                android:src="@drawable/icon_person_with_bg"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toEndOf="@+id/chatActivityBackButton"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -130,7 +133,7 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/imageButton"
+                android:id="@+id/emojiButton"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
@@ -138,29 +141,19 @@
                 android:src="@drawable/emoji_emotions_24px"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.0" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.Dense"
+            <com.vanniktech.emoji.EmojiEditText
+                android:id="@+id/messageEditText"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
-                android:layout_marginBottom="2dp"
-                android:ems="10"
-                android:gravity="start|top"
-                android:hint="Message"
-                android:inputType="textMultiLine"
+                android:hint="send a message..."
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toStartOf="@+id/attachButton"
-                app:layout_constraintStart_toEndOf="@+id/imageButton"
-                app:layout_constraintTop_toTopOf="parent">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/messageEditText"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
-
-
-            </com.google.android.material.textfield.TextInputLayout>
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toEndOf="@+id/emojiButton"
+                app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
                 android:id="@+id/attachButton"

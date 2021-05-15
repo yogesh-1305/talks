@@ -1,4 +1,4 @@
-package com.example.talks.home.videoRoom
+package com.example.talks.videoRoom
 
 import android.os.Bundle
 import android.view.*
@@ -8,6 +8,12 @@ import com.example.talks.R
 import com.example.talks.contactScreen.ContactViewModel
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentVideoRoomBinding
+import org.jitsi.meet.sdk.JitsiMeet
+import org.jitsi.meet.sdk.JitsiMeetActivity
+import org.jitsi.meet.sdk.JitsiMeetConferenceOptions
+import java.net.MalformedURLException
+import java.net.URL
+
 
 class VideoRoomFragment : Fragment() {
 
@@ -21,6 +27,31 @@ class VideoRoomFragment : Fragment() {
     ): View {
         binding = FragmentVideoRoomBinding.inflate(inflater, container, false)
         viewModel = ViewModelProvider(this).get(ContactViewModel::class.java)
+
+        try {
+            val options = JitsiMeetConferenceOptions.Builder()
+                .setServerURL(URL("https://meet.jit.si"))
+                .setAudioMuted(false)
+                .setVideoMuted(false)
+                .setAudioOnly(false)
+                .setWelcomePageEnabled(false)
+                .build()
+            JitsiMeet.setDefaultConferenceOptions(options)
+        } catch (e: MalformedURLException) {
+            e.printStackTrace()
+        }
+
+        binding.button2.setOnClickListener {
+            val options = JitsiMeetConferenceOptions.Builder()
+                .setServerURL(URL("https://meet.jit.si"))
+                .setRoom("room123")
+                .setAudioMuted(false)
+                .setVideoMuted(false)
+                .setAudioOnly(false)
+                .setWelcomePageEnabled(false)
+                .build()
+            JitsiMeetActivity.launch(activity, options)
+        }
 
         return binding.root
     }

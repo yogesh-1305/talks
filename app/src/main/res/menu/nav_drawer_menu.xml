@@ -9,7 +9,7 @@
             android:title="Chats"
             android:icon="@drawable/ic_baseline_home_24"/>
         <item
-            android:id="@+id/contactScreenFragment"
+            android:id="@+id/videoRoomFragment"
             android:title="Room"
             android:icon="@drawable/video_call_icon"/>
 

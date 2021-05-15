@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.example.talks.Helper
+import com.example.talks.R
 import com.example.talks.chat.ChatActivity
 import com.example.talks.database.TalksContact
 import com.example.talks.databinding.ContactListItemViewBinding
@@ -35,32 +35,16 @@ class ContactAdapter(private val contacts: List<TalksContact>, val context: Cont
         val contactImage = contact.contactImageUrl
         if (context != null) {
             Glide.with(context).load(contactImage).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .placeholder(
+                    R.drawable.ic_baseline_person_color
+                )
                 .into(view.contactImage)
         }
 
         view.listItemLayout.setOnClickListener {
-            val name = contact.contactName
-            val userName = contact.contactUserName
-            val number = contact.contactNumber
-            val uid = contact.uId
-            val isTalksContact = contact.isTalksUser
-            val imageBitmap = contact.contactImageBitmap
-            val status = contact.status
-            val bio = contact.contact_bio
 
-            val contactHelper = TalksContact(
-                number,
-                isTalksContact,
-                name,
-                userName,
-                contactImage,
-                imageBitmap,
-                uid,
-                status,
-                bio
-            )
-            Helper.setContact(contactHelper)
             val intent = Intent(context, ChatActivity::class.java)
+            intent.putExtra("contactNumber", contact.contactNumber)
             context?.startActivity(intent)
         }
     }

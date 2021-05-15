@@ -12,12 +12,12 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.example.talks.Helper
 import com.example.talks.R
 import com.example.talks.database.Message
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityChatBinding
 import com.google.firebase.auth.FirebaseAuth
+import com.vanniktech.emoji.EmojiPopup
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -36,6 +36,8 @@ class ChatActivity : AppCompatActivity() {
     private var messageToBeSent = ""
     private var receiverID = ""
 
+    private lateinit var emojiPopup: EmojiPopup
+
     @SuppressLint("SimpleDateFormat")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,19 +46,14 @@ class ChatActivity : AppCompatActivity() {
 
         databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
         viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
-        val contact = Helper.getContact()
-        chatUserName.isSelected = true
 
-        if (contact != null) {
-            Glide.with(this).load(contact.contactImageUrl)
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .into(binding.circleImageView)
-            binding.chatUserName.text = contact.contactName
-            binding.contactStatus.text = "active"
-            receiverID = contact.contactNumber
+        val intent = intent
+        val phoneNumber = intent.getStringExtra("contactNumber")
+
+        if (phoneNumber != null) {
+            observeUserData(phoneNumber)
+            receiverID = phoneNumber
         }
-
-//        viewModel.readMessagesFromServer(senderID, receiverID, databaseViewModel)
 
         val layoutManager = LinearLayoutManager(this).apply {
             stackFromEnd = true
@@ -110,32 +107,57 @@ class ChatActivity : AppCompatActivity() {
                 }
                 else -> {
                     binding.messageEditText.text = null
-                    if (contact != null) {
-                        val time = getTime()
-                        val date = getDate()
-                        val message = Message(
-                            receiverID,
-                            "",
-                            messageToBeSent,
-                            "sent",
-                            false,
-                            time,
-                            date,
-                            true
-                        )
-                        viewModel.sendMessage(
-                            senderID,
-                            receiverID,
-                            messageToBeSent,
-                            time,
-                            date,
-                            databaseViewModel
-                        )
-                        Toast.makeText(this, messageToBeSent, Toast.LENGTH_SHORT).show()
-                    }
+                    val time = getTime()
+                    val date = getDate()
+                    val message = Message(
+                        receiverID,
+                        "",
+                        messageToBeSent,
+                        "sent",
+                        false,
+                        time,
+                        date,
+                        true
+                    )
+                    viewModel.sendMessage(
+                        senderID,
+                        receiverID,
+                        messageToBeSent,
+                        time,
+                        date,
+                        databaseViewModel
+                    )
+                    Toast.makeText(this, messageToBeSent, Toast.LENGTH_SHORT).show()
 
                 }
             }
+        }
+
+        var emojiIconShown = true
+        emojiPopup = EmojiPopup.Builder.fromRootView(chatActivityRootView).build(messageEditText)
+        emojiButton.setOnClickListener {
+            emojiPopup.toggle()
+            emojiIconShown = if (emojiIconShown) {
+                emojiButton.setImageResource(R.drawable.keyboard_icon)
+                false
+            } else {
+                emojiButton.setImageResource(R.drawable.emoji_emotions_24px)
+                true
+            }
+        }
+
+    }
+
+    private fun observeUserData(phoneNumber: String) {
+        lifecycleScope.launch {
+            val contact = databaseViewModel.readSingleContact(phoneNumber)
+            contact.observe(this@ChatActivity, {
+                binding.chatUserName.text = it.contactName
+
+                Glide.with(this@ChatActivity).load(it.contactImageUrl).diskCacheStrategy(
+                    DiskCacheStrategy.AUTOMATIC
+                ).placeholder(R.drawable.ic_baseline_person_color).into(binding.circleImageView)
+            })
         }
     }
 

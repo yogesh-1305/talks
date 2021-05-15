@@ -45,7 +45,7 @@ class ProfileFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
 
         auth = FirebaseAuth.getInstance()
-        uId = auth.currentUser.uid
+        uId = auth.currentUser!!.uid.toString()
         Log.i("USER ID IN FRAGMENT PROFILE===", uId)
 
         databaseViewModel.readAllUserData.observe(viewLifecycleOwner, {
