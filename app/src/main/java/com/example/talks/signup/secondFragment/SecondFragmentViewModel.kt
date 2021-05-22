@@ -23,6 +23,9 @@ class SecondFragmentViewModel : ViewModel() {
     val smsCode: MutableLiveData<String?> by lazy {
         MutableLiveData<String?>()
     }
+    val verificationID: MutableLiveData<String?> by lazy {
+        MutableLiveData<String?>()
+    }
 
     private var storedVerificationId = ""
     private var phoneNumber = ""
@@ -74,7 +77,7 @@ class SecondFragmentViewModel : ViewModel() {
         ) {
             super.onCodeSent(verificationId, forceResendingToken)
             storedVerificationId = verificationId
-            Log.i("Verification id-----", verificationId)
+            verificationID.value = verificationId
         }
     }
 

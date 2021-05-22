@@ -14,4 +14,9 @@
         <!-- Customize your theme here. -->
         <item name="android:windowBackground">@color/custom_palette_1</item>
     </style>
+
+    <style name="ThemeOverlay.Talks.FullscreenContainer" parent="">
+        <item name="fullscreenBackgroundColor">@color/light_blue_900</item>
+        <item name="fullscreenTextColor">@color/light_blue_A400</item>
+    </style>
 </resources>

@@ -1,7 +1,6 @@
 package com.example.talks.chat
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -32,7 +31,6 @@ class ChatAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
             1 -> {
-                Log.i("getItemView type 1***", getItemViewType(viewType).toString())
                 return SenderViewHolder(
                     CustomSenderMessagesBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -42,7 +40,6 @@ class ChatAdapter(
                 )
             }
             2 -> {
-                Log.i("getItemView type 2***", getItemViewType(viewType).toString())
                 return ReceiverViewHolder(
                     CustomReceiverMessagesBinding.inflate(
                         LayoutInflater.from(parent.context),
@@ -67,7 +64,6 @@ class ChatAdapter(
 
 
     override fun getItemViewType(position: Int): Int {
-        Log.i("error check++++", position.toString())
         return if (position < messages.size) {
             when (messages[position].sentByMe) {
                 true -> {

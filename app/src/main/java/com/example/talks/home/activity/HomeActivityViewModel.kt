@@ -1,8 +1,14 @@
 package com.example.talks.home.activity
 
+import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
+import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.talks.R
 import com.example.talks.database.ChatListItem
 import com.example.talks.database.Message
 import com.example.talks.database.TalksContact
@@ -10,9 +16,11 @@ import com.example.talks.database.TalksViewModel
 import com.example.talks.encryption.Encryption
 import com.example.talks.modal.DBMessage
 import com.example.talks.modal.ServerUser
+import com.example.talks.receiver.ActionReceiver
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
@@ -170,5 +178,54 @@ class HomeActivityViewModel : ViewModel() {
         }
     }
 
+    val peerConnectionID: MutableLiveData<String> by lazy {
+        MutableLiveData<String>()
+    }
 
+    fun readPeerConnections(context: Context, currentUserID: String?) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (currentUserID != null) {
+                Firebase.database.getReference("talks_database").child(currentUserID)
+                    .child("call_stats").addValueEventListener(object : ValueEventListener {
+                        override fun onDataChange(snapshot: DataSnapshot) {
+                            for (data in snapshot.children) {
+                                if (data.key.toString() == "callerID") {
+                                    if (data.value.toString() != "") {
+                                        createNotificationForCall(context)
+
+                                    }
+                                }
+                            }
+                        }
+
+                        override fun onCancelled(error: DatabaseError) {
+//                            TODO("Not yet implemented")
+                        }
+                    })
+            }
+        }
+    }
+
+    private fun createNotificationForCall(context: Context) {
+        val declineIntent = Intent(context, ActionReceiver::class.java)
+        val acceptIntent = Intent(context, ActionReceiver::class.java)
+
+        declineIntent.putExtra("action", 0)
+        acceptIntent.putExtra("action", 1)
+
+        val pendingIntentDecline = PendingIntent.getBroadcast(context, 0, declineIntent, 0)
+        val pendingIntentAccept = PendingIntent.getBroadcast(context, 1, acceptIntent, 0)
+
+        val builder = NotificationCompat.Builder(context, "Calls")
+            .setSmallIcon(R.drawable.bell_icon)
+            .setContentTitle("My notification")
+            .setContentText("Hello World!")
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setAutoCancel(false)
+            .addAction(R.drawable.video_call_icon, "Decline", pendingIntentDecline)
+            .addAction(R.drawable.video_call_icon, "Accept", pendingIntentAccept)
+
+        val manager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        manager.notify(1001, builder.build())
+    }
 }

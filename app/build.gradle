@@ -119,6 +119,8 @@ dependencies {
     implementation('org.jitsi.react:jitsi-meet-sdk:2.+') { transitive = true }
     // emoji support
     implementation 'com.vanniktech:emoji-google:0.6.0'
+    // network monitor
+    implementation 'com.novoda:merlin:1.2.0'
 
 
 }

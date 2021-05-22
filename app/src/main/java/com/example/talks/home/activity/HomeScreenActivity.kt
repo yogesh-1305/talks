@@ -8,6 +8,7 @@ import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.Menu
+import android.webkit.*
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -31,10 +32,12 @@ import com.example.talks.profile.ProfileSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
-import java.text.SimpleDateFormat
+import com.novoda.merlin.Merlin
+import kotlinx.android.synthetic.main.activity_calling.*
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
+
 
 class HomeScreenActivity : AppCompatActivity() {
 
@@ -57,6 +60,9 @@ class HomeScreenActivity : AppCompatActivity() {
     private var chatChannelPhoneNumbers = ArrayList<String>()
     private var serverFetchExecuted = false
 
+    private lateinit var merlin: Merlin
+
+    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeScreenBinding.inflate(layoutInflater)
@@ -65,10 +71,8 @@ class HomeScreenActivity : AppCompatActivity() {
         setSupportActionBar(toolbar)
 
         FileManager().createDirectoryInExternalStorage()
-
         FirebaseApp.initializeApp(this)
         auth = FirebaseAuth.getInstance()
-
         viewModel = ViewModelProvider(this).get(HomeActivityViewModel::class.java)
         databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
@@ -159,16 +163,29 @@ class HomeScreenActivity : AppCompatActivity() {
             val intent = Intent(this, ProfileSettingsActivity::class.java)
             startActivity(intent)
         }
+
+        // works when network is connected
+        merlin = Merlin.Builder().withConnectableCallbacks()
+            .build(this).apply {
+                registerConnectable {
+                    viewModel.readPeerConnections(
+                        this@HomeScreenActivity,
+                        auth.currentUser?.uid.toString()
+                    )
+                }
+            }
     }
 
     override fun onResume() {
-        super.onResume()
+        merlin.bind()
         navController.addOnDestinationChangedListener(destinationChangedListener)
+        super.onResume()
     }
 
     override fun onPause() {
-        super.onPause()
+
         navController.removeOnDestinationChangedListener(destinationChangedListener)
+        super.onPause()
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -236,12 +253,5 @@ class HomeScreenActivity : AppCompatActivity() {
         } else {
             true
         }
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun getDate(): String {
-        val today = Date()
-        val format = SimpleDateFormat("ddmmyyyy")
-        return format.format(today)
     }
 }

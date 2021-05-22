@@ -7,7 +7,6 @@ import android.app.AlertDialog
 import android.content.DialogInterface
 import android.os.Bundle
 import android.os.CountDownTimer
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -21,6 +20,7 @@ import com.example.talks.databinding.FragmentSecondBinding
 import com.example.talks.utils.WaitingDialog
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.fragment_second.*
 
 @Suppress("NAME_SHADOWING")
 class SecondFragment : Fragment() {
@@ -64,15 +64,18 @@ class SecondFragment : Fragment() {
         // Firebase initialization
         context?.let { FirebaseApp.initializeApp(it) }
         auth = FirebaseAuth.getInstance()
-//        auth.languageCode = "en"
-
-        Log.i("phone number===", phoneNumber)
 
         context?.let {
             viewModel.sendVerificationCode(countryCode, phoneNumber, it, auth)
         }
 
-        viewModel.smsCode.observe(viewLifecycleOwner,{
+        viewModel.verificationID.observe(viewLifecycleOwner, {
+            if (it != null) {
+                otpScreenProgressBar.visibility = View.VISIBLE
+            }
+        })
+
+        viewModel.smsCode.observe(viewLifecycleOwner, {
             otpTextView.otp = it
         })
 
@@ -84,6 +87,7 @@ class SecondFragment : Fragment() {
 
             override fun onOTPComplete(otp: String?) {
                 viewModel.manualOTPAuth(otp)
+                otpScreenProgressBar.visibility = View.VISIBLE
             }
         }
 
@@ -139,6 +143,7 @@ class SecondFragment : Fragment() {
     }
 
     private fun showAlertDialogForIncorrectOtp() {
+        otpScreenProgressBar.visibility = View.INVISIBLE
         val dialog = AlertDialog.Builder(context)
         dialog.setTitle("OOPS! Incorrect OTP.")
         dialog.setMessage("Maybe you've mistaken entering the correct OTP. ")

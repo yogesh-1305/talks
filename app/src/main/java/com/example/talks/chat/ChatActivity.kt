@@ -1,8 +1,8 @@
 package com.example.talks.chat
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.R
-import com.example.talks.database.Message
+import com.example.talks.calling.CallingActivity
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityChatBinding
 import com.google.firebase.auth.FirebaseAuth
@@ -68,7 +68,6 @@ class ChatActivity : AppCompatActivity() {
         lifecycleScope.launch {
             databaseViewModel.readMessages(receiverID)
                 .observe(this@ChatActivity, { list ->
-                    Log.i("messages list check+++", list.toString())
                     if (list.isNotEmpty()) {
                         val adapter = ChatAdapter(this@ChatActivity, list)
                         recyclerView.adapter = adapter
@@ -100,6 +99,13 @@ class ChatActivity : AppCompatActivity() {
             }
         }
 
+        chatVideoCallButton.setOnClickListener {
+            val callingIntent = Intent(this, CallingActivity::class.java)
+            callingIntent.putExtra("phoneNumber", phoneNumber)
+            callingIntent.putExtra("callAction", 1)
+            startActivity(callingIntent)
+        }
+
         micButton.setOnClickListener {
             when {
                 isTextEmpty -> {
@@ -109,16 +115,6 @@ class ChatActivity : AppCompatActivity() {
                     binding.messageEditText.text = null
                     val time = getTime()
                     val date = getDate()
-                    val message = Message(
-                        receiverID,
-                        "",
-                        messageToBeSent,
-                        "sent",
-                        false,
-                        time,
-                        date,
-                        true
-                    )
                     viewModel.sendMessage(
                         senderID,
                         receiverID,
@@ -152,11 +148,15 @@ class ChatActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val contact = databaseViewModel.readSingleContact(phoneNumber)
             contact.observe(this@ChatActivity, {
-                binding.chatUserName.text = it.contactName
+                if (it != null) {
+                    binding.chatUserName.text = it.contactName
 
-                Glide.with(this@ChatActivity).load(it.contactImageUrl).diskCacheStrategy(
-                    DiskCacheStrategy.AUTOMATIC
-                ).placeholder(R.drawable.ic_baseline_person_color).into(binding.circleImageView)
+                    Glide.with(this@ChatActivity).load(it.contactImageUrl).diskCacheStrategy(
+                        DiskCacheStrategy.AUTOMATIC
+                    ).placeholder(R.drawable.ic_baseline_person_color).into(binding.circleImageView)
+                } else {
+                    binding.chatUserName.text = phoneNumber
+                }
             })
         }
     }
