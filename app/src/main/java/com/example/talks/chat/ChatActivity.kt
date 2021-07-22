@@ -12,15 +12,17 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.talks.Helper
 import com.example.talks.R
+import com.example.talks.calendar.CalendarManager
 import com.example.talks.calling.CallingActivity
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityChatBinding
+import com.example.talks.gallery.attachmentsGallery.activity.AttachmentsActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.vanniktech.emoji.EmojiPopup
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
 import java.util.*
 
 class ChatActivity : AppCompatActivity() {
@@ -30,11 +32,17 @@ class ChatActivity : AppCompatActivity() {
     private lateinit var binding: ActivityChatBinding
 
     private var auth = FirebaseAuth.getInstance()
-    private var senderID = auth.currentUser?.phoneNumber
+    private var senderPhoneNumber = auth.currentUser?.phoneNumber
+    private var senderIdentity = auth.currentUser?.uid
 
     private var isTextEmpty = true
     private var messageToBeSent = ""
     private var receiverID = ""
+
+
+    var userNameSendingToCallingActivity = ""
+    var userIDSendingToCallingActivity = ""
+    var userImageStringSendingToCallingActivity = ""
 
     private lateinit var emojiPopup: EmojiPopup
 
@@ -44,11 +52,13 @@ class ChatActivity : AppCompatActivity() {
         binding = ActivityChatBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
-        viewModel = ViewModelProvider(this).get(ChatViewModel::class.java)
-
         val intent = intent
         val phoneNumber = intent.getStringExtra("contactNumber")
+
+        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
+        val viewModelFactory =
+            ChatViewModelFactory(senderPhoneNumber, phoneNumber, databaseViewModel)
+        viewModel = ViewModelProvider(this, viewModelFactory).get(ChatViewModel::class.java)
 
         if (phoneNumber != null) {
             observeUserData(phoneNumber)
@@ -102,6 +112,15 @@ class ChatActivity : AppCompatActivity() {
         chatVideoCallButton.setOnClickListener {
             val callingIntent = Intent(this, CallingActivity::class.java)
             callingIntent.putExtra("phoneNumber", phoneNumber)
+            callingIntent.putExtra(
+                "userNameSendingToCallingActivity",
+                userNameSendingToCallingActivity
+            )
+            callingIntent.putExtra("userIDSendingToCallingActivity", userIDSendingToCallingActivity)
+            callingIntent.putExtra(
+                "userImageStringSendingToCallingActivity",
+                userImageStringSendingToCallingActivity
+            )
             callingIntent.putExtra("callAction", 1)
             startActivity(callingIntent)
         }
@@ -113,18 +132,8 @@ class ChatActivity : AppCompatActivity() {
                 }
                 else -> {
                     binding.messageEditText.text = null
-                    val time = getTime()
-                    val date = getDate()
-                    viewModel.sendMessage(
-                        senderID,
-                        receiverID,
-                        messageToBeSent,
-                        time,
-                        date,
-                        databaseViewModel
-                    )
-                    Toast.makeText(this, messageToBeSent, Toast.LENGTH_SHORT).show()
-
+                    val time = CalendarManager.getCurrentDateTime()
+                    viewModel.sendMessage(messageToBeSent, time)
                 }
             }
         }
@@ -142,6 +151,25 @@ class ChatActivity : AppCompatActivity() {
             }
         }
 
+        attachButton.setOnClickListener {
+            val attachmentIntent = Intent(this, AttachmentsActivity::class.java)
+            startActivity(attachmentIntent)
+        }
+
+    }
+
+    override fun onResume() {
+        super.onResume()
+        val imagesToSend = Helper.getImages()
+        if (!imagesToSend.isNullOrEmpty()) {
+            viewModel.uploadImageToStorage(
+                imagesToSend,
+                senderIdentity,
+                CalendarManager.getCurrentDateTime(),
+                applicationContext
+            )
+            Toast.makeText(applicationContext, imagesToSend.toString(), Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun observeUserData(phoneNumber: String) {
@@ -149,29 +177,20 @@ class ChatActivity : AppCompatActivity() {
             val contact = databaseViewModel.readSingleContact(phoneNumber)
             contact.observe(this@ChatActivity, {
                 if (it != null) {
-                    binding.chatUserName.text = it.contactName
 
+                    binding.chatUserName.text = it.contactName
                     Glide.with(this@ChatActivity).load(it.contactImageUrl).diskCacheStrategy(
                         DiskCacheStrategy.AUTOMATIC
                     ).placeholder(R.drawable.ic_baseline_person_color).into(binding.circleImageView)
+
+                    userNameSendingToCallingActivity = it.contactName.toString()
+                    userIDSendingToCallingActivity = it.uId.toString()
+                    userImageStringSendingToCallingActivity = it.contactImageUrl.toString()
+
                 } else {
                     binding.chatUserName.text = phoneNumber
                 }
             })
         }
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun getDate(): String {
-        val today = Date()
-        val format = SimpleDateFormat("dd-MM-yyyy")
-        return format.format(today)
-    }
-
-    @SuppressLint("SimpleDateFormat")
-    private fun getTime(): String {
-        val today = Date()
-        val format = SimpleDateFormat("hh:mm")
-        return format.format(today)
     }
 }

@@ -5,24 +5,51 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="#00FFFFFF"
-    android:padding="2dp">
+    android:padding="2dp"
+    android:paddingEnd="50dp"
+    tools:ignore="RtlSymmetry">
 
-    <com.vanniktech.emoji.EmojiTextView
-        android:id="@+id/chat_received_text"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="5dp"
-        android:autoLink="all"
+        android:layout_height="match_parent"
         android:background="@drawable/receiver_message_bg"
-        android:maxWidth="250dp"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="5dp"
-        android:textColor="#ffffff"
-        android:textColorLink="#FFD600"
-        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="test message" />
+        app:layout_constraintTop_toTopOf="parent">
 
+
+        <com.vanniktech.emoji.EmojiTextView
+            android:id="@+id/chat_received_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:autoLink="all"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="5dp"
+            android:textColor="#ffffff"
+            android:textColorLink="#FFD600"
+            android:textSize="16sp"
+            app:autoSizeTextType="uniform"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="test message" />
+
+        <TextView
+            android:id="@+id/receiverTextMessageTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="2dp"
+            android:text="2:22pm"
+            android:textColor="@color/purple_200"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chat_received_text" />
+
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

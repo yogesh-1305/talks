@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:icon="@drawable/chat_icon"
+        android:title="cropImage"
+        app:showAsAction="always" />
+    <item
+        android:icon="@drawable/emoji_emotions_24px"
+        android:title="addSticker"
+        app:showAsAction="always" />
+    <item
+        android:icon="@drawable/devices_icon"
+        android:title="addText"
+        app:showAsAction="always" />
+    <item
+        android:icon="@drawable/bell_icon"
+        android:title="penTool"
+        app:showAsAction="always" />
+</menu>

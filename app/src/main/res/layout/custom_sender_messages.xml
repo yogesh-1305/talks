@@ -4,24 +4,51 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="2dp">
+    android:paddingStart="50dp"
+    android:padding="2dp"
+    tools:ignore="RtlSymmetry">
 
-    <com.vanniktech.emoji.EmojiTextView
-        android:id="@+id/chat_sent_text"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
-        android:autoLink="all"
+        android:layout_height="match_parent"
         android:background="@drawable/sender_message_bg"
-        android:maxWidth="250dp"
-        android:paddingHorizontal="12dp"
-        android:paddingVertical="5dp"
-        android:textColor="#FFFFFF"
-        android:textColorLink="#FFD600"
-        android:textSize="16sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:text="test message" />
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.vanniktech.emoji.EmojiTextView
+            android:id="@+id/chat_sent_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:autoLink="all"
+            android:paddingHorizontal="12dp"
+            android:paddingVertical="5dp"
+            android:textColor="#FFFFFF"
+            android:textColorLink="#FFD600"
+            android:textSize="16sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:text="test message" />
+
+        <TextView
+            android:id="@+id/senderTextMessageTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="2dp"
+            android:text="12:12pm"
+            android:textColor="@color/custom_palette_3"
+            android:textSize="10sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chat_sent_text"
+            app:layout_constraintVertical_bias="0.0" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

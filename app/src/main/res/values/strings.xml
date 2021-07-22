@@ -25,24 +25,6 @@
     <string name="proceedForVerificationButtonText">Verify</string>
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     <!-- edit profile fragment -->
     <string name="edit_profile">Edit Profile</string>
     <string name="changeDP">Change Photo</string>
@@ -70,4 +52,7 @@
     <string name="title_activity_calling">FullscreenActivity</string>
     <string name="dummy_button">Dummy Button</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
+    <string name="title_activity_attachment">AttachmentActivity</string>
+    <string name="tab_text_1">Tab 1</string>
+    <string name="tab_text_2">Tab 2</string>
 </resources>

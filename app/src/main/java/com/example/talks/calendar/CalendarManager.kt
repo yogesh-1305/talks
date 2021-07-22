@@ -2,17 +2,36 @@ package com.example.talks.calendar
 
 import android.annotation.SuppressLint
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class CalendarManager {
 
     companion object {
 
-        @SuppressLint("SimpleDateFormat")
-        fun getDate(): String {
-            val today = Date()
-            val format = SimpleDateFormat("yyyymmdd")
-            return format.format(today)
+        fun getCurrentDateTime(): String {
+            val current = LocalDateTime.now()
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+            return current.format(formatter)
+        }
+
+        fun getYesterdayDatDate(): String{
+            val current = LocalDateTime.now().minusDays(1)
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            return current.format(formatter)
+        }
+
+        fun getTodayDate(): String{
+            val current = LocalDateTime.now()
+            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
+            return current.format(formatter)
+        }
+
+        fun getDateForImage(): String{
+            val current = LocalDateTime.now()
+            val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
+            return current.format(formatter)
         }
 
     }

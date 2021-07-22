@@ -33,10 +33,10 @@
         android:id="@+id/contactListActivity"
         android:name="com.example.talks.contactScreen.ContactListActivity"
         android:label=""
-        tools:layout="@layout/activity_contact_list"></activity>
+        tools:layout="@layout/activity_contact_list" />
     <fragment
         android:id="@+id/videoRoomFragment"
         android:name="com.example.talks.videoRoom.VideoRoomFragment"
-        android:label="fragment_video_room"
+        android:label=""
         tools:layout="@layout/fragment_video_room" />
 </navigation>

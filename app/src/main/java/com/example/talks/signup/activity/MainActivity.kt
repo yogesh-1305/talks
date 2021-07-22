@@ -30,7 +30,6 @@ class MainActivity : AppCompatActivity() {
 
     private var contactPhoneNumberList = ArrayList<String>()
     private var contactNameList = HashMap<String, String>()
-    private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
     private var dataFetchedOnce = false
 
     override fun onCreate(savedInstanceState: Bundle?) {

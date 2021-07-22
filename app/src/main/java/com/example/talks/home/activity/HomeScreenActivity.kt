@@ -21,6 +21,7 @@ import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.talks.BuildConfig
 import com.example.talks.R
 import com.example.talks.database.ChatListItem
 import com.example.talks.database.TalksContact
@@ -54,9 +55,9 @@ class HomeScreenActivity : AppCompatActivity() {
     private lateinit var binding: ActivityHomeScreenBinding
     private lateinit var auth: FirebaseAuth
 
-    private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
-    var contactList = HashMap<String, String>()
-    private var contacts = ArrayList<String>()
+    private val encryptionKey = BuildConfig.ENCRYPTION_KEY
+    var contactNamesWithPhoneNumberAsKey = HashMap<String, String>()
+    private var contactPhoneNumbers = ArrayList<String>()
     private var chatChannelPhoneNumbers = ArrayList<String>()
     private var serverFetchExecuted = false
 
@@ -79,7 +80,7 @@ class HomeScreenActivity : AppCompatActivity() {
         if (isPermissionGranted()) {
             readContacts()
         }
-        for (number in contactList.keys) {
+        for (number in contactNamesWithPhoneNumberAsKey.keys) {
             databaseViewModel.updateChatChannelUserName(number)
         }
 
@@ -94,7 +95,9 @@ class HomeScreenActivity : AppCompatActivity() {
                 if (chatChannelPhoneNumbers.contains(message.chatId)) {
                     // update the existing chat channel with last message and timestamp
                     databaseViewModel.updateChatChannel(
-                        message.messageText.toString(), message.sendTime.toString(), "text",
+                        message.messageText.toString(),
+                        message.creationTime.toString(),
+                        message.messageType.toString(),
                         message.chatId
                     )
                 } else {
@@ -102,10 +105,10 @@ class HomeScreenActivity : AppCompatActivity() {
                     val chatChannel =
                         ChatListItem(
                             message.chatId,
-                            contactList[message.chatId],
+                            contactNamesWithPhoneNumberAsKey[message.chatId],
                             message.messageText,
-                            "text",
-                            message.sendTime.toString()
+                            message.messageType.toString(),
+                            message.creationTime.toString()
                         )
                     databaseViewModel.createChatChannel(chatChannel)
                     databaseViewModel.updateChatChannelUserName(message.chatId)
@@ -127,8 +130,12 @@ class HomeScreenActivity : AppCompatActivity() {
         databaseViewModel.readContactPhoneNumbers.observe(this, {
             if (it != null) {
                 if (!serverFetchExecuted) {
-                    viewModel.getUsersFromServer(it, contactList, databaseViewModel, encryptionKey)
-                    Toast.makeText(this, "loop check2", Toast.LENGTH_SHORT).show()
+                    viewModel.getUsersFromServer(
+                        it,
+                        contactNamesWithPhoneNumberAsKey,
+                        databaseViewModel,
+                        encryptionKey
+                    )
                     serverFetchExecuted = true
                 }
             }
@@ -148,7 +155,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        viewModel.getCurrentUserData(auth.currentUser?.uid, databaseViewModel)
+//        viewModel.getCurrentUserData(auth.currentUser?.uid, databaseViewModel)
 
         databaseViewModel.readAllUserData.observe(this, {
             val user1 = it[0]
@@ -170,7 +177,8 @@ class HomeScreenActivity : AppCompatActivity() {
                 registerConnectable {
                     viewModel.readPeerConnections(
                         this@HomeScreenActivity,
-                        auth.currentUser?.uid.toString()
+                        auth.currentUser?.uid.toString(),
+                        contactNamesWithPhoneNumberAsKey
                     )
                 }
             }
@@ -213,8 +221,8 @@ class HomeScreenActivity : AppCompatActivity() {
 
             phoneNumber = phoneNumber.replace("\\s".toRegex(), "").trim()
             phoneNumber = formatPhoneNumber(phoneNumber)
-            contacts.add(phoneNumber)
-            contactList[phoneNumber] = contactName
+            contactPhoneNumbers.add(phoneNumber)
+            contactNamesWithPhoneNumberAsKey[phoneNumber] = contactName
             val contact = TalksContact(
                 phoneNumber, null, contactName, null,
                 null, null, null, null, null

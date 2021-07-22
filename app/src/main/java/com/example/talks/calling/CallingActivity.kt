@@ -29,6 +29,8 @@ class CallingActivity : AppCompatActivity() {
     private var callAction: Int? = null
 
     private val currentUserID: String = FirebaseAuth.getInstance().currentUser?.uid.toString()
+    private val currentUserPhoneNumber: String =
+        FirebaseAuth.getInstance().currentUser?.phoneNumber.toString()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -37,23 +39,27 @@ class CallingActivity : AppCompatActivity() {
 
         viewModel = ViewModelProvider(this).get(CallActivityViewModel::class.java)
         databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
-        setClickListeners()
 
         val intent = intent
         val phoneNumber = intent.getStringExtra("phoneNumber")
+        val userName = intent.getStringExtra("userNameSendingToCallingActivity")
+        val userID = intent.getStringExtra("userIDSendingToCallingActivity")
+        val userImageUrl = intent.getStringExtra("userImageStringSendingToCallingActivity")
         callAction = intent.getIntExtra("callAction", 0)
 
         when (callAction) {
             1 -> {
                 // sending a call
                 if (phoneNumber != null) {
-                    setupWebView()
-                    displayUserData(phoneNumber)
+                    displayUserData(phoneNumber, userName, userImageUrl)
+                    if (userID != null) {
+                        setupWebView(userID)
+                    }
                 }
             }
             2 -> {
                 // receiving a call
-                setupWebView()
+                setupWebView("")
                 hideTopLayout()
 
             }
@@ -64,23 +70,20 @@ class CallingActivity : AppCompatActivity() {
                 if (it == "call_rejected") {
                     Toast.makeText(this, "call rejected", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, it, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, it + "uid rec", Toast.LENGTH_SHORT).show()
                     startCall(it)
                     hideTopLayout()
                 }
+            }else{
+                Toast.makeText(this, "call declined", Toast.LENGTH_SHORT).show()
             }
         })
-
-    }
-
-    private fun setClickListeners() {
-        var videoFeedDisabled = false
-        var audioFeedDisabled = false
 
         callActivityToolbar.setNavigationOnClickListener {
             this.enterPictureInPictureMode()
         }
 
+        var audioFeedDisabled = false
         audioFeedController.setOnClickListener {
             audioFeedDisabled = if (audioFeedDisabled) {
                 webView.evaluateJavascript("javascript:toggleAudio(false)", null)
@@ -93,6 +96,7 @@ class CallingActivity : AppCompatActivity() {
             }
         }
 
+        var videoFeedDisabled = false
         videoFeedController.setOnClickListener {
             videoFeedDisabled = if (videoFeedDisabled) {
                 webView.evaluateJavascript("javascript:toggleVideo(false)", null)
@@ -106,9 +110,13 @@ class CallingActivity : AppCompatActivity() {
         }
 
         cutCallButton.setOnClickListener {
+            if (phoneNumber != null) {
+                viewModel.cutCallFromCallerSide(phoneNumber)
+            }
             webView.destroy()
             finish()
         }
+
     }
 
     private fun hideTopLayout() {
@@ -124,21 +132,22 @@ class CallingActivity : AppCompatActivity() {
         }
     }
 
-    private fun displayUserData(phoneNumber: String) {
-        lifecycleScope.launch {
-            databaseViewModel.readSingleContact(phoneNumber).observe(this@CallingActivity, {
-                Glide.with(this@CallingActivity).load(it.contactImageUrl).diskCacheStrategy(
-                    DiskCacheStrategy.AUTOMATIC
-                ).placeholder(R.drawable.ic_baseline_person_color).into(callActivityUserImage)
-                callActivityUserName.text = it.contactName
-
-                viewModel.updatePeerConnectionID(currentUserID, it.uId)
-            })
+    private fun displayUserData(phoneNumber: String, userName: String?, userImageUrl: String?) {
+        if (userName != null) {
+            Glide.with(this@CallingActivity).load(userImageUrl).diskCacheStrategy(
+                DiskCacheStrategy.AUTOMATIC
+            ).placeholder(R.drawable.ic_baseline_person_color).into(callActivityUserImage)
+            callActivityUserName.text = userName
+            return
         }
+        callActivityUserName.text = phoneNumber
+        Glide.with(this@CallingActivity)
+            .load(R.drawable.ic_baseline_person_color)
+            .into(callActivityUserImage)
     }
 
     @SuppressLint("SetJavaScriptEnabled")
-    private fun setupWebView() {
+    private fun setupWebView(receiverUID: String) {
         binding.webView.apply {
             settings.domStorageEnabled = true
             settings.javaScriptEnabled = true
@@ -147,6 +156,8 @@ class CallingActivity : AppCompatActivity() {
                 JavascriptInterface(
                     this@CallingActivity,
                     currentUserID,
+                    receiverUID,
+                    currentUserPhoneNumber,
                     viewModel,
                 ), "Android"
             )
@@ -185,6 +196,8 @@ class CallingActivity : AppCompatActivity() {
         }
     }
 
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////
     override fun onBackPressed() {
         this.enterPictureInPictureMode()
     }

@@ -29,11 +29,11 @@ class TalksApplication : Application() {
         ////////////////////////////////////////////////////////////////////
         createNotificationChannelForCalls()
         ////////////////////////////////////////////////////////////////////
-        GlobalScope.launch(Dispatchers.IO) {
-            Firebase.database.getReference("talks_database").child(userID)
-                .child("call_stats")
-                .child("callerID").setValue("")
-        }
+//        GlobalScope.launch(Dispatchers.IO) {
+//            Firebase.database.getReference("talks_database").child(userID)
+//                .child("call_stats")
+//                .child("callerID").setValue("")
+//        }
     }
 
     private fun createNotificationChannelForCalls() {

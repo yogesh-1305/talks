@@ -21,6 +21,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.talks.BuildConfig
 import com.example.talks.Helper
 import com.example.talks.R
 import com.example.talks.calendar.CalendarManager
@@ -55,7 +56,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     private val args: ThirdFragmentArgs by navArgs()
 
     //encryption key (v.v.imp)
-    private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
+    private val encryptionKey = BuildConfig.ENCRYPTION_KEY
 
     // Variables
     private var countryName = ""
@@ -125,7 +126,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 Log.i("local user===", it.toString())
 
                 val image = Helper.getImage()
-                val date = CalendarManager.getDate()
+                val date = CalendarManager.getCurrentDateTime()
 
                 FileManager().createDirectoryInExternalStorage()
                 FileManager().saveProfileImageInExternalStorage(this, image, date)

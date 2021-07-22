@@ -19,19 +19,23 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:usesCleartextTraffic="true"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Talks"
+        android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup">
+        <activity android:name=".gallery.attachmentEditing.AttachmentEditingActivity"></activity>
+        <activity android:name=".gallery.attachmentsGallery.activity.AttachmentsActivity" />
+
         <receiver android:name=".receiver.ActionReceiver" />
+
         <activity
             android:name=".calling.CallingActivity"
             android:configChanges="smallestScreenSize|screenLayout|orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_calling"
             android:screenOrientation="sensorPortrait"
             android:supportsPictureInPicture="true"
-            android:theme="@style/Theme.Talks.Fullscreen"></activity>
+            android:theme="@style/Theme.Talks.Fullscreen" />
 
         <service
             android:name=".service.TalksService"
@@ -39,7 +43,6 @@
         <service
             android:name="com.novoda.merlin.MerlinService"
             android:exported="false" />
-
 
         <activity android:name=".gallery.GalleryActivity" />
         <activity

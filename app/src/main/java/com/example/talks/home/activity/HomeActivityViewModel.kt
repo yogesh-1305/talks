@@ -14,7 +14,6 @@ import com.example.talks.database.Message
 import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
 import com.example.talks.encryption.Encryption
-import com.example.talks.modal.DBMessage
 import com.example.talks.modal.ServerUser
 import com.example.talks.receiver.ActionReceiver
 import com.google.firebase.database.ChildEventListener
@@ -22,15 +21,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
-import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
 class HomeActivityViewModel : ViewModel() {
-    private var fireStore: FirebaseFirestore = Firebase.firestore
 
     val users: MutableLiveData<MutableList<ServerUser>> by lazy {
         MutableLiveData<MutableList<ServerUser>>()
@@ -51,7 +46,6 @@ class HomeActivityViewModel : ViewModel() {
 
             Firebase.database.getReference("talks_database").get()
                 .addOnSuccessListener {
-//                    Log.i("contacts Snapshot====", it.toString())
 
                     for (data in it.children) {
 
@@ -62,9 +56,9 @@ class HomeActivityViewModel : ViewModel() {
                         val contactStatus = data.child("status").value.toString()
                         val contactId = data.child("uid").value.toString()
                         val contactImageBitmap = data.child("contactImageBitmap").value.toString()
-//                        Log.i("contact number in homeVM****", data.toString())
+
                         if (databaseContactList.contains(contactNumber)) {
-//                            Log.i("contacts====", contactNumber)
+
                             val decryptedImage =
                                 Encryption().decrypt(contactImageUrl, encryptionKey)
                             val user = TalksContact(
@@ -110,91 +104,99 @@ class HomeActivityViewModel : ViewModel() {
         })
     }
 
-    fun getCurrentUserData(currentUserId: String?, databaseViewModel: TalksViewModel) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (currentUserId != null) {
-                fireStore.collection("user_database").document(currentUserId)
-                    .get().addOnSuccessListener {
-                        val currentUser = it.toObject<ServerUser>()
-                        if (currentUser != null) {
-//                            val localUser = TalksContact(
-//                                currentUser.getUserPhoneNumber(),
-//                                currentUser.
-//                                currentUser.getUserName(),
-//                                currentUser.getUserProfileImage(),
-//                                currentUserId
-//                            )
-//                            databaseViewModel.updateUser(localUser)
-                        }
-                    }
-            }
-        }
-    }
-
 
     fun readMessagesFromServer(userId: String?, talksVM: TalksViewModel) {
-        val dbRef = Firebase.database.getReference("talks_database_chats")
-        if (userId != null) {
-            dbRef.child(userId).addChildEventListener(object : ChildEventListener {
-                override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-                    val message = snapshot.getValue(DBMessage::class.java)
-                    val key = snapshot.key.toString()
+        viewModelScope.launch(Dispatchers.IO) {
+            val dbRef = Firebase.database.getReference("talks_database_chats")
+            if (userId != null) {
+                dbRef.child(userId).addChildEventListener(object : ChildEventListener {
+                    override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
 
-                    val chatId = message?.chatId
-                    val messageText = message?.messageText
-                    val messageStatus = message?.messageStatus
-                    val needsPush = message?.needsPush
-                    val sendTime = message?.sendTime
-                    val sendDate = message?.sendDate
-                    val sentByMe = message?.sentByMe
+                        val chatId = snapshot.child("chatId").value.toString()
+                        val messageID = snapshot.key.toString()
+                        val messageType = snapshot.child("messageType").value.toString()
+                        val messageText = snapshot.child("messageText").value.toString()
+                        val status = snapshot.child("status").value.toString()
+                        val messageCreationTime = snapshot.child("creationTime").value.toString()
+                        val deliveryTime = snapshot.child("deliveryTime").value.toString()
+                        val seenTime = snapshot.child("seenTime").value.toString()
+                        val mediaSize = snapshot.child("mediaSize").value.toString()
+                        val mediaDuration = snapshot.child("mediaDuration").value.toString()
+                        val mediaCaption = snapshot.child("mediaCaption").value.toString()
+                        val mediaUrl = snapshot.child("mediaUrl").value.toString()
+                        val mediaThumbnailString = snapshot.child("mediaThumbnailString").value.toString()
+                        val sentByMe = snapshot.child("sentByMe").value as Boolean?
+                        val deleted = snapshot.child("deleted").value as Boolean?
 
-                    val localMessage = Message(
-                        chatId.toString(), key, messageText.toString(),
-                        messageStatus.toString(),
-                        needsPush, sendTime.toString(),
-                        sendDate.toString(), sentByMe
-                    )
+                        val localMessage = Message(
+                            chatId,
+                            messageID,
+                            messageType
+                        ).apply {
+                            this.messageText = messageText
+                            this.status = status
+                            this.creationTime = messageCreationTime
+                            this.deliveryTime = deliveryTime
+                            this.seenTime = seenTime
+                            this.mediaSize = mediaSize
+                            this.mediaDuration = mediaDuration
+                            this.mediaCaption = mediaCaption
+                            this.mediaUrl = mediaUrl
+                            this.mediaThumbnailString = mediaThumbnailString
+                            this.sentByMe = sentByMe
+                            this.deleted = deleted
+                        }
+                        talksVM.addMessage(localMessage)
 
-                    talksVM.addMessage(localMessage)
+                    }
 
-                }
+                    override fun onChildChanged(
+                        snapshot: DataSnapshot,
+                        previousChildName: String?
+                    ) {
+                        val status = snapshot.child("status").value.toString()
+                        val deliveryTime = snapshot.child("deliveryTime").value.toString()
+                        val seenTime = snapshot.child("seenTime").value.toString()
+                        val deleted = snapshot.child("deleted").value as Boolean?
+                    }
 
-                override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
-                }
+                    override fun onChildRemoved(snapshot: DataSnapshot) {
+                    }
 
-                override fun onChildRemoved(snapshot: DataSnapshot) {
-                }
+                    override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
+                        TODO("Not yet implemented")
+                    }
 
-                override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-                    TODO("Not yet implemented")
-                }
+                    override fun onCancelled(error: DatabaseError) {
+                        TODO("Not yet implemented")
+                    }
 
-                override fun onCancelled(error: DatabaseError) {
-                    TODO("Not yet implemented")
-                }
-
-            })
+                })
+            }
         }
+
     }
 
-    val peerConnectionID: MutableLiveData<String> by lazy {
-        MutableLiveData<String>()
+    val contactData: MutableLiveData<TalksContact> by lazy {
+        MutableLiveData<TalksContact>()
     }
 
-    fun readPeerConnections(context: Context, currentUserID: String?) {
+    fun readPeerConnections(
+        context: Context,
+        currentUserID: String?,
+        contactNames: HashMap<String, String>
+    ) {
         viewModelScope.launch(Dispatchers.IO) {
             if (currentUserID != null) {
                 Firebase.database.getReference("talks_database").child(currentUserID)
                     .child("call_stats").addValueEventListener(object : ValueEventListener {
                         override fun onDataChange(snapshot: DataSnapshot) {
-                            for (data in snapshot.children) {
-                                if (data.key.toString() == "callerID") {
-                                    if (data.value.toString() != "") {
-                                        createNotificationForCall(context)
-
-                                    }
-                                }
+                            val callerID = snapshot.child("callerID").value.toString()
+                            val callerPhoneNumber =
+                                snapshot.child("callerPhoneNumber").value.toString()
+                            val callerName = getCallerName(contactNames, callerPhoneNumber)
+                            if (callerPhoneNumber != "") {
+                                createNotificationForCall(context, callerName)
                             }
                         }
 
@@ -206,7 +208,17 @@ class HomeActivityViewModel : ViewModel() {
         }
     }
 
-    private fun createNotificationForCall(context: Context) {
+    private fun getCallerName(
+        contactNames: HashMap<String, String>, callerID: String
+    ): String {
+        return if (contactNames.containsKey(callerID)) {
+            contactNames[callerID].toString()
+        } else {
+            callerID
+        }
+    }
+
+    private fun createNotificationForCall(context: Context, callerName: String) {
         val declineIntent = Intent(context, ActionReceiver::class.java)
         val acceptIntent = Intent(context, ActionReceiver::class.java)
 
@@ -218,8 +230,8 @@ class HomeActivityViewModel : ViewModel() {
 
         val builder = NotificationCompat.Builder(context, "Calls")
             .setSmallIcon(R.drawable.bell_icon)
-            .setContentTitle("My notification")
-            .setContentText("Hello World!")
+            .setContentTitle(callerName)
+            .setContentText("Incoming Video Call")
             .setPriority(NotificationCompat.PRIORITY_HIGH)
             .setAutoCancel(false)
             .addAction(R.drawable.video_call_icon, "Decline", pendingIntentDecline)

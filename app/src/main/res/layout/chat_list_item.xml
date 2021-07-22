@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="match_parent"
     android:id="@+id/chatListItemLayout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
     android:background="@drawable/ripple_effect"
-    android:clickable="true"
-    android:layout_height="wrap_content">
+    android:clickable="true">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/chatListImage"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
+        android:elevation="2dp"
         android:src="@drawable/talks"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -25,8 +26,11 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:fontFamily="@font/aclonica"
+        android:elevation="2dp"
+        android:fontFamily="@font/prompt"
         android:text="TextView"
+        android:textSize="15sp"
+        android:textStyle="normal"
         app:layout_constraintBottom_toTopOf="@+id/chatListLatestMessage"
         app:layout_constraintEnd_toStartOf="@+id/chatListTimeStamp"
         app:layout_constraintStart_toEndOf="@+id/chatListImage"
@@ -38,9 +42,11 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:fontFamily="@font/advent_pro"
-        android:text="TextView"
+        android:elevation="2dp"
+        android:fontFamily="@font/prompt"
         android:maxLines="1"
+        android:text="TextView"
+        android:textSize="12sp"
         app:layout_constraintEnd_toStartOf="@+id/chatListMuteImage"
         app:layout_constraintStart_toEndOf="@+id/chatListImage"
         app:layout_constraintTop_toBottomOf="@+id/chatListName" />
@@ -50,6 +56,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
+        android:elevation="2dp"
         android:maxLines="1"
         android:text="2:33pm"
         app:layout_constraintEnd_toEndOf="parent"
@@ -66,16 +73,16 @@
         android:paddingVertical="2dp"
         android:text="3"
         android:textAlignment="center"
+        android:visibility="invisible"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp"
-        android:visibility="visible" />
+        app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp" />
 
     <ImageView
         android:id="@+id/chatListPinImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/chatListUnreadMessageCount"
         app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp"
         app:srcCompat="@drawable/emoji_emotions_24px" />
@@ -85,7 +92,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:layout_constraintEnd_toStartOf="@+id/chatListPinImage"
         app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp"
         app:srcCompat="@drawable/emoji_emotions_24px" />

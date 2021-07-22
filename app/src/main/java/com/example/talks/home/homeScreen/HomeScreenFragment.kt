@@ -5,6 +5,7 @@ import android.view.*
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.talks.R
 import com.example.talks.database.TalksViewModel
@@ -36,7 +37,7 @@ class HomeScreenFragment : Fragment() {
         databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
         val auth = FirebaseAuth.getInstance().currentUser?.uid
-        val contactMap = HomeScreenActivity().contactList
+        val contactMap = HomeScreenActivity().contactNamesWithPhoneNumberAsKey
 
         val recyclerView = binding.homeScreenRecyclerView.apply {
             setHasFixedSize(true)

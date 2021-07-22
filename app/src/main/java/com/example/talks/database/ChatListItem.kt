@@ -22,6 +22,6 @@ data class ChatListItem(
     var isChatArchived: Boolean = false
     var lastReadMessageID: Int = 0
     var unseenMessagesCount: Int = 0
-    var chatListImageUrl: String = ""
-    var chatListImageBitmap: String = ""
+    var chatListImageUrl: String? = ""
+    var chatListImageBitmap: String? = ""
 }

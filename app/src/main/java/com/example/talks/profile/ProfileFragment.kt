@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.talks.BuildConfig
 import com.example.talks.Helper
 import com.example.talks.calendar.CalendarManager
 import com.example.talks.database.TalksViewModel
@@ -27,7 +28,7 @@ class ProfileFragment : Fragment() {
     private lateinit var databaseViewModel: TalksViewModel
     private lateinit var viewModel: ProfileViewModel
 
-    private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
+    private val encryptionKey = BuildConfig.ENCRYPTION_KEY
     var image = ""
     var userName = ""
     var userBio = ""
@@ -110,7 +111,7 @@ class ProfileFragment : Fragment() {
         viewModel.imageUpdatedInLocalDatabase.observe(viewLifecycleOwner, {
             if (it) {
                 val image = Helper.getImage()
-                val date = CalendarManager.getDate()
+                val date = CalendarManager.getCurrentDateTime()
                 binding.profileScreenImage.setImageURI(image)
                 FileManager().createDirectoryInExternalStorage()
                 FileManager().saveProfileImageInExternalStorage(this, image, date)

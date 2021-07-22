@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/attachments_nav"
+    app:startDestination="@id/imagesAttachmentFragment">
+
+    <fragment
+        android:id="@+id/imagesAttachmentFragment"
+        android:name="com.example.talks.gallery.attachmentsGallery.images.ImagesAttachmentFragment"
+        android:label="fragment_images_attachment"
+        tools:layout="@layout/fragment_images_attachment" />
+    <fragment
+        android:id="@+id/videosAttachmentFragment"
+        android:name="com.example.talks.gallery.attachmentsGallery.videos.VideosAttachmentFragment"
+        android:label="fragment_videos_attachment"
+        tools:layout="@layout/fragment_videos_attachment" />
+    <fragment
+        android:id="@+id/documentsAttachmentFragment"
+        android:name="com.example.talks.gallery.attachmentsGallery.documents.DocumentsAttachmentFragment"
+        android:label="fragment_documents_attachment"
+        tools:layout="@layout/fragment_documents_attachment" />
+</navigation>

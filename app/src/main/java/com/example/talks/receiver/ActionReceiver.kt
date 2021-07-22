@@ -34,7 +34,7 @@ class ActionReceiver : BroadcastReceiver() {
                 // accept call
                 clearNotification(context)
                 closeNotificationTray(context)
-                moveToCallingActivity(context, peerConnectionID)
+                moveToCallingActivity(context, currentUserID)
             }
             2 -> {
                 Toast.makeText(context, "Error Starting Call!", Toast.LENGTH_SHORT).show()
@@ -43,14 +43,32 @@ class ActionReceiver : BroadcastReceiver() {
     }
 
     private fun declineIncomingCall(currentUserID: String) {
+
+        val map = HashMap<String, Any?>()
+        map["callerID"] = ""
+        map["callerPhoneNumber"] = ""
+        map["receiverConnectionID"] = ""
+        map["rejected"] = true
+
         GlobalScope.launch(Dispatchers.IO) {
             Firebase.database.getReference("talks_database").child(currentUserID)
                 .child("call_stats")
-                .child("peerConnectionID").setValue("")
+                .setValue(map)
         }
     }
 
-    private fun moveToCallingActivity(context: Context?, peerConnectionID: String?) {
+    private fun moveToCallingActivity(context: Context?, currentUserID: String) {
+        val map = HashMap<String, Any?>()
+        map["callerID"] = ""
+        map["callerPhoneNumber"] = ""
+        map["receiverConnectionID"] = ""
+        map["rejected"] = false
+        GlobalScope.launch(Dispatchers.IO) {
+
+            Firebase.database.getReference("talks_database").child(currentUserID)
+                .child("call_stats")
+                .setValue(map)
+        }
         val callingActivityIntent = Intent(context, CallingActivity::class.java)
         callingActivityIntent.putExtra("callAction", 2)
         callingActivityIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)

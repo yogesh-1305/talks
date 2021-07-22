@@ -29,10 +29,8 @@ class GalleryActivity : AppCompatActivity() {
     private lateinit var viewModel: GalleryActivityViewModel
     private lateinit var imagesList: MutableList<String>
 
-
-
     //encryption key (v.v.imp)
-    private val encryptionKey = "DB5583F3E615C496FC6AA1A5BEA33"
+    private val encryptionKey = BuildConfig.ENCRYPTION_KEY
 
     @RequiresApi(Build.VERSION_CODES.Q)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,6 +96,7 @@ class GalleryActivity : AppCompatActivity() {
             pathOfImage = cursor.getString(columnIndex)
             listOfAllImages.add(pathOfImage)
         }
+        cursor.close()
         return listOfAllImages
     }
 }

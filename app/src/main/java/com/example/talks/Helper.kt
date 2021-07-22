@@ -33,6 +33,17 @@ class Helper {
         }
 
         ////////////////////////////////////////////////////////////////////////
+
+        private var imagesList: ArrayList<Uri>? = null
+
+        fun setImages(images: ArrayList<Uri>){
+            imagesList = images
+        }
+
+        fun getImages():ArrayList<Uri>?{
+            return imagesList
+        }
+
     }
 
 

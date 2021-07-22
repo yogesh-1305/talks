@@ -22,11 +22,17 @@ function init(caller) {
 //    1 -> caller
 //    else -> receiver
         if(caller == 1){
-            Android.onSenderPeerConnected(id)
-        }else if (caller == 2){
+            Android.onSenderPeerConnected()
+        }
+        if (caller == 2){
             Android.onReceiverPeerConnected(id)
         }
     })
+
+    peer.on('error', function(error){
+        Android.error(error)
+    })
+
     listen()
 }
 
