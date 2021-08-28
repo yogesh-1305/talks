@@ -2,48 +2,47 @@ package com.example.talks.signup.thirdFragment
 
 import android.net.Uri
 import android.util.Log
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.talks.database.TalksContact
-import com.example.talks.database.TalksViewModel
-import com.example.talks.database.User
 import com.google.firebase.database.ktx.database
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@HiltViewModel
+class ThirdFragmentViewModel @Inject constructor(var storageRef: FirebaseStorage) :
+    ViewModel() {
+//    private val storageRef = FirebaseStorage.getInstance()
 
-class ThirdFragmentViewModel : ViewModel() {
-
-    private var fireStore: FirebaseFirestore = Firebase.firestore
-    private var storageRef = FirebaseStorage.getInstance()
-
-    val existingUserData: MutableLiveData<User> by lazy {
-        MutableLiveData<User>()
+    val existingUserData: MutableLiveData<HashMap<String, String>> by lazy {
+        MutableLiveData<HashMap<String, String>>()
+    }
+    val localUserData: MutableLiveData<HashMap<String, String?>> by lazy {
+        MutableLiveData<HashMap<String, String?>>()
     }
     val profileImageUrl: MutableLiveData<String?> by lazy {
         MutableLiveData<String?>()
     }
 
-    fun getUserFromDatabase(userUid: String?) {
+    fun getUserFromDatabaseIfExists(userUid: String?) {
         viewModelScope.launch(Dispatchers.IO) {
             val dbRef = Firebase.database.getReference("talks_database")
             if (userUid != null) {
                 dbRef.child(userUid).get().addOnSuccessListener {
-                    val userName = it.child("contactUserName").value.toString()
-                    val userImage = it.child("contactImageUrl").value.toString()
-                    val userBio = it.child("contact_bio").value.toString()
+                    val userName = it.child("user_name").value.toString()
+                    val userImage = it.child("user_image_url").value.toString()
+                    val userBio = it.child("user_bio").value.toString()
 
-                    val user = User(
-                        0, "",
-                        userName, userImage, "", userBio, ""
+                    val user = hashMapOf(
+                        "user_name" to userName,
+                        "user_image" to userImage,
+                        "user_bio" to userBio
                     )
                     existingUserData.value = user
                 }
@@ -52,25 +51,20 @@ class ThirdFragmentViewModel : ViewModel() {
     }
 
     fun addUserToFirebaseDatabase(
-        user: TalksContact,
-        userUid: String?,
-        talksViewModel: TalksViewModel
+        user: HashMap<String, String?>,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             val dbRef = Firebase.database.getReference("talks_database")
-            if (userUid != null) {
-                dbRef.child(userUid).setValue(user).addOnSuccessListener {
-                    Log.i("user Added to db===", user.contactNumber)
-                    val localUser = User(
-                        0,
-                        user.contactNumber,
-                        "${user.contactUserName}",
-                        user.contactImageUrl,
-                        user.contactImageBitmap,
-                        user.contact_bio,
-                        user.uId
+            if (user["user_UID"] != null) {
+                dbRef.child(user["user_UID"]!!).setValue(user).addOnSuccessListener {
+                    val localUser = hashMapOf(
+                        "phone_number" to user["phone_number"],
+                        "user_name" to user["user_name"],
+                        "user_image" to user["user_image_url"],
+                        "user_bio" to user["user_bio"],
+                        "user_id" to user["user_UID"]
                     )
-                    addUserToLocalDatabase(localUser, talksViewModel)
+                    localUserData.value = localUser
                 }.addOnFailureListener {
                     Log.i("failed login====", it.toString())
                 }
@@ -78,14 +72,6 @@ class ThirdFragmentViewModel : ViewModel() {
         }
     }
 
-    private fun addUserToLocalDatabase(user: User, talksViewModel: TalksViewModel) {
-        Log.i("database-------", user.phoneNumber.toString())
-        talksViewModel.addUser(user)
-    }
-
-    fun readLocalUserData(talksViewModel: TalksViewModel): LiveData<List<User>> {
-        return talksViewModel.readAllUserData
-    }
 
     fun uploadImageToStorage(image: Uri?, userId: String) {
         if (image != null) {

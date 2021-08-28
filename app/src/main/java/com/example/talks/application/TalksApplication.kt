@@ -9,10 +9,9 @@ import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.vanniktech.emoji.EmojiManager
 import com.vanniktech.emoji.google.GoogleEmojiProvider
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
+import dagger.hilt.android.HiltAndroidApp
 
+@HiltAndroidApp
 class TalksApplication : Application() {
 
     override fun onCreate() {
@@ -44,10 +43,8 @@ class TalksApplication : Application() {
             val desc = "Make sound when getting a call"
             val importance = NotificationManager.IMPORTANCE_HIGH
             val mChannel = NotificationChannel(channelId, name, importance)
-            mChannel.apply {
-                description = desc
-                enableVibration(true)
-            }
+            mChannel.description = desc
+            mChannel.enableVibration(true)
             val notificationManager = getSystemService(NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.createNotificationChannel(mChannel)
         }

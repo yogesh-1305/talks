@@ -159,10 +159,8 @@ class HomeScreenActivity : AppCompatActivity() {
 
         databaseViewModel.readAllUserData.observe(this, {
             val user1 = it[0]
-            val image1 = Encryption().decrypt(user1.profileImage, encryptionKey)
-//            Log.i("TAG IMAGE=====", image1.toString())
-
-            Glide.with(this).load(image1).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            Glide.with(this).load(user1.profileImage)
+                .placeholder(R.drawable.ic_baseline_person_24)
                 .into(binding.toolbarDP)
         })
 
@@ -224,8 +222,7 @@ class HomeScreenActivity : AppCompatActivity() {
             contactPhoneNumbers.add(phoneNumber)
             contactNamesWithPhoneNumberAsKey[phoneNumber] = contactName
             val contact = TalksContact(
-                phoneNumber, null, contactName, null,
-                null, null, null, null, null
+                phoneNumber, contactName
             )
             databaseViewModel.addContact(contact)
         }

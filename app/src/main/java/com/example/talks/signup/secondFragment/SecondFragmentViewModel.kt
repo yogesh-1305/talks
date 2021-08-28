@@ -85,15 +85,7 @@ class SecondFragmentViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             auth.signInWithCredential(p0)
                 .addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        Log.i("sign in success-----", it.toString())
-                        isUserLoggedIn.value = true
-
-                    } else {
-                        isUserLoggedIn.value = false
-                        Log.i("sign in failed-----", it.toString())
-                    }
-
+                    isUserLoggedIn.value = it.isSuccessful
                 }
         }
     }

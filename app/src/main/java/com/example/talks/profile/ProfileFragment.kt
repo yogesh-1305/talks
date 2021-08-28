@@ -53,11 +53,9 @@ class ProfileFragment : Fragment() {
             val user1 = it[0]
 
             userName = user1.userName.toString()
-            userBio = user1.userBio.toString()
+            userBio = user1.bio.toString()
             phoneNumber = user1.phoneNumber.toString()
-
-            image = Encryption().decrypt(user1.profileImage, encryptionKey).toString()
-            Glide.with(this).load(image).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+            Glide.with(this).load(user1.profileImage).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .into(binding.profileScreenImage)
 
             binding.phoneNumberInProfile.text = phoneNumber

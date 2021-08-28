@@ -1,6 +1,7 @@
 package com.example.talks.signup.activity
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
@@ -21,8 +22,13 @@ import com.karumi.dexter.MultiplePermissionsReport
 import com.karumi.dexter.PermissionToken
 import com.karumi.dexter.listener.PermissionRequest
 import com.karumi.dexter.listener.multi.MultiplePermissionsListener
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainActivityViewModel
@@ -32,18 +38,18 @@ class MainActivity : AppCompatActivity() {
     private var contactNameList = HashMap<String, String>()
     private var dataFetchedOnce = false
 
+    @Inject
+    lateinit var auth : FirebaseAuth
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         viewModel = ViewModelProvider(this).get(MainActivityViewModel::class.java)
         databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
-        FirebaseApp.initializeApp(this)
-        val auth = FirebaseAuth.getInstance()
-
         /* If user is already logged in -> navigate to home screen
         * else ask fro permissions and start signup process*/
-        lifecycleScope.launch {
+        CoroutineScope(Dispatchers.Main).launch {
             if (isCurrentUserLoggedIn(auth)) {
                 navigateToHomeScreenActivity()
             } else {
@@ -96,6 +102,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    @SuppressLint("Range")
     private fun showContacts(phones: Cursor) {
         lifecycleScope.launch {
             while (phones.moveToNext()) {
@@ -109,8 +116,7 @@ class MainActivity : AppCompatActivity() {
                 contactPhoneNumberList.add(phoneNumber)
                 contactNameList[phoneNumber] = contactName
                 val contact = TalksContact(
-                    phoneNumber, null, contactName, null,
-                    null, null, null, null, null
+                    phoneNumber, contactName
                 )
                 databaseViewModel.addContact(contact)
             }

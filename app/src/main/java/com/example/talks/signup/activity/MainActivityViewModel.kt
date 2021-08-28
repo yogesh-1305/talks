@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
 import com.example.talks.modal.ServerUser
+import com.example.talks.utils.Utility
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
@@ -45,17 +46,17 @@ class MainActivityViewModel : ViewModel() {
                         Log.i("user List====", databaseContactList.toString())
                         if (databaseContactList.contains(contactNumber!!)) {
                             Log.i("contacts====", contactNumber.toString())
-                            val user = TalksContact(
+                            var user = TalksContact(
                                 contactNumber,
-                                true,
-                                contactNameList[contactNumber],
-                                contactUserName,
-                                contactImageUrl,
-                                contactImageBitmap,
-                                contactId,
-                                contactStatus,
-                                contactBio
-                            )
+                                contactNameList[contactNumber]
+                            ).apply {
+                                this.contactUserName = contactUserName
+                                this.contactImageUrl = contactImageUrl.toString()
+                                this.contactImageBitmap = Utility.getBitmapFromUrl(contactImageUrl.toString())
+                                this.uId = contactId
+                                this.status = contactStatus
+                                this.contactBio = contactBio
+                            }
                             databaseViewModel.updateUser(user)
                         }
 

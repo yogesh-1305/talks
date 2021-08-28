@@ -16,6 +16,7 @@ import com.example.talks.database.TalksViewModel
 import com.example.talks.encryption.Encryption
 import com.example.talks.modal.ServerUser
 import com.example.talks.receiver.ActionReceiver
+import com.example.talks.utils.Utility
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
@@ -50,28 +51,28 @@ class HomeActivityViewModel : ViewModel() {
                     for (data in it.children) {
 
                         val contactNumber = data.child("contactNumber").value.toString()
-                        val contactUserName = data.child("contactUserName").value.toString()
-                        val contactImageUrl = data.child("contactImageUrl").value.toString()
-                        val contactBio = data.child("contact_bio").value.toString()
+                        var contactUserName = data.child("contactUserName").value.toString()
+                        var contactImageUrl = data.child("contactImageUrl").value.toString()
+                        var contactBio = data.child("contact_bio").value.toString()
                         val contactStatus = data.child("status").value.toString()
                         val contactId = data.child("uid").value.toString()
-                        val contactImageBitmap = data.child("contactImageBitmap").value.toString()
+                        var contactImageBitmap = data.child("contactImageBitmap").value.toString()
 
                         if (databaseContactList.contains(contactNumber)) {
 
                             val decryptedImage =
                                 Encryption().decrypt(contactImageUrl, encryptionKey)
-                            val user = TalksContact(
+                            var user = TalksContact(
                                 contactNumber,
-                                true,
-                                contactNameList[contactNumber],
-                                contactUserName,
-                                decryptedImage,
-                                contactImageBitmap,
-                                contactId,
-                                contactStatus,
-                                contactBio
-                            )
+                                contactNameList[contactNumber]
+                            ).apply {
+                                this.contactUserName = contactUserName
+                                this.contactImageUrl = decryptedImage.toString()
+                                this.contactImageBitmap = Utility.getBitmapFromUrl(decryptedImage.toString())
+                                this.uId = contactId
+                                this.status = contactStatus
+                                this.contactBio = contactBio
+                            }
                             databaseViewModel.updateUser(user)
                         }
                     }
@@ -124,7 +125,8 @@ class HomeActivityViewModel : ViewModel() {
                         val mediaDuration = snapshot.child("mediaDuration").value.toString()
                         val mediaCaption = snapshot.child("mediaCaption").value.toString()
                         val mediaUrl = snapshot.child("mediaUrl").value.toString()
-                        val mediaThumbnailString = snapshot.child("mediaThumbnailString").value.toString()
+                        val mediaThumbnailString =
+                            snapshot.child("mediaThumbnailString").value.toString()
                         val sentByMe = snapshot.child("sentByMe").value as Boolean?
                         val deleted = snapshot.child("deleted").value as Boolean?
 

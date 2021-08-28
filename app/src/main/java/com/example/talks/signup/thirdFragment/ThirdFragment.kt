@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
-import android.util.Log
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -16,7 +15,7 @@ import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModelProvider
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
@@ -25,32 +24,36 @@ import com.example.talks.BuildConfig
 import com.example.talks.Helper
 import com.example.talks.R
 import com.example.talks.calendar.CalendarManager
-import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
+import com.example.talks.database.User
 import com.example.talks.databinding.FragmentThirdBinding
 import com.example.talks.encryption.Encryption
 import com.example.talks.fileManager.FileManager
 import com.example.talks.gallery.GalleryActivity
 import com.example.talks.home.activity.HomeScreenActivity
 import com.example.talks.utils.UploadingDialog
+import com.example.talks.utils.Utility
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.GlobalScope
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
-    // Firebase Initialize
-    private lateinit var auth: FirebaseAuth
+    @Inject
+    lateinit var auth: FirebaseAuth
     private lateinit var userUid: String
 
     // View Binding
     private lateinit var binding: FragmentThirdBinding
 
     // View Models
-    private lateinit var talksViewModel: TalksViewModel
-    private lateinit var viewModel: ThirdFragmentViewModel
+    private val talksViewModel: TalksViewModel by viewModels()
+    private val viewModel: ThirdFragmentViewModel by viewModels()
 
     //args
     private val args: ThirdFragmentArgs by navArgs()
@@ -72,58 +75,90 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentThirdBinding.inflate(inflater, container, false)
-
-        ////////////////////////////////////////////////////////////////////////////////////
-        // User viewModel to access the Room Database
-        talksViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
-        viewModel = ViewModelProvider(this).get(ThirdFragmentViewModel::class.java)
-
-        ////////////////////////////////////////////////////////////////////////////////////
-        // loading dialogs
         dialog = UploadingDialog(activity as Activity)
 
-        ////////////////////////////////////////////////////////////////////////////////////
-        // nav args
+        // data from second Fragment
         countryName = args.countryName
         countryCode = args.countryCode
         phoneNumber = args.phoneNumber
 
-        ////////////////////////////////////////////////////////////////////////////////////
-        // Firebase Initialize
-        auth = FirebaseAuth.getInstance()
+        // firebase unique user id
         userUid = auth.currentUser!!.uid
 
-        ////////////////////////////////////////////////////////////////////////////////////
-        Log.i("TAG==", "UID  $userUid")
-        viewModel.getUserFromDatabase(userUid)
+        // get user data from server if exists
+        viewModel.getUserFromDatabaseIfExists(userUid)
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        subscribeToObservers()
+        setClickListeners()
+
+    }
+
+    private fun subscribeToObservers() {
         viewModel.existingUserData.observe(viewLifecycleOwner, {
             if (it != null) {
                 retrievedImageUrl =
-                    Encryption().decrypt(it.profileImage, encryptionKey).toString()
+                    Encryption().decrypt(it["user_image"], encryptionKey).toString()
 
-                binding.thirdFragmentNameEditText.setText(it.userName)
-                binding.thirdFragmentBioEditText.setText(it.userBio)
+                binding.thirdFragmentNameEditText.setText(it["user_name"])
+                binding.thirdFragmentBioEditText.setText(it["userBio"])git
 
                 if (Helper.getImage() == null) {
                     Glide.with(this).load(retrievedImageUrl)
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                        .placeholder(R.drawable.ic_baseline_person_24)
                         .into(binding.thirdFragmentUserImage)
-                    Log.i("TAG==", "IMAGE helper is null  $retrievedImageUrl")
                     binding.progressBar.visibility = View.GONE
 
                 }
             } else {
-                Glide.with(this).load(R.drawable.ic_baseline_person_color)
+                Glide.with(this).load(R.drawable.ic_baseline_person_24)
                     .into(binding.thirdFragmentUserImage)
                 binding.progressBar.visibility = View.GONE
             }
         })
 
-        ////////////////////////////////////////////////////////////////////////////////////
+        viewModel.profileImageUrl.observe(viewLifecycleOwner, {
+            if (it != null) {
+                val image = Encryption().encrypt(it, encryptionKey)
+                val user = hashMapOf(
+                    "phone_number" to "$countryCode$phoneNumber",
+                    "user_name" to getNameFromEditText(),
+                    "user_bio" to getBioFromEditText(),
+                    "user_image_url" to image,
+                    "user_UID" to userUid,
+                    "user_active_status" to "active now",
+                )
+                viewModel.addUserToFirebaseDatabase(user)
+            }
+        })
 
-        viewModel.readLocalUserData(talksViewModel).observe(viewLifecycleOwner, {
+        viewModel.localUserData.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()) {
-                Log.i("local user===", it.toString())
+                val decryptedImageUrl =
+                    Encryption().decrypt(it["user_image"], encryptionKey)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    val imageBitmap = Utility.getBitmapFromUrl(decryptedImageUrl)
+                    val dbUser =
+                        User(
+                            phoneNumber = it["phone_number"],
+                            userName = it["user_name"],
+                            profileImage = imageBitmap,
+                            bio = it["user_bio"],
+                            firebaseAuthUID = it["user_id"]
+                        )
+                    talksViewModel.addUser(user = dbUser)
+                }
+            }
+        })
+
+//        -----------------------------Room Database VM------------------------------------
+        talksViewModel.readAllUserData.observe(viewLifecycleOwner, {
+            if (it.isNotEmpty()) {
 
                 val image = Helper.getImage()
                 val date = CalendarManager.getCurrentDateTime()
@@ -131,29 +166,26 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 FileManager().createDirectoryInExternalStorage()
                 FileManager().saveProfileImageInExternalStorage(this, image, date)
 
-                GlobalScope.launch {
+                lifecycleScope.launch {
                     delay(1000L)
                     dialog.dismiss()
-                    val intent = Intent(context, HomeScreenActivity::class.java)
-                    startActivity(intent)
+                    startActivity(Intent(context, HomeScreenActivity::class.java))
                     delay(500L)
                     activity?.finish()
 
                 }
             }
         })
+    }
 
-        ////////////////////////////////////////////////////////////////////////////////////
-
+    private fun setClickListeners() {
         binding.thirdFragmentUserImage.setOnClickListener {
             if (isPermissionGranted()) {
-                navigateToGallery()
+                navigateToGalleryActivity()
             }
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////
-
-        binding.button.setOnClickListener {
+        binding.saveAndContinueButton.setOnClickListener {
             if (getNameFromEditText().isNotEmpty()) {
                 startUploadProcess()
             } else {
@@ -168,50 +200,18 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             }
         }
 
-        ////////////////////////////////////////////////////////////////////////////////////
-
-        viewModel.profileImageUrl.observe(viewLifecycleOwner, {
-            if (it != null) {
-                val image = Encryption().encrypt(it, encryptionKey)
-                val user = TalksContact(
-                    "$countryCode$phoneNumber",
-                    true,
-                    "null",
-                    getNameFromEditText(),
-                    image,
-                    "null",
-                    userUid,
-                    "active",
-                    getBioFromEditText()
-                )
-                viewModel.addUserToFirebaseDatabase(user, userUid, talksViewModel)
-            }
-        }
-        )
-
-        ////////////////////////////////////////////////////////////////////////////////////
-
         binding.thirdFragmentNameEditText.setOnEditorActionListener(this)
-
-        return binding.root
     }
 
     override fun onResume() {
         super.onResume()
         val image = Helper.getImage()
-        Log.i("TAG==", "IMAGE helper not null  $retrievedImageUrl")
-        Glide.with(binding.root).load(image).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-            .into(binding.thirdFragmentUserImage)
-
-        binding.progressBar.visibility = View.GONE
-    }
-
-    private fun getNameFromEditText(): String {
-        return binding.thirdFragmentNameEditText.text.toString()
-    }
-
-    private fun getBioFromEditText(): String {
-        return binding.thirdFragmentBioEditText.text.toString()
+        if (image != null) {
+            Glide.with(binding.root).load(image).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                .placeholder(R.drawable.ic_baseline_person_24)
+                .into(binding.thirdFragmentUserImage)
+            binding.progressBar.visibility = View.GONE
+        }
     }
 
     private fun startUploadProcess() {
@@ -224,26 +224,21 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             }
         } else {
             val encryptedImage = Encryption().encrypt(retrievedImageUrl, encryptionKey)
-            val user = TalksContact(
-                "$countryCode$phoneNumber",
-                true,
-                "null",
-                getNameFromEditText(),
-                "$encryptedImage",
-                "null",
-                userUid,
-                "active",
-                getBioFromEditText()
+            val user = hashMapOf(
+                "phone_number" to "$countryCode$phoneNumber",
+                "user_name" to getNameFromEditText(),
+                "user_bio" to getBioFromEditText(),
+                "user_image_url" to encryptedImage,
+                "user_UID" to userUid,
+                "user_active_status" to "active now",
             )
-            viewModel.addUserToFirebaseDatabase(user, userUid, talksViewModel)
+            viewModel.addUserToFirebaseDatabase(user)
         }
     }
 
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
-            lifecycleScope.launch {
-                startUploadProcess()
-            }
+            startUploadProcess()
             binding.root.hideKeyboard()
             return true
         }
@@ -283,12 +278,20 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == 112 && permissions.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            navigateToGallery()
+            navigateToGalleryActivity()
         }
     }
 
-    private fun navigateToGallery() {
+    private fun navigateToGalleryActivity() {
         val intent = Intent(context, GalleryActivity::class.java)
         activity?.startActivity(intent)
+    }
+
+    private fun getNameFromEditText(): String {
+        return binding.thirdFragmentNameEditText.text.toString()
+    }
+
+    private fun getBioFromEditText(): String {
+        return binding.thirdFragmentBioEditText.text.toString()
     }
 }

@@ -24,10 +24,11 @@
         android:theme="@style/Theme.Talks"
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup">
-        <activity android:name=".gallery.attachmentEditing.AttachmentEditingActivity"></activity>
-        <activity android:name=".gallery.attachmentsGallery.activity.AttachmentsActivity" />
+        <activity android:name=".gallery.attachmentEditing.AttachmentEditingActivity"
+            android:exported="false"></activity>
+        <activity android:name=".gallery.attachmentsGallery.activity.AttachmentsActivity"/>
 
-        <receiver android:name=".receiver.ActionReceiver" />
+        <receiver android:name=".receiver.ActionReceiver"/>
 
         <activity
             android:name=".calling.CallingActivity"
@@ -39,7 +40,7 @@
 
         <service
             android:name=".service.TalksService"
-            android:enabled="true" />
+            android:exported="false" />
         <service
             android:name="com.novoda.merlin.MerlinService"
             android:exported="false" />
@@ -53,6 +54,7 @@
         <activity android:name=".home.activity.HomeScreenActivity" />
         <activity
             android:name=".signup.activity.MainActivity"
+            android:exported="true"
             android:screenOrientation="sensorPortrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
