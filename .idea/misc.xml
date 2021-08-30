@@ -8,6 +8,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/Shadow/StudioProjects/talks/app/src/main/res/layout/activity_calling.xml" value="0.23229166666666667" />
+        <entry key="..\:/Users/Shadow/StudioProjects/talks/app/src/main/res/layout/activity_chat.xml" value="0.23229166666666667" />
+        <entry key="..\:/Users/Shadow/StudioProjects/talks/app/src/main/res/layout/activity_home_screen.xml" value="0.2" />
         <entry key="..\:/Users/Shadow/StudioProjects/talks/app/src/main/res/layout/fragment_first.xml" value="0.25" />
         <entry key="..\:/Users/Shadow/StudioProjects/talks/app/src/main/res/xml/root_preferences.xml" value="0.12708333333333333" />
       </map>

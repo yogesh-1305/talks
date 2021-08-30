@@ -5,19 +5,20 @@ import android.graphics.BitmapFactory
 import android.util.Log
 import android.widget.Toast
 import androidx.core.content.ContentProviderCompat.requireContext
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.io.IOException
 import java.net.URL
 
 object Utility {
 
-    fun getBitmapFromUrl(Url: String?): Bitmap? {
-        return try {
-            val url = URL(Url)
-            BitmapFactory.decodeStream(url.openConnection().getInputStream())
-        } catch (e: IOException) {
-            Log.d("image bitmap error", " in utility object")
-            null
-        }
-    }
+   fun URL.toBitmap(): Bitmap? {
+       return try {
+           BitmapFactory.decodeStream(openStream())
+       }catch (e: IOException){
+           null
+       }
+   }
 
 }

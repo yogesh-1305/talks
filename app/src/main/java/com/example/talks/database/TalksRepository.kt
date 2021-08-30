@@ -1,16 +1,20 @@
 package com.example.talks.database
 
 import androidx.lifecycle.LiveData
+import dagger.hilt.android.AndroidEntryPoint
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class TalksRepository(private val talksDao: TalksDao) {
+class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
 
     val readAllUserData: LiveData<List<User>> = talksDao.readUserData()
     val readContacts: LiveData<List<TalksContact>> = talksDao.readContacts()
-    val readChatListItem: LiveData<List<ChatListItem>> = talksDao.readChatList()
+    val readChatListItem: LiveData<List<ChatListQueriedData>> = talksDao.readChatList()
     val readContactPhoneNumbers: LiveData<List<String>> = talksDao.readContactPhoneNumbers()
     val getDistinctMessages: LiveData<List<String>> = talksDao.getDistinctMessages()
     val lastAddedMessage: LiveData<Message> = talksDao.getLastAddedMessage()
-    val getChatChannels: LiveData<List<String>> = talksDao.getChatChannels()
+    val getChatListPhoneNumbers: LiveData<List<String>> = talksDao.getChatListPhoneNumbers()
+    val getDistinctPhoneNumbers: LiveData<List<String>> = talksDao.getDistinctPhoneNumbers()
 
     suspend fun readMessages(chatID: String): LiveData<List<Message>> {
         return talksDao.readMessages(chatID)
@@ -48,17 +52,12 @@ class TalksRepository(private val talksDao: TalksDao) {
         talksDao.createChatChannel(chatListItem)
     }
 
-    suspend fun updateChatChannelUserName(contactNumber: String) {
-        talksDao.updateChatChannelUserName(contactNumber)
-    }
 
     suspend fun updateChatChannel(
-        messageText: String,
-        sortTimestamp: String,
-        messageType: String,
-        contactNumber: String
+        contact_number: String,
+        messageID: String
     ) {
-        talksDao.updateChatChannel(messageText, sortTimestamp, messageType, contactNumber)
+        talksDao.updateChatChannel(contact_number, messageID)
     }
 
     suspend fun readSingleContact(phoneNumber: String): LiveData<TalksContact> {

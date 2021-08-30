@@ -2,25 +2,28 @@ package com.example.talks.home.homeScreen
 
 import android.os.Bundle
 import android.view.*
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.talks.R
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentHomeScreenBinding
 import com.example.talks.home.activity.HomeScreenActivity
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class HomeScreenFragment : Fragment() {
 
     private lateinit var binding: FragmentHomeScreenBinding
-    private var viewModel: HomeScreenViewModel? = null
-    private lateinit var databaseViewModel: TalksViewModel
 
-    private var chatChannelPhoneNumbers = ArrayList<String>()
-    private var messagesIDs = ArrayList<Int>()
+    private val viewModel: HomeScreenViewModel by viewModels()
+    private val databaseViewModel: TalksViewModel by viewModels()
+
+    private lateinit var homeScreenAdapter: HomeScreenAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setHasOptionsMenu(true)
@@ -33,22 +36,12 @@ class HomeScreenFragment : Fragment() {
     ): View {
         // Inflate the layout for this fragment
         binding = FragmentHomeScreenBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this).get(HomeScreenViewModel::class.java)
-        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
-        val auth = FirebaseAuth.getInstance().currentUser?.uid
-        val contactMap = HomeScreenActivity().contactNamesWithPhoneNumberAsKey
-
-        val recyclerView = binding.homeScreenRecyclerView.apply {
-            setHasFixedSize(true)
-            layoutManager = LinearLayoutManager(context)
-        }
+        setupRecyclerView()
         databaseViewModel.readChatListItem.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()) {
-                for (numbers in it) {
-                    val adapter = HomeScreenAdapter(it, context)
-                    recyclerView.adapter = adapter
-                }
+                   homeScreenAdapter.submitChatList(it)
+                Toast.makeText(requireContext(), "$it", Toast.LENGTH_SHORT).show()
             }
         })
 
@@ -57,6 +50,12 @@ class HomeScreenFragment : Fragment() {
                 .navigate(R.id.action_homeScreenFragment_to_contactListActivity)
         }
         return binding.root
+    }
+
+    private fun setupRecyclerView() = binding.homeScreenRecyclerView.apply {
+        homeScreenAdapter = HomeScreenAdapter(context)
+        this.adapter = homeScreenAdapter
+        layoutManager = LinearLayoutManager(requireContext())
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {

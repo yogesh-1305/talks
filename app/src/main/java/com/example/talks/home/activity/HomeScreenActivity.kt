@@ -7,9 +7,11 @@ import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.Menu
 import android.webkit.*
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -34,12 +36,15 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.novoda.merlin.Merlin
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_calling.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
-
+@AndroidEntryPoint
 class HomeScreenActivity : AppCompatActivity() {
 
     private lateinit var toolbar: Toolbar
@@ -49,8 +54,8 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private lateinit var bottomNavigationView: BottomNavigationView
 
-    private lateinit var viewModel: HomeActivityViewModel
-    private lateinit var databaseViewModel: TalksViewModel
+    private val viewModel: HomeActivityViewModel by viewModels()
+    private val databaseViewModel: TalksViewModel by viewModels()
 
     private lateinit var binding: ActivityHomeScreenBinding
     private lateinit var auth: FirebaseAuth
@@ -74,44 +79,28 @@ class HomeScreenActivity : AppCompatActivity() {
         FileManager().createDirectoryInExternalStorage()
         FirebaseApp.initializeApp(this)
         auth = FirebaseAuth.getInstance()
-        viewModel = ViewModelProvider(this).get(HomeActivityViewModel::class.java)
-        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
 
         if (isPermissionGranted()) {
             readContacts()
         }
-        for (number in contactNamesWithPhoneNumberAsKey.keys) {
-            databaseViewModel.updateChatChannelUserName(number)
-        }
-
         viewModel.readMessagesFromServer(auth.currentUser?.phoneNumber, databaseViewModel)
 
-        databaseViewModel.chatChannels.observe(this, {
+        databaseViewModel.getChatListPhoneNumbers.observe(this, {
             chatChannelPhoneNumbers = it as ArrayList<String>
         })
-
-        databaseViewModel.lastAddedMessage.observe(this, { message ->
-            if (message != null) {
-                if (chatChannelPhoneNumbers.contains(message.chatId)) {
-                    // update the existing chat channel with last message and timestamp
-                    databaseViewModel.updateChatChannel(
-                        message.messageText.toString(),
-                        message.creationTime.toString(),
-                        message.messageType.toString(),
-                        message.chatId
-                    )
+        databaseViewModel.lastAddedMessage.observe(this, {
+            if (it != null) {
+                if (!chatChannelPhoneNumbers.contains(it.chatId)) {
+                    val chatListItem =
+                        ChatListItem(contactNumber = it.chatId, messageID = it.messageID)
+                    databaseViewModel.createChatChannel(chatListItem)
+                    Timber.d("${it.messageID} at creation====")
                 } else {
-                    // create new chat channel
-                    val chatChannel =
-                        ChatListItem(
-                            message.chatId,
-                            contactNamesWithPhoneNumberAsKey[message.chatId],
-                            message.messageText,
-                            message.messageType.toString(),
-                            message.creationTime.toString()
-                        )
-                    databaseViewModel.createChatChannel(chatChannel)
-                    databaseViewModel.updateChatChannelUserName(message.chatId)
+                    Timber.d("${it.messageID} at update====")
+                    databaseViewModel.updateChatChannel(
+                        contact_number = it.chatId,
+                        messageID = it.messageID.toString()
+                    )
                 }
             }
         })

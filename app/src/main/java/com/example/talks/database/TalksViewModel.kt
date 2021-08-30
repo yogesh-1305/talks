@@ -3,36 +3,27 @@ package com.example.talks.database
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class TalksViewModel(application: Application) : AndroidViewModel(application) {
+@HiltViewModel
+class TalksViewModel @Inject constructor(private val repository: TalksRepository) : ViewModel() {
 
-    var readAllUserData: LiveData<List<User>>
-    private val repository: TalksRepository
-    var readAllContacts: LiveData<List<TalksContact>>
-    var readChatListItem: LiveData<List<ChatListItem>>
-    var readContactPhoneNumbers: LiveData<List<String>>
-    var getDistinctMessages: LiveData<List<String>>
-    var lastAddedMessage: LiveData<Message>
-    var chatChannels: LiveData<List<String>>
-
-    init {
-        val userDao = TalksDatabase.getDatabase(application).talksDao()
-        repository = TalksRepository(userDao)
-        readAllUserData = repository.readAllUserData
-        readAllContacts = repository.readContacts
-        readChatListItem = repository.readChatListItem
-        readContactPhoneNumbers = repository.readContactPhoneNumbers
-        getDistinctMessages = repository.getDistinctMessages
-        lastAddedMessage = repository.lastAddedMessage
-        chatChannels = repository.getChatChannels
-    }
+    var readAllUserData: LiveData<List<User>> = repository.readAllUserData
+    var readAllContacts: LiveData<List<TalksContact>> = repository.readContacts
+    var readChatListItem: LiveData<List<ChatListQueriedData>> = repository.readChatListItem
+    var readContactPhoneNumbers: LiveData<List<String>> = repository.readContactPhoneNumbers
+    var getDistinctMessages: LiveData<List<String>> = repository.getDistinctMessages
+    var lastAddedMessage: LiveData<Message> = repository.lastAddedMessage
+    var getChatListPhoneNumbers: LiveData<List<String>> = repository.getChatListPhoneNumbers
+    var getDistinctPhoneNumbers: LiveData<List<String>> = repository.getDistinctPhoneNumbers
 
     suspend fun readMessages(chatID: String): LiveData<List<Message>> {
         return repository.readMessages(chatID)
-
     }
 
     fun addUser(user: User) {
@@ -83,20 +74,12 @@ class TalksViewModel(application: Application) : AndroidViewModel(application) {
         }
     }
 
-    fun updateChatChannelUserName(contactNumber: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            repository.updateChatChannelUserName(contactNumber)
-        }
-    }
-
     fun updateChatChannel(
-        messageText: String,
-        sortTimestamp: String,
-        messageType: String,
-        contactNumber: String
+       contact_number: String,
+       messageID: String
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateChatChannel(messageText, sortTimestamp, messageType, contactNumber)
+            repository.updateChatChannel(contact_number, messageID)
         }
     }
 

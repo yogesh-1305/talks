@@ -33,8 +33,13 @@ interface TalksDao {
     @Query("SELECT contact_number FROM talks_contacts ORDER BY contactName ASC")
     fun readContactPhoneNumbers(): LiveData<List<String>>
 
-    @Query("SELECT * FROM chat_list ORDER by sortTimestamp DESC")
-    fun readChatList(): LiveData<List<ChatListItem>>
+    @Query("""
+            select contact_number, contactName, contactImageUrl, messageText, messageType, creationTime from chat_list
+            left join talks_contacts on contactNumber = contact_number
+            left join talks_messages on chat_list.messageID = talks_messages.messageID
+            group by contact_number order by creationTime desc
+            """)
+    fun readChatList(): LiveData<List<ChatListQueriedData>>
 
     @Query("SELECT * FROM talks_messages WHERE chatId = :chatID")
     fun readMessages(chatID: String): LiveData<List<Message>>
@@ -46,12 +51,15 @@ interface TalksDao {
     fun getLastAddedMessage(): LiveData<Message>
 
     @Query("SELECT contactNumber FROM chat_list")
-    fun getChatChannels(): LiveData<List<String>>
+    fun getChatListPhoneNumbers(): LiveData<List<String>>
+
+    @Query("select distinct chatID from talks_messages")
+    fun getDistinctPhoneNumbers(): LiveData<List<String>>
 
     // Update
 
     // user
-    @Update
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun updateUser(contact: TalksContact)
 
     // user name
@@ -66,14 +74,9 @@ interface TalksDao {
     @Query("UPDATE user_data SET bio = :userBio")
     suspend fun updateUserBio(userBio: String)
 
-    @Query("UPDATE chat_list SET contactName = (SELECT contactName from talks_contacts WHERE contactNumber = :contactNumber), chatListImageUrl = (SELECT contactImageUrl from talks_contacts WHERE contactNumber = :contactNumber) WHERE contactNumber = :contactNumber")
-    suspend fun updateChatChannelUserName(contactNumber: String)
-
-    @Query("UPDATE chat_list SET messageText = :messageText, sortTimeStamp = :sortTimestamp, messageType = :messageType WHERE contactNumber = :contactNumber")
+    @Query("UPDATE chat_list SET contactNumber = :contact_number, messageID = :messageID where contactNumber = :contact_number")
     suspend fun updateChatChannel(
-        messageText: String,
-        sortTimestamp: String,
-        messageType: String,
-        contactNumber: String
+        contact_number: String,
+        messageID: String
     )
 }

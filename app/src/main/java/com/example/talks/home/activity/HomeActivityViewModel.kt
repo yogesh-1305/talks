@@ -4,6 +4,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -17,14 +19,15 @@ import com.example.talks.encryption.Encryption
 import com.example.talks.modal.ServerUser
 import com.example.talks.receiver.ActionReceiver
 import com.example.talks.utils.Utility
+import com.example.talks.utils.Utility.toBitmap
 import com.google.firebase.database.ChildEventListener
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
+import java.net.URL
 
 class HomeActivityViewModel : ViewModel() {
 
@@ -36,6 +39,7 @@ class HomeActivityViewModel : ViewModel() {
         MutableLiveData<ChatListItem>()
     }
 
+    @DelicateCoroutinesApi
     fun getUsersFromServer(
         databaseContactList: List<String>,
         contactNameList: HashMap<String, String>,
@@ -50,31 +54,26 @@ class HomeActivityViewModel : ViewModel() {
 
                     for (data in it.children) {
 
-                        val contactNumber = data.child("contactNumber").value.toString()
-                        var contactUserName = data.child("contactUserName").value.toString()
-                        var contactImageUrl = data.child("contactImageUrl").value.toString()
-                        var contactBio = data.child("contact_bio").value.toString()
-                        val contactStatus = data.child("status").value.toString()
-                        val contactId = data.child("uid").value.toString()
-                        var contactImageBitmap = data.child("contactImageBitmap").value.toString()
+                        val contactNumber = data.child("phone_number").value.toString()
+                        val contactUserName = data.child("user_name").value.toString()
+                        val contactImageUrl = data.child("user_image_url").value.toString()
+                        val contactBio = data.child("user_bio").value.toString()
+                        val contactId = data.child("userUID").value.toString()
 
-                        if (databaseContactList.contains(contactNumber)) {
-
-                            val decryptedImage =
-                                Encryption().decrypt(contactImageUrl, encryptionKey)
-                            var user = TalksContact(
-                                contactNumber,
-                                contactNameList[contactNumber]
-                            ).apply {
-                                this.contactUserName = contactUserName
-                                this.contactImageUrl = decryptedImage.toString()
-                                this.contactImageBitmap = Utility.getBitmapFromUrl(decryptedImage.toString())
-                                this.uId = contactId
-                                this.status = contactStatus
-                                this.contactBio = contactBio
-                            }
-                            databaseViewModel.updateUser(user)
+                        val decryptedImage =
+                            Encryption().decrypt(contactImageUrl, encryptionKey)
+                        val user = TalksContact(
+                            contactNumber,
+                            contactNameList[contactNumber]
+                        ).apply {
+                            this.contactUserName = contactUserName
+                            this.contactImageUrl = decryptedImage.toString()
+                            this.uId = contactId
+                            this.isTalksUser = true
+                            this.contactBio = contactBio
                         }
+                        databaseViewModel.updateUser(user)
+
                     }
                 }
         }

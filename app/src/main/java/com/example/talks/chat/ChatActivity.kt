@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
@@ -16,6 +17,7 @@ import com.example.talks.Helper
 import com.example.talks.R
 import com.example.talks.calendar.CalendarManager
 import com.example.talks.calling.CallingActivity
+import com.example.talks.database.ChatListItem
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityChatBinding
 import com.example.talks.gallery.attachmentsGallery.activity.AttachmentsActivity
@@ -23,11 +25,12 @@ import com.google.firebase.auth.FirebaseAuth
 import com.vanniktech.emoji.EmojiPopup
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.*
 
 class ChatActivity : AppCompatActivity() {
 
-    private lateinit var databaseViewModel: TalksViewModel
+    private val databaseViewModel: TalksViewModel by viewModels()
     private lateinit var viewModel: ChatViewModel
     private lateinit var binding: ActivityChatBinding
 
@@ -55,7 +58,6 @@ class ChatActivity : AppCompatActivity() {
         val intent = intent
         val phoneNumber = intent.getStringExtra("contactNumber")
 
-        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
         val viewModelFactory =
             ChatViewModelFactory(senderPhoneNumber, phoneNumber, databaseViewModel)
         viewModel = ViewModelProvider(this, viewModelFactory).get(ChatViewModel::class.java)
@@ -155,6 +157,27 @@ class ChatActivity : AppCompatActivity() {
             val attachmentIntent = Intent(this, AttachmentsActivity::class.java)
             startActivity(attachmentIntent)
         }
+
+        var chatChannelPhoneNumbers = ArrayList<String>()
+        databaseViewModel.getChatListPhoneNumbers.observe(this, {
+            chatChannelPhoneNumbers = it as ArrayList<String>
+        })
+        databaseViewModel.lastAddedMessage.observe(this, {
+            if (it != null) {
+                if (!chatChannelPhoneNumbers.contains(it.chatId)) {
+                    val chatListItem =
+                        ChatListItem(contactNumber = it.chatId, messageID = it.messageID)
+                    databaseViewModel.createChatChannel(chatListItem)
+                    Timber.d("${it.messageID} at creation====")
+                } else {
+                    Timber.d("${it.messageID} at update====")
+                    databaseViewModel.updateChatChannel(
+                        contact_number = it.chatId,
+                        messageID = it.messageID.toString()
+                    )
+                }
+            }
+        })
 
     }
 

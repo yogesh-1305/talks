@@ -33,12 +33,14 @@ import com.example.talks.gallery.GalleryActivity
 import com.example.talks.home.activity.HomeScreenActivity
 import com.example.talks.utils.UploadingDialog
 import com.example.talks.utils.Utility
+import com.example.talks.utils.Utility.toBitmap
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import java.net.URL
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,18 +57,17 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     private val talksViewModel: TalksViewModel by viewModels()
     private val viewModel: ThirdFragmentViewModel by viewModels()
 
-    //args
-    private val args: ThirdFragmentArgs by navArgs()
-
     //encryption key (v.v.imp)
     private val encryptionKey = BuildConfig.ENCRYPTION_KEY
 
+    //args
+    private val args: ThirdFragmentArgs by navArgs()
     // Variables
     private var countryName = ""
     private var countryCode = ""
     private var phoneNumber = ""
-    private var retrievedImageUrl: String = ""
 
+    private var retrievedImageUrl: String = ""
     // Pop up dialogs
     private lateinit var dialog: UploadingDialog
 
@@ -77,13 +78,12 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         binding = FragmentThirdBinding.inflate(inflater, container, false)
         dialog = UploadingDialog(activity as Activity)
 
-        // data from second Fragment
+        // firebase unique user id
+        userUid = auth.currentUser!!.uid
+
         countryName = args.countryName
         countryCode = args.countryCode
         phoneNumber = args.phoneNumber
-
-        // firebase unique user id
-        userUid = auth.currentUser!!.uid
 
         // get user data from server if exists
         viewModel.getUserFromDatabaseIfExists(userUid)
@@ -105,7 +105,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                     Encryption().decrypt(it["user_image"], encryptionKey).toString()
 
                 binding.thirdFragmentNameEditText.setText(it["user_name"])
-                binding.thirdFragmentBioEditText.setText(it["userBio"])git
+                binding.thirdFragmentBioEditText.setText(it["userBio"])
 
                 if (Helper.getImage() == null) {
                     Glide.with(this).load(retrievedImageUrl)
@@ -142,7 +142,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 val decryptedImageUrl =
                     Encryption().decrypt(it["user_image"], encryptionKey)
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val imageBitmap = Utility.getBitmapFromUrl(decryptedImageUrl)
+                    val imageBitmap = URL(decryptedImageUrl).toBitmap()
                     val dbUser =
                         User(
                             phoneNumber = it["phone_number"],
