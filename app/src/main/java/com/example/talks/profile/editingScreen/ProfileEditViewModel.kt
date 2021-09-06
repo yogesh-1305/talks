@@ -24,13 +24,13 @@ class ProfileEditViewModel : ViewModel() {
 
             val dbRef = Firebase.database.getReference("talks_database")
             val userNameUpdate: MutableMap<String, String> = HashMap()
-            userNameUpdate["contactUserName"] = name
+            userNameUpdate["user_name"] = name
 
             dbRef.child(uid).updateChildren(userNameUpdate as Map<String, String>)
                 .addOnCompleteListener {
                     if (it.isComplete) {
                         talksDatabase.updateUserName(name)
-                        isUserUpdated.value = true
+                        isUserUpdated.postValue(true)
                     }
                 }
         }
@@ -41,13 +41,13 @@ class ProfileEditViewModel : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             val dbRef = Firebase.database.getReference("talks_database")
             val bioUpdate: MutableMap<String, String> = HashMap()
-            bioUpdate["contact_bio"] = bio
+            bioUpdate["user_bio"] = bio
 
             dbRef.child(uid).updateChildren(bioUpdate as Map<String, String>)
                 .addOnCompleteListener {
                     if (it.isComplete) {
                         talksDatabase.updateUserBio(bio)
-                        isUserUpdated.value = true
+                        isUserUpdated.postValue(true)
                     }
                 }
         }

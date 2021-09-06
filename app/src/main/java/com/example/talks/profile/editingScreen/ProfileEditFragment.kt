@@ -6,11 +6,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.example.talks.R
@@ -36,7 +34,7 @@ class ProfileEditFragment : Fragment() {
 
     private val args: ProfileEditFragmentArgs by navArgs()
 
-    private var isUsernameEdited: Boolean = true
+    private var editType: EditType? = null
 
     @Inject
     lateinit var auth: FirebaseAuth
@@ -54,45 +52,15 @@ class ProfileEditFragment : Fragment() {
 
         uId = auth.currentUser?.uid.toString()
 
-        if (args.editType == 1) {
+        /* modify edit text according to args.editType...
+        ... if editType
+        ... 1 -> modify for editing username
+        ... else -> modify for editing bio
+        * */
+        if (args.editType == 1) modifyEditTextForUsername() else modifyEditTextForBio()
 
-            isUsernameEdited = true
-            toolbar.title = "Edit username"
-            inputLayout.hint = "Edit username"
-            inputLayout.counterMaxLength = 15
-            inputEditText.isSingleLine = true
-            inputEditText.isSelected = true
-            inputEditText.setText(args.editString)
-
-        } else {
-
-            isUsernameEdited = false
-            toolbar.title = "Edit bio"
-            inputLayout.hint = "Edit bio"
-            inputLayout.counterMaxLength = 50
-            inputEditText.isSelected = true
-            inputEditText.setText(args.editString)
-
-        }
-
-        viewModel.isUserUpdated.observe(viewLifecycleOwner, {
-            if (it) {
-                navigateToProfileFragment()
-            }
-        })
-
-        viewModel.isBioUpdated.observe(viewLifecycleOwner, {
-            if (it) {
-                navigateToProfileFragment()
-            }
-        })
-
+        subscribeToObservers()
         return binding.root
-    }
-
-    private fun navigateToProfileFragment() {
-        Navigation.findNavController(binding.root)
-            .navigate(R.id.action_profileEditFragment_to_profileFragment2)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -110,14 +78,15 @@ class ProfileEditFragment : Fragment() {
                         binding.editProfileProgressBar.visibility = View.VISIBLE
                         binding.textInputLayoutInProfileEdit.isEnabled = false
 
-                        if (isUsernameEdited && inputEditText.text.toString().trim().isNotBlank()) {
+                        if (editType == EditType.USERNAME && inputEditText.text.toString().trim()
+                                .isNotBlank()
+                        ) {
                             viewModel.setUsername(
                                 inputEditText.text.toString(),
                                 uId,
                                 databaseViewModel
                             )
-                        } else if (!isUsernameEdited) {
-                            Toast.makeText(context, "bio tapped", Toast.LENGTH_SHORT).show()
+                        } else if (editType == EditType.BIO) {
                             viewModel.setBio(inputEditText.text.toString(), uId, databaseViewModel)
                         }
                     } else {
@@ -131,7 +100,7 @@ class ProfileEditFragment : Fragment() {
 
 
         binding.textInputEditText.addTextChangedListener {
-            if (isUsernameEdited) {
+            if (editType == EditType.USERNAME) {
                 if (it.isNullOrEmpty()) {
                     inputLayout.helperText = "**username cannot be empty"
                 } else {
@@ -141,6 +110,43 @@ class ProfileEditFragment : Fragment() {
         }
     }
 
+    private fun subscribeToObservers() {
+        viewModel.isUserUpdated.observe(viewLifecycleOwner, {
+            if (it) {
+                navigateToProfileFragment()
+            }
+        })
+
+        viewModel.isBioUpdated.observe(viewLifecycleOwner, {
+            if (it) {
+                navigateToProfileFragment()
+            }
+        })
+    }
+
+    private fun navigateToProfileFragment() {
+        Navigation.findNavController(binding.root)
+            .navigate(R.id.action_profileEditFragment_to_profileFragment2)
+    }
+
+    private fun modifyEditTextForUsername() {
+        editType = EditType.USERNAME
+        toolbar.title = "Edit username"
+        inputLayout.hint = "Edit username"
+        inputLayout.counterMaxLength = 15
+        inputEditText.isSingleLine = true
+        inputEditText.isSelected = true
+        inputEditText.setText(args.editString)
+    }
+
+    private fun modifyEditTextForBio() {
+        editType = EditType.BIO
+        toolbar.title = "Edit bio"
+        inputLayout.hint = "Edit bio"
+        inputLayout.counterMaxLength = 50
+        inputEditText.isSelected = true
+        inputEditText.setText(args.editString)
+    }
 
     private fun String.showErrorDialog() {
         val alertDialog = AlertDialog.Builder(activity)
@@ -150,4 +156,8 @@ class ProfileEditFragment : Fragment() {
         }
         alertDialog.show()
     }
+}
+
+enum class EditType {
+    USERNAME, BIO
 }
