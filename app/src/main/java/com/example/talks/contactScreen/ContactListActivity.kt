@@ -4,22 +4,26 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.talks.R
 import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityContactListBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ContactListActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityContactListBinding
     private lateinit var adapter: ContactAdapter
     private lateinit var recyclerView: RecyclerView
-    private lateinit var viewModel: ContactViewModel
-    private lateinit var databaseViewModel: TalksViewModel
+
+    private val talksViewModel: TalksViewModel by viewModels()
+    private val viewModel: ContactViewModel by viewModels()
+
     private var contactsList = ArrayList<TalksContact>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,22 +33,20 @@ class ContactListActivity : AppCompatActivity() {
         setSupportActionBar(binding.contactScreenToolbar)
         supportActionBar?.title = null
 
-        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
-        viewModel = ViewModelProvider(this).get(ContactViewModel::class.java)
-
         recyclerView = binding.contactsRecyclerView
         recyclerView.setHasFixedSize(true)
         recyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
 
-        databaseViewModel.readAllContacts.observe(this, {
-            contactsList = it as ArrayList<TalksContact>
-            adapter = ContactAdapter(contactsList, this)
-            recyclerView.adapter = adapter
+        talksViewModel.readAllContacts.observe(this, {
+            it?.let {
+                contactsList = it as ArrayList<TalksContact>
+                adapter = ContactAdapter(contactsList, this)
+                recyclerView.adapter = adapter
 
-            binding.contactScreenToolbar.title = "Contacts"
-            binding.contactScreenToolbar.subtitle = contactsList.size.toString()
+                binding.contactScreenToolbar.title = "Contacts"
+                binding.contactScreenToolbar.subtitle = contactsList.size.toString()
+            }
         })
-
         binding.contactScreenToolbar.setNavigationOnClickListener { finish() }
     }
 

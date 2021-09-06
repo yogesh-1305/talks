@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
@@ -21,20 +22,25 @@ import com.example.talks.encryption.Encryption
 import com.example.talks.fileManager.FileManager
 import com.example.talks.gallery.GalleryActivity
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileBinding
-    private lateinit var databaseViewModel: TalksViewModel
-    private lateinit var viewModel: ProfileViewModel
+    private val databaseViewModel: TalksViewModel by viewModels()
+    private val viewModel: ProfileViewModel by viewModels()
 
     private val encryptionKey = BuildConfig.ENCRYPTION_KEY
+
     var image = ""
     var userName = ""
     var userBio = ""
     var phoneNumber = ""
 
-    private lateinit var auth: FirebaseAuth
+    @Inject
+    lateinit var auth: FirebaseAuth
     private lateinit var uId: String
 
     override fun onCreateView(
@@ -42,81 +48,71 @@ class ProfileFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentProfileBinding.inflate(layoutInflater, container, false)
-        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
-        viewModel = ViewModelProvider(this).get(ProfileViewModel::class.java)
-
-        auth = FirebaseAuth.getInstance()
-        uId = auth.currentUser!!.uid.toString()
-        Log.i("USER ID IN FRAGMENT PROFILE===", uId)
+        uId = auth.currentUser?.uid.toString()
 
         databaseViewModel.readAllUserData.observe(viewLifecycleOwner, {
-            val user1 = it[0]
+            it?.let {
+                val user1 = it[0]
+                userName = user1.userName.toString()
+                userBio = if (!user1.bio.isNullOrEmpty()) user1.bio else "Set a Bio"
+                phoneNumber = user1.phoneNumber.toString()
+                Glide.with(this).load(user1.profileImage)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .into(binding.profileScreenImage)
 
-            userName = user1.userName.toString()
-            userBio = user1.bio.toString()
-            phoneNumber = user1.phoneNumber.toString()
-            Glide.with(this).load(user1.profileImage).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .into(binding.profileScreenImage)
-
-            binding.phoneNumberInProfile.text = phoneNumber
-            binding.usernameInProfile.text = userName
-            binding.bioInProfile.text = userBio
-            binding.profileScreenName.text = userName
-        })
-
-        binding.changePhotoFAB.setOnClickListener {
-            val intent = Intent(context, GalleryActivity::class.java)
-            activity?.startActivity(intent)
-        }
-
-        binding.profileScreenBackButton.setOnClickListener {
-            activity?.finish()
-        }
-
-        binding.editPhoneNumberCard.setOnClickListener {
-            Toast.makeText(context, "Feature coming Soon", Toast.LENGTH_SHORT).show()
-        }
-
-        binding.editUserNameButton.setOnClickListener {
-            val editName = 1
-            val action =
-                ProfileFragmentDirections.actionProfileFragment2ToProfileEditFragment(
-                    editName,
-                    userName
-                )
-            Navigation.findNavController(binding.root)
-                .navigate(action)
-        }
-
-        binding.editBioButton.setOnClickListener {
-            val editBio = 2
-            val action =
-                ProfileFragmentDirections.actionProfileFragment2ToProfileEditFragment(
-                    editBio,
-                    userBio
-                )
-            Navigation.findNavController(binding.root)
-                .navigate(action)
-        }
-
-        viewModel.updatedProfileImageURL.observe(viewLifecycleOwner, {
-            if (it != null) {
-                val encryptedImageURL = Encryption().encrypt(it, encryptionKey)
-                viewModel.updateImageToDatabase(encryptedImageURL, uId, databaseViewModel)
+                binding.apply {
+                    phoneNumberInProfile.text = phoneNumber
+                    usernameInProfile.text = userName
+                    bioInProfile.text = userBio
+                    profileScreenName.text = userName
+                }
             }
         })
 
-        viewModel.imageUpdatedInLocalDatabase.observe(viewLifecycleOwner, {
-            if (it) {
-                val image = Helper.getImage()
-                val date = CalendarManager.getCurrentDateTime()
-                binding.profileScreenImage.setImageURI(image)
-                FileManager().createDirectoryInExternalStorage()
-                FileManager().saveProfileImageInExternalStorage(this, image, date)
-                Helper.setImageToNull()
-            }
-        })
+        binding.apply {
 
+            // button to change photo
+            changePhotoFAB.setOnClickListener {
+                val intent = Intent(context, GalleryActivity::class.java)
+                activity?.startActivity(intent)
+            }
+
+            // back button
+            profileScreenBackButton.setOnClickListener {
+                activity?.finish()
+            }
+
+            // edit phone number card
+            editPhoneNumberCard.setOnClickListener {
+                Toast.makeText(context, "Feature coming Soon", Toast.LENGTH_SHORT).show()
+            }
+
+            // edit user name card
+            editUserNameButton.setOnClickListener {
+                val editName = 1
+                val action =
+                    ProfileFragmentDirections.actionProfileFragment2ToProfileEditFragment(
+                        editName,
+                        userName
+                    )
+                Navigation.findNavController(binding.root)
+                    .navigate(action)
+            }
+
+            // edit bio card
+            editBioButton.setOnClickListener {
+                val editBio = 2
+                val action =
+                    ProfileFragmentDirections.actionProfileFragment2ToProfileEditFragment(
+                        editBio,
+                        userBio
+                    )
+                Navigation.findNavController(binding.root)
+                    .navigate(action)
+            }
+        }
+
+        subscribeToObservers()
         return binding.root
     }
 
@@ -126,7 +122,30 @@ class ProfileFragment : Fragment() {
         if (image != null) {
             viewModel.updateProfileImageInStorage(image, uId)
             binding.profileFragmentProgressBar.visibility = View.VISIBLE
-            Log.i("TAG IMAGE EDIT===", image.toString())
         }
+    }
+
+    private fun subscribeToObservers(){
+
+        viewModel.apply {
+            updatedProfileImageURL.observe(viewLifecycleOwner, {
+                if (it != null) {
+                    val encryptedImageURL = Encryption().encrypt(it, encryptionKey)
+                    viewModel.updateImageToDatabase(encryptedImageURL, uId, databaseViewModel)
+                }
+            })
+
+            imageUpdatedInLocalDatabase.observe(viewLifecycleOwner, {
+                if (it) {
+                    val image = Helper.getImage()
+                    val date = CalendarManager.getCurrentDateTime()
+                    binding.profileScreenImage.setImageURI(image)
+                    FileManager().createDirectoryInExternalStorage()
+                    FileManager().saveProfileImageInExternalStorage(this@ProfileFragment, image, date)
+                    Helper.setImageToNull()
+                }
+            })
+        }
+
     }
 }

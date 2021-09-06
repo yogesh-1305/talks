@@ -4,7 +4,10 @@ import android.content.Context
 import android.net.Uri
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.AsyncListDiffer
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
+import com.example.talks.database.ChatListQueriedData
 import com.example.talks.database.Message
 import com.example.talks.databinding.CustomReceiverMessagesBinding
 import com.example.talks.databinding.CustomSenderMessagesBinding
@@ -13,9 +16,23 @@ import com.example.talks.databinding.SenderChatImageLayoutBinding
 
 class ChatAdapter(
     val context: Context?,
-    private val messages: List<Message>
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
+
+    private val diffCallback = object : DiffUtil.ItemCallback<Message>() {
+        override fun areItemsTheSame(oldItem: Message, newItem: Message): Boolean {
+            return oldItem.id == newItem.id
+        }
+
+        override fun areContentsTheSame(oldItem: Message, newItem: Message): Boolean {
+            return oldItem.hashCode() == newItem.hashCode()
+        }
+    }
+
+    private val differ = AsyncListDiffer(this, diffCallback)
+
+    fun submitChatList(list:List<Message>) = differ.submitList(list)
+
 
     inner class SenderTextViewHolder(val binding: CustomSenderMessagesBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -105,7 +122,7 @@ class ChatAdapter(
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        val message = messages[position]
+        val message = differ.currentList[position]
 
         when (holder) {
             is SenderTextViewHolder -> holder.bind(message)
@@ -122,6 +139,7 @@ class ChatAdapter(
     private val receiverImageMessageCode = 4
 
     override fun getItemViewType(position: Int): Int {
+        val messages = differ.currentList
         if (position >= messages.size) {
             return 0
         } else {
@@ -155,6 +173,6 @@ class ChatAdapter(
 
 
     override fun getItemCount(): Int {
-        return messages.size
+        return differ.currentList.size
     }
 }

@@ -23,16 +23,21 @@ import com.example.talks.databinding.ActivityChatBinding
 import com.example.talks.gallery.attachmentsGallery.activity.AttachmentsActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.vanniktech.emoji.EmojiPopup
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_chat.*
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.*
 
+@AndroidEntryPoint
 class ChatActivity : AppCompatActivity() {
 
     private val databaseViewModel: TalksViewModel by viewModels()
-    private lateinit var viewModel: ChatViewModel
+    private lateinit var viewModelFactory: ChatViewModelFactory
+    private val viewModel: ChatViewModel by viewModels() { viewModelFactory }
     private lateinit var binding: ActivityChatBinding
+
+    private lateinit var chatAdapter: ChatAdapter
 
     private var auth = FirebaseAuth.getInstance()
     private var senderPhoneNumber = auth.currentUser?.phoneNumber
@@ -58,35 +63,21 @@ class ChatActivity : AppCompatActivity() {
         val intent = intent
         val phoneNumber = intent.getStringExtra("contactNumber")
 
-        val viewModelFactory =
+        viewModelFactory =
             ChatViewModelFactory(senderPhoneNumber, phoneNumber, databaseViewModel)
-        viewModel = ViewModelProvider(this, viewModelFactory).get(ChatViewModel::class.java)
 
         if (phoneNumber != null) {
             observeUserData(phoneNumber)
             receiverID = phoneNumber
         }
 
-        val layoutManager = LinearLayoutManager(this).apply {
-            stackFromEnd = true
-            isSmoothScrollbarEnabled = true
-        }
-
-        val recyclerView = binding.chatRecyclerView.apply {
-            setHasFixedSize(true)
-            setLayoutManager(layoutManager)
-        }
-
+        setupRecyclerView()
         lifecycleScope.launch {
             databaseViewModel.readMessages(receiverID)
                 .observe(this@ChatActivity, { list ->
-                    if (list.isNotEmpty()) {
-                        val adapter = ChatAdapter(this@ChatActivity, list)
-                        recyclerView.adapter = adapter
-                    } else {
-                        Toast.makeText(applicationContext, "list is empty", Toast.LENGTH_SHORT)
-                            .show()
-                    }
+                   list?.let {
+                       chatAdapter.submitChatList(list)
+                   }
                 })
         }
 
@@ -99,7 +90,6 @@ class ChatActivity : AppCompatActivity() {
             if (it != null) {
                 if (it.isEmpty()) {
                     isTextEmpty = true
-                    Toast.makeText(this, "zero", Toast.LENGTH_SHORT).show()
                     attachButton.visibility = View.VISIBLE
                     micButton.setImageResource(R.drawable.ic_baseline_mic_24)
                 } else {
@@ -178,6 +168,16 @@ class ChatActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun setupRecyclerView() = binding.chatRecyclerView.apply {
+        chatAdapter = ChatAdapter(this@ChatActivity)
+        this.adapter = chatAdapter
+        this.setHasFixedSize(true)
+        layoutManager = LinearLayoutManager(this@ChatActivity).apply {
+            stackFromEnd = true
+            isSmoothScrollbarEnabled = true
+        }
 
     }
 
@@ -191,7 +191,6 @@ class ChatActivity : AppCompatActivity() {
                 CalendarManager.getCurrentDateTime(),
                 applicationContext
             )
-            Toast.makeText(applicationContext, imagesToSend.toString(), Toast.LENGTH_SHORT).show()
         }
     }
 

@@ -4,8 +4,9 @@ import android.os.Bundle
 import androidx.fragment.app.FragmentActivity
 import com.example.talks.databinding.ActivityProfileSettingsBinding
 import com.r0adkll.slidr.model.SlidrInterface
+import dagger.hilt.android.AndroidEntryPoint
 
-
+@AndroidEntryPoint
 class ProfileSettingsActivity : FragmentActivity() {
 
     private lateinit var binding: ActivityProfileSettingsBinding

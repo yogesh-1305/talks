@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
@@ -19,12 +20,15 @@ import com.example.talks.networkManager.NetworkManager
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth
+import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ProfileEditFragment : Fragment() {
 
     private lateinit var binding: FragmentProfileEditBinding
-    private lateinit var databaseViewModel: TalksViewModel
-    private lateinit var viewModel: ProfileEditViewModel
+    private val databaseViewModel: TalksViewModel by viewModels()
+    private val viewModel: ProfileEditViewModel by viewModels()
 
     private lateinit var toolbar: androidx.appcompat.widget.Toolbar
     private lateinit var inputLayout: TextInputLayout
@@ -34,7 +38,8 @@ class ProfileEditFragment : Fragment() {
 
     private var isUsernameEdited: Boolean = true
 
-    private lateinit var auth: FirebaseAuth
+    @Inject
+    lateinit var auth: FirebaseAuth
     private lateinit var uId: String
 
     override fun onCreateView(
@@ -42,15 +47,12 @@ class ProfileEditFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         binding = FragmentProfileEditBinding.inflate(inflater, container, false)
-        databaseViewModel = ViewModelProvider(this).get(TalksViewModel::class.java)
-        viewModel = ViewModelProvider(this).get(ProfileEditViewModel::class.java)
         toolbar = binding.profileEditToolbar
 
         inputLayout = binding.textInputLayoutInProfileEdit
         inputEditText = binding.textInputEditText
 
-        auth = FirebaseAuth.getInstance()
-        uId = auth.currentUser!!.uid
+        uId = auth.currentUser?.uid.toString()
 
         if (args.editType == 1) {
 

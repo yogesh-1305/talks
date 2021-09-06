@@ -11,6 +11,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import android.content.Context
 import com.example.talks.database.TalksDatabase
+import com.example.talks.database.TalksRepository
+import com.example.talks.database.TalksViewModel
 import javax.inject.Singleton
 
 @Module
@@ -35,6 +37,5 @@ object AppModule {
     @Singleton
     @Provides
     fun provideDatabaseDao(db: TalksDatabase) = db.talksDao()
-
 
 }

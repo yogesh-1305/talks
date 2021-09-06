@@ -11,16 +11,16 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TalksViewModel @Inject constructor(private val repository: TalksRepository) : ViewModel() {
+class TalksViewModel @Inject public constructor(private val repository: TalksRepository) : ViewModel() {
 
-    var readAllUserData: LiveData<List<User>> = repository.readAllUserData
-    var readAllContacts: LiveData<List<TalksContact>> = repository.readContacts
-    var readChatListItem: LiveData<List<ChatListQueriedData>> = repository.readChatListItem
-    var readContactPhoneNumbers: LiveData<List<String>> = repository.readContactPhoneNumbers
-    var getDistinctMessages: LiveData<List<String>> = repository.getDistinctMessages
-    var lastAddedMessage: LiveData<Message> = repository.lastAddedMessage
-    var getChatListPhoneNumbers: LiveData<List<String>> = repository.getChatListPhoneNumbers
-    var getDistinctPhoneNumbers: LiveData<List<String>> = repository.getDistinctPhoneNumbers
+    val readAllUserData: LiveData<List<User>> = repository.readAllUserData
+    val readAllContacts: LiveData<List<TalksContact>> = repository.readContacts
+    val readChatListItem: LiveData<List<ChatListQueriedData>> = repository.readChatListItem
+    val readContactPhoneNumbers: LiveData<List<String>> = repository.readContactPhoneNumbers
+    val getDistinctMessages: LiveData<List<String>> = repository.getDistinctMessages
+    val lastAddedMessage: LiveData<Message> = repository.lastAddedMessage
+    val getChatListPhoneNumbers: LiveData<List<String>> = repository.getChatListPhoneNumbers
+    val getDistinctPhoneNumbers: LiveData<List<String>> = repository.getDistinctPhoneNumbers
 
     suspend fun readMessages(chatID: String): LiveData<List<Message>> {
         return repository.readMessages(chatID)
