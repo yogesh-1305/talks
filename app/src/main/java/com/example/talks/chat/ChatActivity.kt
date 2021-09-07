@@ -8,12 +8,11 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.addTextChangedListener
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.example.talks.Helper
+import com.example.talks.others.Helper
 import com.example.talks.R
 import com.example.talks.calendar.CalendarManager
 import com.example.talks.calling.CallingActivity

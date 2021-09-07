@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.GridLayoutManager
 import com.example.talks.BuildConfig
-import com.example.talks.Helper
+import com.example.talks.others.Helper
 import com.example.talks.databinding.ActivityGalleryBinding
 import com.theartofdev.edmodo.cropper.CropImage
 import id.zelory.compressor.Compressor
@@ -38,8 +38,6 @@ class GalleryActivity : AppCompatActivity() {
         binding = ActivityGalleryBinding.inflate(layoutInflater)
         setContentView(binding.root)
         viewModel = ViewModelProvider(this).get(GalleryActivityViewModel::class.java)
-
-
 
         imagesList = LinkedList()
         imagesList = listOfImages(this)

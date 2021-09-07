@@ -2,10 +2,8 @@ package com.example.talks.gallery.attachmentEditing
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Toast
 import androidx.viewpager.widget.ViewPager
-import androidx.viewpager2.widget.ViewPager2
-import com.example.talks.Helper
+import com.example.talks.others.Helper
 import com.example.talks.R
 import kotlinx.android.synthetic.main.activity_attachment_editing.*
 

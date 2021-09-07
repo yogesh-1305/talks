@@ -1,4 +1,4 @@
-package com.example.talks
+package com.example.talks.others
 
 import android.net.Uri
 import com.example.talks.database.TalksContact
@@ -14,18 +14,18 @@ class Helper {
         }
 
         fun setContact(contact: TalksContact?) {
-            this.contact = contact
+            Companion.contact = contact
         }
 
         ////////////////////////////////////////////////////////////////////////
         private var image: Uri? = null
 
         fun imageFromGallery(image: Uri?) {
-            this.image = image
+            Companion.image = image
         }
 
         fun getImage(): Uri? {
-            return this.image
+            return image
         }
 
         fun setImageToNull() {

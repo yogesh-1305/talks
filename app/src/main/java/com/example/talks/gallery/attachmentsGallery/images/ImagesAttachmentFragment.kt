@@ -1,31 +1,19 @@
 package com.example.talks.gallery.attachmentsGallery.images
 
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.Intent
-import android.database.Cursor
-import android.net.Uri
 import android.os.Build
 import android.os.Bundle
-import android.provider.MediaStore
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
-import com.example.talks.BuildConfig
-import com.example.talks.Helper
+import com.example.talks.others.Helper
 import com.example.talks.R
 import com.example.talks.databinding.FragmentImagesAttachmentBinding
-import com.example.talks.gallery.attachmentEditing.AttachmentEditingActivity
 import com.example.talks.gallery.attachmentsGallery.AttachmentStateListener
 import kotlinx.android.synthetic.main.fragment_images_attachment.*
-import java.util.*
 
 @Suppress("DEPRECATION")
 class ImagesAttachmentFragment : Fragment(), AttachmentStateListener {
@@ -33,7 +21,7 @@ class ImagesAttachmentFragment : Fragment(), AttachmentStateListener {
     private lateinit var binding : FragmentImagesAttachmentBinding
     private lateinit var viewModel: ImagesViewModel
 
-    var toolbarSubtitle = 0
+    private var toolbarSubtitle = 0
     private var toolbarNormalState = true
 
     private lateinit var imagesAdapter: ImagesAdapter

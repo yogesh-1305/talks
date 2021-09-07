@@ -2,19 +2,17 @@ package com.example.talks.profile
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.BuildConfig
-import com.example.talks.Helper
+import com.example.talks.others.Helper
 import com.example.talks.calendar.CalendarManager
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentProfileBinding

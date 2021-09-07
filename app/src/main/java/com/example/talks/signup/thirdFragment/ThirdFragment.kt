@@ -21,7 +21,7 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.BuildConfig
-import com.example.talks.Helper
+import com.example.talks.others.Helper
 import com.example.talks.R
 import com.example.talks.calendar.CalendarManager
 import com.example.talks.database.TalksViewModel
@@ -32,7 +32,6 @@ import com.example.talks.fileManager.FileManager
 import com.example.talks.gallery.GalleryActivity
 import com.example.talks.home.activity.HomeScreenActivity
 import com.example.talks.utils.UploadingDialog
-import com.example.talks.utils.Utility
 import com.example.talks.utils.Utility.toBitmap
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth

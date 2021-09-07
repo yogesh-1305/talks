@@ -1,6 +1,8 @@
 package com.example.talks.encryption
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import java.io.UnsupportedEncodingException
 import java.security.MessageDigest
 import java.security.NoSuchAlgorithmException
@@ -28,6 +30,7 @@ class Encryption internal constructor(){
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("GetInstance")
     fun encrypt(strToEncrypt: String, secret: String): String? {
         try {
@@ -42,6 +45,7 @@ class Encryption internal constructor(){
         return null
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("GetInstance")
     fun decrypt(strToDecrypt: String?, secret: String): String? {
         try {

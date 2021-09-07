@@ -13,6 +13,8 @@ import android.content.Context
 import com.example.talks.database.TalksDatabase
 import com.example.talks.database.TalksRepository
 import com.example.talks.database.TalksViewModel
+import com.example.talks.others.Constants
+import com.example.talks.others.Constants.DATABASE_NAME
 import javax.inject.Singleton
 
 @Module
@@ -31,7 +33,7 @@ object AppModule {
     @Provides
     fun provideRunningDatabase(@ApplicationContext context: Context) = Room.databaseBuilder(
         context, TalksDatabase::class.java,
-        "talks_database"
+        DATABASE_NAME
     ).build()
 
     @Singleton
