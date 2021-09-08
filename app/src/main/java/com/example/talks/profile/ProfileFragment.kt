@@ -1,11 +1,13 @@
 package com.example.talks.profile
 
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
@@ -18,11 +20,14 @@ import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.FragmentProfileBinding
 import com.example.talks.encryption.Encryption
 import com.example.talks.fileManager.FileManager
+import com.example.talks.fileManager.TalksStorageManager
 import com.example.talks.gallery.GalleryActivity
+import com.example.talks.others.utility.ConversionUtility.toBitmap
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@RequiresApi(Build.VERSION_CODES.O)
 @AndroidEntryPoint
 class ProfileFragment : Fragment() {
 
@@ -48,25 +53,12 @@ class ProfileFragment : Fragment() {
         binding = FragmentProfileBinding.inflate(layoutInflater, container, false)
         uId = auth.currentUser?.uid.toString()
 
-        databaseViewModel.readAllUserData.observe(viewLifecycleOwner, {
-            it?.let {
-                val user1 = it[0]
-                userName = user1.userName.toString()
-                userBio = if (!user1.bio.isNullOrEmpty()) user1.bio else "Set a Bio"
-                phoneNumber = user1.phoneNumber.toString()
-                Glide.with(this).load(user1.profileImage)
-                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                    .into(binding.profileScreenImage)
+        subscribeToObservers()
+        setClickListeners()
+        return binding.root
+    }
 
-                binding.apply {
-                    phoneNumberInProfile.text = phoneNumber
-                    usernameInProfile.text = userName
-                    bioInProfile.text = userBio
-                    profileScreenName.text = userName
-                }
-            }
-        })
-
+    private fun setClickListeners() {
         binding.apply {
 
             // button to change photo
@@ -109,9 +101,57 @@ class ProfileFragment : Fragment() {
                     .navigate(action)
             }
         }
+    }
 
-        subscribeToObservers()
-        return binding.root
+    private fun subscribeToObservers() {
+
+        databaseViewModel.readAllUserData.observe(viewLifecycleOwner, {
+            it?.let {
+                val user1 = it[0]
+                userName = user1.userName.toString()
+                userBio = if (!user1.bio.isNullOrEmpty()) user1.bio else "Set a Bio"
+                phoneNumber = user1.phoneNumber.toString()
+                Glide.with(this).load(user1.imageLocalPath ?: user1.profileImageUrl)
+                    .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+                    .into(binding.profileScreenImage)
+
+                binding.apply {
+                    phoneNumberInProfile.text = phoneNumber
+                    usernameInProfile.text = userName
+                    bioInProfile.text = userBio
+                    profileScreenName.text = userName
+                }
+            }
+        })
+
+        viewModel.apply {
+            updatedProfileImageURL.observe(viewLifecycleOwner, {
+                it?.let {
+                    val encryptedImageURL = Encryption().encrypt(it, encryptionKey).toString()
+                    val imageBitmap = Helper.getImage()?.toBitmap(requireActivity())
+                    val imagePath = imageBitmap?.let { bitmap ->
+                        TalksStorageManager.saveProfilePhotoInPrivateStorage(
+                            requireContext(),
+                            bitmap
+                        )
+                    }
+                    viewModel.updateImageToDatabase(
+                        encryptedImageURL,
+                        imagePath.toString(),
+                        uId,
+                        databaseViewModel
+                    )
+                }
+            })
+
+            imageUpdatedInLocalDatabase.observe(viewLifecycleOwner, {
+                if (it) {
+                    val image = Helper.getImage()
+                    binding.profileScreenImage.setImageURI(image)
+                    Helper.setImageToNull()
+                }
+            })
+        }
     }
 
     override fun onResume() {
@@ -121,29 +161,5 @@ class ProfileFragment : Fragment() {
             viewModel.updateProfileImageInStorage(image, uId)
             binding.profileFragmentProgressBar.visibility = View.VISIBLE
         }
-    }
-
-    private fun subscribeToObservers(){
-
-        viewModel.apply {
-            updatedProfileImageURL.observe(viewLifecycleOwner, {
-                if (it != null) {
-                    val encryptedImageURL = Encryption().encrypt(it, encryptionKey)
-                    viewModel.updateImageToDatabase(encryptedImageURL, uId, databaseViewModel)
-                }
-            })
-
-            imageUpdatedInLocalDatabase.observe(viewLifecycleOwner, {
-                if (it) {
-                    val image = Helper.getImage()
-                    val date = CalendarManager.getCurrentDateTime()
-                    binding.profileScreenImage.setImageURI(image)
-                    FileManager().createDirectoryInExternalStorage()
-                    FileManager().saveProfileImageInExternalStorage(this@ProfileFragment, image, date)
-                    Helper.setImageToNull()
-                }
-            })
-        }
-
     }
 }

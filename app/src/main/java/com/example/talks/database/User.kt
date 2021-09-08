@@ -8,11 +8,12 @@ import androidx.room.PrimaryKey
 data class User(
     val phoneNumber: String?,
     val userName: String?,
-    val profileImage: Bitmap?,
+    val profileImageUrl: String?,
     val bio: String?,
     val firebaseAuthUID: String?
 )
 {
     @PrimaryKey(autoGenerate = true)
     var id: Int? = null
+    var imageLocalPath: String? = null
 }

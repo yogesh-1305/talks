@@ -1,11 +1,18 @@
 package com.example.talks.signup.thirdFragment
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
+import android.database.Cursor
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
+import android.graphics.drawable.BitmapDrawable
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.KeyEvent
 import android.view.LayoutInflater
 import android.view.View
@@ -13,32 +20,38 @@ import android.view.ViewGroup
 import android.view.inputmethod.EditorInfo
 import android.view.inputmethod.InputMethodManager
 import android.widget.TextView
-import androidx.core.app.ActivityCompat
+import android.widget.Toast
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
+import coil.request.ImageRequest
+import coil.request.SuccessResult
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.BuildConfig
-import com.example.talks.others.Helper
 import com.example.talks.R
 import com.example.talks.calendar.CalendarManager
+import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
 import com.example.talks.database.User
 import com.example.talks.databinding.FragmentThirdBinding
 import com.example.talks.encryption.Encryption
-import com.example.talks.fileManager.FileManager
+import com.example.talks.fileManager.TalksStorageManager
 import com.example.talks.gallery.GalleryActivity
 import com.example.talks.home.activity.HomeScreenActivity
+import com.example.talks.others.Helper
+import com.example.talks.others.utility.ConversionUtility.toBitmap
+import com.example.talks.others.utility.PermissionsUtility
 import com.example.talks.utils.UploadingDialog
 import com.example.talks.utils.Utility.toBitmap
 import com.google.android.material.snackbar.Snackbar
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import java.net.URL
 import javax.inject.Inject
 
@@ -61,14 +74,24 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
     //args
     private val args: ThirdFragmentArgs by navArgs()
+
     // Variables
     private var countryName = ""
     private var countryCode = ""
     private var phoneNumber = ""
 
     private var retrievedImageUrl: String = ""
+
     // Pop up dialogs
     private lateinit var dialog: UploadingDialog
+
+    private var contactPhoneNumberList = ArrayList<String>()
+    private var contactNameList = HashMap<String, String>()
+    private var dataFetchedOnce = false
+
+    private lateinit var storagePermission: ActivityResultLauncher<String>
+    private lateinit var storagePermissionBelowAndroidQ: ActivityResultLauncher<Array<String>>
+    private lateinit var contactPermission: ActivityResultLauncher<String>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -90,13 +113,76 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         subscribeToObservers()
         setClickListeners()
 
+        registerForPermissionCallbacks()
+        requestContactsPermission()
+
     }
 
+    private fun registerForPermissionCallbacks() {
+        storagePermission =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                if (it) {
+                    navigateToGalleryActivity()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "permission denied in third fragment",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+        storagePermissionBelowAndroidQ =
+            registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+                if (it[Manifest.permission.READ_EXTERNAL_STORAGE] == true && it[Manifest.permission.WRITE_EXTERNAL_STORAGE] == true) {
+                    navigateToGalleryActivity()
+                } else {
+                    Toast.makeText(
+                        requireContext(),
+                        "permission denied in third fragment",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+        contactPermission =
+            registerForActivityResult(ActivityResultContracts.RequestPermission()) {
+                if (it) {
+                    readContacts()
+                } else {
+                    TODO("handle permission denial")
+                }
+            }
+    }
+
+    private fun requestContactsPermission() {
+        if (PermissionsUtility.hasContactsPermissions(requireContext())) return
+        contactPermission.launch(Manifest.permission.READ_CONTACTS)
+    }
+
+    private fun hasStoragePermissions(): Boolean {
+        if (PermissionsUtility.hasStoragePermissions(requireContext())) return true
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+            storagePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
+        } else {
+            storagePermission.launch(
+                arrayOf(
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                ).toString()
+            )
+        }
+        return false
+    }
+
+    @DelicateCoroutinesApi
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun subscribeToObservers() {
         viewModel.existingUserData.observe(viewLifecycleOwner, {
             if (it != null) {
@@ -141,15 +227,22 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 val decryptedImageUrl =
                     Encryption().decrypt(it["user_image"], encryptionKey)
                 lifecycleScope.launch(Dispatchers.IO) {
-                    val imageBitmap = URL(decryptedImageUrl).toBitmap()
+                    val imageBitmap = async { decryptedImageUrl?.toBitmap(requireContext()) }
+                    val imagePath = imageBitmap.await()?.let { bitmap ->
+                        TalksStorageManager.saveProfilePhotoInPrivateStorage(requireContext(),
+                            bitmap
+                        )
+                    }
                     val dbUser =
                         User(
                             phoneNumber = it["phone_number"],
                             userName = it["user_name"],
-                            profileImage = imageBitmap,
+                            profileImageUrl = decryptedImageUrl,
                             bio = it["user_bio"],
                             firebaseAuthUID = it["user_id"]
-                        )
+                        ).apply {
+                            imageLocalPath = imagePath
+                        }
                     talksViewModel.addUser(user = dbUser)
                 }
             }
@@ -162,9 +255,6 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 val image = Helper.getImage()
                 val date = CalendarManager.getCurrentDateTime()
 
-                FileManager().createDirectoryInExternalStorage()
-                FileManager().saveProfileImageInExternalStorage(this, image, date)
-
                 lifecycleScope.launch {
                     delay(1000L)
                     dialog.dismiss()
@@ -175,11 +265,28 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 }
             }
         })
+
+        lifecycleScope.launch {
+            talksViewModel.readContactPhoneNumbers.observe(viewLifecycleOwner, {
+                if (it != null) {
+                    if (!dataFetchedOnce) {
+                        viewModel.getUsersFromServer(
+                            it,
+                            contactNameList,
+                            talksViewModel,
+                            encryptionKey
+                        )
+                        dataFetchedOnce = true
+                    }
+                }
+            })
+        }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setClickListeners() {
         binding.thirdFragmentUserImage.setOnClickListener {
-            if (isPermissionGranted()) {
+            if (hasStoragePermissions()) {
                 navigateToGalleryActivity()
             }
         }
@@ -213,28 +320,41 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun startUploadProcess() {
         dialog.startDialog()
         val image = Helper.getImage()
+        val imageBitmap = image?.toBitmap(requireActivity())
 
         if (image != null) {
             lifecycleScope.launch {
                 viewModel.uploadImageToStorage(image, userUid)
+                imageBitmap?.let {
+                    TalksStorageManager.saveProfilePhotoInPrivateStorage(
+                        requireContext(),
+                        it
+                    )
+                }
             }
         } else {
-            val encryptedImage = Encryption().encrypt(retrievedImageUrl, encryptionKey)
-            val user = hashMapOf(
-                "phone_number" to "$countryCode$phoneNumber",
-                "user_name" to getNameFromEditText(),
-                "user_bio" to getBioFromEditText(),
-                "user_image_url" to encryptedImage,
-                "user_UID" to userUid,
-                "user_active_status" to "active now",
-            )
-            viewModel.addUserToFirebaseDatabase(user)
+            lifecycleScope.launch() {
+                val encryptedImage = Encryption().encrypt(retrievedImageUrl, encryptionKey)
+                val user = hashMapOf(
+                    "phone_number" to "$countryCode$phoneNumber",
+                    "user_name" to getNameFromEditText(),
+                    "user_bio" to getBioFromEditText(),
+                    "user_image_url" to encryptedImage,
+                    "user_UID" to userUid,
+                    "user_active_status" to "active now",
+                )
+                viewModel.addUserToFirebaseDatabase(user)
+            }
         }
     }
 
+
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
         if (actionId == EditorInfo.IME_ACTION_DONE) {
             startUploadProcess()
@@ -250,36 +370,50 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         imm.hideSoftInputFromWindow(windowToken, 0)
     }
 
-    private fun isPermissionGranted(): Boolean {
-        return if (context?.let {
-                ActivityCompat.checkSelfPermission(
-                    it,
-                    Manifest.permission.READ_EXTERNAL_STORAGE
-                )
-            } != PackageManager.PERMISSION_GRANTED) {
-            activity?.let {
-                ActivityCompat.requestPermissions(
-                    it,
-                    Array(1) { Manifest.permission.READ_EXTERNAL_STORAGE },
-                    112
-                )
-            }
-            false
-        } else {
-            true
+    private fun readContacts() {
+        val phones = requireActivity().contentResolver?.query(
+            ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
+            null, null, null, ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME
+        )
+        if (phones != null) {
+            showContacts(phones)
         }
     }
 
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<out String>,
-        grantResults: IntArray
-    ) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
-        if (requestCode == 112 && permissions.equals(Manifest.permission.READ_EXTERNAL_STORAGE)) {
-            navigateToGalleryActivity()
+    @SuppressLint("Range")
+    private fun showContacts(phones: Cursor) {
+        lifecycleScope.launch {
+            while (phones.moveToNext()) {
+                val contactName =
+                    phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME))
+                var phoneNumber =
+                    phones.getString(phones.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER))
+
+                phoneNumber = phoneNumber.replace("\\s".toRegex(), "").trim()
+                phoneNumber = formatPhoneNumber(phoneNumber)
+                contactPhoneNumberList.add(phoneNumber)
+                contactNameList[phoneNumber] = contactName
+                val contact = TalksContact(
+                    phoneNumber, contactName
+                )
+                talksViewModel.addContact(contact)
+            }
         }
     }
+
+    private fun formatPhoneNumber(phoneNumber: String): String {
+        var number = phoneNumber
+        if (!number.startsWith("+")) {
+            number = if (phoneNumber.startsWith("0")) {
+                number = phoneNumber.drop(1)
+                "+91$number"
+            } else {
+                "+91$number"
+            }
+        }
+        return number
+    }
+
 
     private fun navigateToGalleryActivity() {
         val intent = Intent(context, GalleryActivity::class.java)

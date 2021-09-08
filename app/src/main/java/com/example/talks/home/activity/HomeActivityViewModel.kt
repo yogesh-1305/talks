@@ -5,7 +5,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.Bitmap
+import android.os.Build
 import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -39,6 +41,7 @@ class HomeActivityViewModel : ViewModel() {
         MutableLiveData<ChatListItem>()
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @DelicateCoroutinesApi
     fun getUsersFromServer(
         databaseContactList: List<String>,

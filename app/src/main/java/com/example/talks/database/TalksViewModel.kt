@@ -56,9 +56,9 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
         }
     }
 
-    fun updateUserImage(userImage: String) {
+    fun updateUserImage(userImage: String, imageLocalPath: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateUserImage(userImage)
+            repository.updateUserImage(userImage, imageLocalPath)
         }
     }
 

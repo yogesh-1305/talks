@@ -5,11 +5,13 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.Menu
 import android.webkit.*
 import androidx.activity.viewModels
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
@@ -19,6 +21,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.bumptech.glide.Glide
+import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.BuildConfig
 import com.example.talks.R
 import com.example.talks.database.ChatListItem
@@ -26,6 +29,7 @@ import com.example.talks.database.TalksContact
 import com.example.talks.database.TalksViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.fileManager.FileManager
+import com.example.talks.fileManager.TalksStorageManager
 import com.example.talks.profile.ProfileSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.FirebaseApp
@@ -62,6 +66,7 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private lateinit var merlin: Merlin
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,9 +74,6 @@ class HomeScreenActivity : AppCompatActivity() {
         setContentView(binding.root)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
-
-        FileManager().createDirectoryInExternalStorage()
-        FirebaseApp.initializeApp(this)
         auth = FirebaseAuth.getInstance()
 
         if (isPermissionGranted()) {
@@ -138,13 +140,12 @@ class HomeScreenActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-//        viewModel.getCurrentUserData(auth.currentUser?.uid, databaseViewModel)
 
         databaseViewModel.readAllUserData.observe(this, {
             val user1 = it[0]
-            Glide.with(this).load(user1.profileImage)
-                .placeholder(R.drawable.ic_baseline_person_24)
-                .into(binding.toolbarDP)
+            Glide.with(this).load(user1.imageLocalPath ?: user1.profileImageUrl).diskCacheStrategy(
+                DiskCacheStrategy.AUTOMATIC
+            ).placeholder(R.drawable.ic_baseline_person_24).into(binding.toolbarDP)
         })
 
         binding.toolbarDP.setOnClickListener {

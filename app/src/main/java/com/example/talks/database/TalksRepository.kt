@@ -40,8 +40,8 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
         talksDao.updateUserName(userName)
     }
 
-    suspend fun updateUserImage(userImage: String) {
-        talksDao.updateUserImage(userImage)
+    suspend fun updateUserImage(userImage: String, imageLocalPath: String) {
+        talksDao.updateUserImage(userImage, imageLocalPath)
     }
 
     suspend fun updateUserBio(userBio: String) {

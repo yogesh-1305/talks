@@ -67,8 +67,8 @@ interface TalksDao {
     suspend fun updateUserName(userName: String)
 
     // user image
-    @Query("UPDATE user_data SET profileImage = :userImage")
-    suspend fun updateUserImage(userImage: String)
+    @Query("UPDATE user_data SET profileImageUrl = :userImage, imageLocalPath = :imageLocalPath")
+    suspend fun updateUserImage(userImage: String, imageLocalPath: String)
 
     // user bio
     @Query("UPDATE user_data SET bio = :userBio")

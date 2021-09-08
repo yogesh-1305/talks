@@ -4,6 +4,8 @@ import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.os.Build
+import com.example.talks.fileManager.TalksStorageManager
+import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
@@ -16,23 +18,20 @@ class TalksApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        FirebaseApp.initializeApp(this)
         val auth = FirebaseAuth.getInstance()
         val userID = auth.currentUser?.uid.toString()
 
         /////////////////////////////////////////////////////////////////////
         Firebase.database.setPersistenceEnabled(true)
-        val dbRef = Firebase.database.getReference("chat_database")
+        val dbRef = Firebase.database.getReference("talks_database_chats")
         dbRef.keepSynced(false)
         EmojiManager.install(GoogleEmojiProvider())
 
-        ////////////////////////////////////////////////////////////////////
-        createNotificationChannelForCalls()
-        ////////////////////////////////////////////////////////////////////
-//        GlobalScope.launch(Dispatchers.IO) {
-//            Firebase.database.getReference("talks_database").child(userID)
-//                .child("call_stats")
-//                .child("callerID").setValue("")
-//        }
+
+        // create directories
+        TalksStorageManager.createDirectoryInPrivateStorage(this)
+        TalksStorageManager.createDirectoryInPublicStorage()
     }
 
     private fun createNotificationChannelForCalls() {

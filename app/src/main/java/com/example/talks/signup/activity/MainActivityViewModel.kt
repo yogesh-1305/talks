@@ -22,48 +22,4 @@ class MainActivityViewModel : ViewModel() {
     val users: MutableLiveData<MutableList<ServerUser>> by lazy {
         MutableLiveData<MutableList<ServerUser>>()
     }
-
-    fun getUsersFromServer(
-        databaseContactList: List<String>,
-        contactNameList: HashMap<String, String>,
-        databaseViewModel: TalksViewModel
-    ) {
-
-        viewModelScope.launch(Dispatchers.IO) {
-
-            fireStore.collection("user_database").get()
-                .addOnSuccessListener {
-                    Log.i("contacts Snapshot====", it.toString())
-
-                    for (document in it) {
-
-                        val contactNumber = document.getString("contactNumber")
-                        val contactUserName = document.getString("contactUserName")
-                        val contactImageUrl = document.getString("contactImageUrl")
-                        val contactBio = document.getString("contact_bio")
-                        val contactStatus = document.getString("status")
-                        val contactId = document.getString("uid")
-                        val contactImageBitmap = document.getString("contactImageBitmap")
-
-                        Log.i("user List====", databaseContactList.toString())
-                        if (databaseContactList.contains(contactNumber!!)) {
-                            Log.i("contacts====", contactNumber.toString())
-                            var user = TalksContact(
-                                contactNumber,
-                                contactNameList[contactNumber]
-                            ).apply {
-                                this.contactUserName = contactUserName
-                                this.contactImageUrl = contactImageUrl.toString()
-                                this.uId = contactId
-                                this.status = contactStatus
-                                this.contactBio = contactBio
-                            }
-                            databaseViewModel.updateUser(user)
-                        }
-
-                    }
-
-                }
-        }
-    }
 }

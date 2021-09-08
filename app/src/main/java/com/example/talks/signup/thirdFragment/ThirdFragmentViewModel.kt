@@ -5,12 +5,16 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.talks.database.TalksContact
+import com.example.talks.database.TalksViewModel
+import com.example.talks.encryption.Encryption
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -28,6 +32,45 @@ class ThirdFragmentViewModel @Inject constructor(var storageRef: FirebaseStorage
     }
     val profileImageUrl: MutableLiveData<String?> by lazy {
         MutableLiveData<String?>()
+    }
+    @DelicateCoroutinesApi
+    fun getUsersFromServer(
+        databaseContactList: List<String>,
+        contactNameList: HashMap<String, String>,
+        databaseViewModel: TalksViewModel,
+        encryptionKey: String
+    ) {
+
+        viewModelScope.launch(Dispatchers.IO) {
+
+            Firebase.database.getReference("talks_database").get()
+                .addOnSuccessListener {
+
+                    for (data in it.children) {
+
+                        val contactNumber = data.child("phone_number").value.toString()
+                        val contactUserName = data.child("user_name").value.toString()
+                        val contactImageUrl = data.child("user_image_url").value.toString()
+                        val contactBio = data.child("user_bio").value.toString()
+                        val contactId = data.child("userUID").value.toString()
+
+                        val decryptedImage =
+                            Encryption().decrypt(contactImageUrl, encryptionKey)
+                        val user = TalksContact(
+                            contactNumber,
+                            contactNameList[contactNumber]
+                        ).apply {
+                            this.contactUserName = contactUserName
+                            this.contactImageUrl = decryptedImage.toString()
+                            this.uId = contactId
+                            this.isTalksUser = true
+                            this.contactBio = contactBio
+                        }
+                        databaseViewModel.updateUser(user)
+
+                    }
+                }
+        }
     }
 
     fun getUserFromDatabaseIfExists(userUid: String?) {

@@ -18,15 +18,8 @@ class FileManager {
     fun createDirectoryInExternalStorage() {
 
         val talksFolder = File(Environment.getExternalStorageDirectory(), "/Talks")
-        Log.i("folder make check///", talksFolder.absolutePath.toString())
         talksFolder.mkdirs()
 
-        Log.i("folder mkdirs check///", talksFolder.mkdir().toString())
-        Log.i("folder state check///", Environment.getExternalStorageState().toString())
-        Log.i(
-            "folder readable check///",
-            (Environment.MEDIA_MOUNTED_READ_ONLY == Environment.getExternalStorageState()).toString()
-        )
         val profilePicturesFolder = File(talksFolder, "Profile Pictures")
         profilePicturesFolder.mkdir()
 
@@ -71,7 +64,6 @@ class FileManager {
                         }
                     }
                 } else {
-                    createDirectoryInExternalStorage()
                 }
             }
 

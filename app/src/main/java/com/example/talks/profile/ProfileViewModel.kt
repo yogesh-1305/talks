@@ -53,18 +53,16 @@ class ProfileViewModel : ViewModel() {
         }
     }
 
-    fun updateImageToDatabase(image: String?, uid: String?, databaseViewModel: TalksViewModel) {
+    fun updateImageToDatabase(imageUrl: String, imageLocalPath: String, uid: String?, databaseViewModel: TalksViewModel) {
         val dbRef = Firebase.database.getReference("talks_database")
         if (uid != null) {
             val imageUpdate: MutableMap<String, String> = HashMap()
-            imageUpdate["contactImageUrl"] = image.toString()
+            imageUpdate["contactImageUrl"] = imageUrl.toString()
 
             dbRef.child(uid).updateChildren(imageUpdate as Map<String, String>)
                 .addOnCompleteListener {
                     if (it.isComplete) {
-                        if (image != null) {
-                            databaseViewModel.updateUserImage(image)
-                        }
+                        databaseViewModel.updateUserImage(imageUrl, imageLocalPath)
                         imageUpdatedInLocalDatabase.value = true
                     }
                 }
