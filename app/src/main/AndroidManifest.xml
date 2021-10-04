@@ -28,19 +28,15 @@
             android:exported="false"></activity>
         <activity android:name=".gallery.attachmentsGallery.activity.AttachmentsActivity"/>
 
-        <receiver android:name=".receiver.ActionReceiver"/>
+        <receiver android:name=".data.receiver.ActionReceiver"/>
 
         <activity
-            android:name=".calling.CallingActivity"
+            android:name=".ui.call.activity.CallingActivity"
             android:configChanges="smallestScreenSize|screenLayout|orientation|keyboardHidden|screenSize"
             android:label="@string/title_activity_calling"
             android:screenOrientation="sensorPortrait"
             android:supportsPictureInPicture="true"
             android:theme="@style/Theme.Talks.Fullscreen" />
-
-        <service
-            android:name=".service.TalksService"
-            android:exported="false" />
         <service
             android:name="com.novoda.merlin.MerlinService"
             android:exported="false" />
@@ -49,11 +45,11 @@
         <activity
             android:name=".profile.ProfileSettingsActivity"
             android:screenOrientation="sensorPortrait" />
-        <activity android:name=".contactScreen.ContactListActivity" />
-        <activity android:name=".chat.ChatActivity" />
-        <activity android:name=".home.activity.HomeScreenActivity" />
+        <activity android:name=".ui.contacts.activity.ContactListActivity" />
+        <activity android:name=".ui.chat.activity.ChatActivity" />
+        <activity android:name=".ui.home.activity.HomeScreenActivity" />
         <activity
-            android:name=".signup.activity.MainActivity"
+            android:name=".ui.authentication.activity.MainActivity"
             android:exported="true"
             android:screenOrientation="sensorPortrait">
             <intent-filter>

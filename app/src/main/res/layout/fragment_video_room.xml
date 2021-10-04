@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:background="@drawable/home_screen_round_corner"
     android:layout_height="match_parent"
-    tools:context=".videoRoom.VideoRoomFragment">
+    tools:context=".ui.meet.VideoRoomFragment">
 
     <com.airbnb.lottie.LottieAnimationView
         android:layout_width="0dp"

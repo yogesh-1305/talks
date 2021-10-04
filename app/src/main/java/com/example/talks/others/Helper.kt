@@ -1,7 +1,7 @@
 package com.example.talks.others
 
 import android.net.Uri
-import com.example.talks.database.TalksContact
+import com.example.talks.data.model.TalksContact
 
 class Helper {
     companion object {

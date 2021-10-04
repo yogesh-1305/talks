@@ -5,27 +5,42 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.drawable.BitmapDrawable
 import android.net.Uri
-import androidx.core.content.ContentProviderCompat.requireContext
 import coil.request.ImageRequest
-import coil.request.SuccessResult
-import com.example.talks.home.activity.HomeScreenActivity
 import android.content.Context
+import android.graphics.drawable.Drawable
+import coil.ImageLoader
+import coil.request.SuccessResult
+import java.io.IOException
 
 object ConversionUtility {
 
-    fun Uri.toBitmap(activity: Activity): Bitmap {
-        val inputStream = activity.contentResolver.openInputStream(this)
-        val bitmap = BitmapFactory.decodeStream(inputStream)
-        inputStream?.close()
-        return bitmap
+    fun Uri.toBitmap(activity: Activity): Bitmap? {
+        return try {
+            val inputStream = activity.contentResolver.openInputStream(this)
+            val bitmap = BitmapFactory.decodeStream(inputStream)
+            inputStream?.close()
+            bitmap
+        } catch (e: IOException) {
+            e.printStackTrace()
+            null
+        }
+
     }
 
-    suspend fun String.toBitmap(context: Context): Bitmap {
-        val loading = coil.ImageLoader(context)
-        val request = ImageRequest.Builder(context)
-            .data(this)
-            .build()
-        return ((loading.execute(request) as SuccessResult).drawable as BitmapDrawable).bitmap
+    suspend fun String.toBitmap(context: Context): Bitmap? {
+        return try {
+            val loading = ImageLoader(context)
+            val request: ImageRequest = ImageRequest.Builder(context)
+                .data(this)
+                .build()
+
+            val result: SuccessResult = loading.execute(request) as SuccessResult
+            val bitmap = result.drawable
+            (bitmap as BitmapDrawable).bitmap
+
+        } catch (e: Exception) {
+            null
+        }
     }
 
 }

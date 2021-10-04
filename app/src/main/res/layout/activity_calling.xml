@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="?attr/fullscreenBackgroundColor"
     android:theme="@style/ThemeOverlay.Talks.FullscreenContainer"
-    tools:context=".calling.CallingActivity">
+    tools:context=".ui.call.activity.CallingActivity">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/callActivityToolbar"

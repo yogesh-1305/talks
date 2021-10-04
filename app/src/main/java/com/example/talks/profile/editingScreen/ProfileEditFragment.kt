@@ -12,9 +12,9 @@ import androidx.fragment.app.viewModels
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.navArgs
 import com.example.talks.R
-import com.example.talks.database.TalksViewModel
+import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.FragmentProfileEditBinding
-import com.example.talks.networkManager.NetworkManager
+import com.example.talks.others.networkManager.NetworkManager
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.auth.FirebaseAuth

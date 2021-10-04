@@ -15,12 +15,10 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.BuildConfig
 import com.example.talks.others.Helper
-import com.example.talks.calendar.CalendarManager
-import com.example.talks.database.TalksViewModel
+import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.FragmentProfileBinding
-import com.example.talks.encryption.Encryption
-import com.example.talks.fileManager.FileManager
-import com.example.talks.fileManager.TalksStorageManager
+import com.example.talks.others.encryption.Encryption
+import com.example.talks.others.fileManager.TalksStorageManager
 import com.example.talks.gallery.GalleryActivity
 import com.example.talks.others.utility.ConversionUtility.toBitmap
 import com.google.firebase.auth.FirebaseAuth

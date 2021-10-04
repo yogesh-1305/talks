@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".signup.secondFragment.SecondFragment">
+    tools:context=".ui.authentication.fragments.SecondFragment">
 
     <TextView
         android:id="@+id/waiting_instructions_text_view"

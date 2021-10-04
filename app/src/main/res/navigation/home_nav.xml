@@ -6,7 +6,7 @@
     app:startDestination="@id/homeScreenFragment">
     <fragment
         android:id="@+id/homeScreenFragment"
-        android:name="com.example.talks.home.homeScreen.HomeScreenFragment"
+        android:name="com.example.talks.ui.home.fragments.HomeScreenFragment"
         android:label=""
         tools:layout="@layout/fragment_home_screen" >
         <action
@@ -22,7 +22,7 @@
     </fragment>
     <activity
         android:id="@+id/chatActivity"
-        android:name="com.example.talks.chat.ChatActivity"
+        android:name="com.example.talks.ui.chat.activity.ChatActivity"
         android:label="activity_chat"
         tools:layout="@layout/activity_chat">
         <argument
@@ -31,12 +31,12 @@
     </activity>
     <activity
         android:id="@+id/contactListActivity"
-        android:name="com.example.talks.contactScreen.ContactListActivity"
+        android:name="com.example.talks.ui.contacts.activity.ContactListActivity"
         android:label=""
         tools:layout="@layout/activity_contact_list" />
     <fragment
         android:id="@+id/videoRoomFragment"
-        android:name="com.example.talks.videoRoom.VideoRoomFragment"
+        android:name="com.example.talks.ui.meet.VideoRoomFragment"
         android:label=""
         tools:layout="@layout/fragment_video_room" />
 </navigation>

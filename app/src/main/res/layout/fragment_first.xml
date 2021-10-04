@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#FFFFFF"
-    tools:context=".signup.firstFragment.FirstFragment">
+    tools:context=".ui.authentication.fragments.FirstFragment">
 
     <com.hbb20.CountryCodePicker
         android:id="@+id/countryCodePicker"
