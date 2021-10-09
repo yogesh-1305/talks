@@ -14,8 +14,8 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
 import com.example.talks.R
 import com.example.talks.databinding.FragmentFirstBinding
-import com.example.talks.others.Constants.AUTH_STATE_ADD_OTP
-import com.example.talks.others.Constants.KEY_AUTH_STATE
+import com.example.talks.constants.LocalConstants.AUTH_STATE_ADD_OTP
+import com.example.talks.constants.LocalConstants.KEY_AUTH_STATE
 import com.example.talks.others.networkManager.NetworkManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi

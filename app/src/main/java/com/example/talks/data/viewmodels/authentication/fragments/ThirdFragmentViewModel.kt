@@ -5,6 +5,13 @@ import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.talks.constants.ServerConstants.FIREBASE_DB_NAME
+import com.example.talks.constants.ServerConstants.USER_BIO
+import com.example.talks.constants.ServerConstants.USER_IMAGE_STORAGE_PATH
+import com.example.talks.constants.ServerConstants.USER_IMAGE_URL
+import com.example.talks.constants.ServerConstants.USER_NAME
+import com.example.talks.constants.ServerConstants.USER_PHONE_NUMBER
+import com.example.talks.constants.ServerConstants.USER_UNIQUE_ID
 import com.example.talks.data.model.TalksContact
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.others.encryption.Encryption
@@ -22,7 +29,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ThirdFragmentViewModel @Inject constructor(var storageRef: FirebaseStorage) :
     ViewModel() {
-//    private val storageRef = FirebaseStorage.getInstance()
 
     val existingUserData: MutableLiveData<HashMap<String, String>> by lazy {
         MutableLiveData<HashMap<String, String>>()
@@ -33,6 +39,7 @@ class ThirdFragmentViewModel @Inject constructor(var storageRef: FirebaseStorage
     val profileImageUrl: MutableLiveData<String?> by lazy {
         MutableLiveData<String?>()
     }
+
     @DelicateCoroutinesApi
     fun getUsersFromServer(
         databaseContactList: List<String>,
@@ -43,16 +50,20 @@ class ThirdFragmentViewModel @Inject constructor(var storageRef: FirebaseStorage
 
         viewModelScope.launch(Dispatchers.IO) {
 
-            Firebase.database.getReference("talks_database").get()
+            Firebase.database.getReference(FIREBASE_DB_NAME).get()
                 .addOnSuccessListener {
 
                     for (data in it.children) {
 
-                        val contactNumber = data.child("phone_number").value.toString()
-                        val contactUserName = data.child("user_name").value.toString()
-                        val contactImageUrl = data.child("user_image_url").value.toString()
-                        val contactBio = data.child("user_bio").value.toString()
-                        val contactId = data.child("userUID").value.toString()
+                        val contactNumber =
+                            data.child(USER_PHONE_NUMBER).value.toString()
+                        val contactUserName =
+                            data.child(USER_NAME).value.toString()
+                        val contactImageUrl =
+                            data.child(USER_IMAGE_URL).value.toString()
+                        val contactBio = data.child(USER_BIO).value.toString()
+                        val contactId =
+                            data.child(USER_UNIQUE_ID).value.toString()
 
                         val decryptedImage =
                             Encryption().decrypt(contactImageUrl, encryptionKey)
@@ -75,17 +86,17 @@ class ThirdFragmentViewModel @Inject constructor(var storageRef: FirebaseStorage
 
     fun getUserFromDatabaseIfExists(userUid: String?) {
         viewModelScope.launch(Dispatchers.IO) {
-            val dbRef = Firebase.database.getReference("talks_database")
+            val dbRef = Firebase.database.getReference(FIREBASE_DB_NAME)
             if (userUid != null) {
                 dbRef.child(userUid).get().addOnSuccessListener {
-                    val userName = it.child("user_name").value.toString()
-                    val userImage = it.child("user_image_url").value.toString()
-                    val userBio = it.child("user_bio").value.toString()
+                    val userName = it.child(USER_NAME).value.toString()
+                    val userImage = it.child(USER_IMAGE_URL).value.toString()
+                    val userBio = it.child(USER_BIO).value.toString()
 
                     val user = hashMapOf(
-                        "user_name" to userName,
-                        "user_image" to userImage,
-                        "user_bio" to userBio
+                        USER_NAME to userName,
+                        USER_IMAGE_URL to userImage,
+                        USER_BIO to userBio
                     )
                     existingUserData.value = user
                 }
@@ -97,20 +108,21 @@ class ThirdFragmentViewModel @Inject constructor(var storageRef: FirebaseStorage
         user: HashMap<String, String?>,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            val dbRef = Firebase.database.getReference("talks_database")
-            if (user["user_UID"] != null) {
-                dbRef.child(user["user_UID"]!!).setValue(user).addOnSuccessListener {
-                    val localUser = hashMapOf(
-                        "phone_number" to user["phone_number"],
-                        "user_name" to user["user_name"],
-                        "user_image" to user["user_image_url"],
-                        "user_bio" to user["user_bio"],
-                        "user_id" to user["user_UID"]
-                    )
-                    localUserData.value = localUser
-                }.addOnFailureListener {
-                    Log.i("failed login====", it.toString())
-                }
+            val dbRef = Firebase.database.getReference(FIREBASE_DB_NAME)
+            if (user[USER_UNIQUE_ID] != null) {
+                dbRef.child(user[USER_UNIQUE_ID]!!).setValue(user)
+                    .addOnSuccessListener {
+                        val localUser = hashMapOf(
+                            USER_PHONE_NUMBER to user[USER_PHONE_NUMBER],
+                            USER_NAME to user[USER_NAME],
+                            USER_IMAGE_URL to user[USER_IMAGE_URL],
+                            USER_BIO to user[USER_BIO],
+                            USER_UNIQUE_ID to user[USER_UNIQUE_ID]
+                        )
+                        localUserData.value = localUser
+                    }.addOnFailureListener {
+                        Log.i("failed login====", it.toString())
+                    }
             }
         }
     }
@@ -119,7 +131,7 @@ class ThirdFragmentViewModel @Inject constructor(var storageRef: FirebaseStorage
     fun uploadImageToStorage(image: Uri?, userId: String) {
         if (image != null) {
             viewModelScope.launch(Dispatchers.IO) {
-                val reference = storageRef.getReference(userId).child("profile_image")
+                val reference = storageRef.getReference(userId).child(USER_IMAGE_STORAGE_PATH)
                 val uploadTask = reference.putFile(image)
                 uploadTask.addOnSuccessListener {
                     getDownloadUrl(uploadTask, reference)

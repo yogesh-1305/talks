@@ -8,5 +8,6 @@
         <item>@font/mitr_light</item>
         <item>@font/prompt</item>
         <item>@font/prompt_thin</item>
+        <item>@font/roboto</item>
     </array>
 </resources>

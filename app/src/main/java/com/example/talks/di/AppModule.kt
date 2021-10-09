@@ -12,8 +12,8 @@ import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import com.example.talks.database.db.TalksDatabase
-import com.example.talks.others.Constants.DATABASE_NAME
-import com.example.talks.others.Constants.SHARED_PREFERENCES_NAME
+import com.example.talks.constants.LocalConstants.DATABASE_NAME
+import com.example.talks.constants.LocalConstants.SHARED_PREFERENCES_NAME
 import javax.inject.Singleton
 
 @Module

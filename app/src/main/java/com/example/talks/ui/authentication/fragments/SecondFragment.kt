@@ -1,7 +1,5 @@
 package com.example.talks.ui.authentication.fragments
 
-import `in`.aabhasjindal.otptextview.OTPListener
-import `in`.aabhasjindal.otptextview.OtpTextView
 import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.content.DialogInterface
@@ -12,15 +10,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.example.talks.R
 import com.example.talks.data.viewmodels.authentication.fragments.SecondFragmentViewModel
 import com.example.talks.databinding.FragmentSecondBinding
-import com.example.talks.others.Constants
+import com.example.talks.constants.LocalConstants
 import com.example.talks.others.dialog.WaitingDialog
-import com.google.firebase.FirebaseApp
+import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_second.*
@@ -42,7 +41,7 @@ class SecondFragment : Fragment() {
     @Inject
     lateinit var prefs: SharedPreferences
 
-    private lateinit var otpTextView: OtpTextView
+    private lateinit var otpTextView: TextInputEditText
     private lateinit var resendOTPTextView: TextView
     private var phoneNumber: String? = null
     private lateinit var dialog: WaitingDialog
@@ -55,10 +54,11 @@ class SecondFragment : Fragment() {
         viewModel = ViewModelProvider(this).get(SecondFragmentViewModel::class.java)
 
         phoneNumber = prefs.getString("phoneNumber", "")
-        val waitingText = binding.waitingInstructionsTextView
-        waitingText.text =
-            "Waiting to automatically detect an SMS sent to \'$phoneNumber\'"
-        otpTextView = binding.otpView
+        binding.enteredPhoneNumber.text = phoneNumber?.formatForScreen() ?: "Number Not Found"
+//        val waitingText = binding.waitingInstructionsTextView
+//        waitingText.text =
+//            "Waiting to automatically detect an SMS sent to \'$phoneNumber\'"
+        otpTextView = binding.otpEditText
 
         dialog = activity?.let { WaitingDialog(it) }!!
 
@@ -76,17 +76,13 @@ class SecondFragment : Fragment() {
         })
 
         viewModel.smsCode.observe(viewLifecycleOwner, {
-            otpTextView.otp = it
+            otpTextView.setText(it)
         })
 
         // OTP Handler
-        otpTextView.otpListener = object : OTPListener {
-            override fun onInteractionListener() {
-                // do nothing
-            }
-
-            override fun onOTPComplete(otp: String?) {
-                viewModel.manualOTPAuth(otp)
+        otpTextView.addTextChangedListener{
+            if (it?.length == 6){
+                viewModel.manualOTPAuth(it.toString())
                 otpScreenProgressBar.visibility = View.VISIBLE
             }
         }
@@ -106,7 +102,7 @@ class SecondFragment : Fragment() {
         viewModel.isUserLoggedIn.observe(viewLifecycleOwner, {
             if (it) {
 
-                prefs.edit().putInt(Constants.KEY_AUTH_STATE, Constants.AUTH_STATE_ADD_DATA).apply()
+                prefs.edit().putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_ADD_DATA).apply()
                 dialog.dismiss()
                 Navigation.findNavController(binding.root)
                     .navigate(R.id.action_secondFragment_to_thirdFragment)
@@ -149,5 +145,18 @@ class SecondFragment : Fragment() {
             dialog.dismiss()
         }
         dialog.show()
+    }
+
+    private fun String.formatForScreen() : String{
+        val number  = this
+        val formattedNumber = StringBuilder()
+        formattedNumber.apply {
+            append(number.substring(0..2))
+            append(" ")
+            append(number.substring(3..7))
+            append(" ")
+            append(number.substring(8))
+        }
+        return formattedNumber.toString()
     }
 }

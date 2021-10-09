@@ -1,6 +1,6 @@
-package com.example.talks.others
+package com.example.talks.constants
 
-object Constants {
+object LocalConstants {
 
     const val DATABASE_NAME = "talks_database"
 

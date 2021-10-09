@@ -28,13 +28,19 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.BuildConfig
 import com.example.talks.R
+import com.example.talks.constants.LocalConstants
+import com.example.talks.constants.ServerConstants.USER_BIO
+import com.example.talks.constants.ServerConstants.USER_IMAGE_URL
+import com.example.talks.constants.ServerConstants.USER_NAME
+import com.example.talks.constants.ServerConstants.USER_PHONE_NUMBER
+import com.example.talks.constants.ServerConstants.USER_STATUS
+import com.example.talks.constants.ServerConstants.USER_UNIQUE_ID
 import com.example.talks.data.model.TalksContact
 import com.example.talks.data.model.User
 import com.example.talks.data.viewmodels.authentication.fragments.ThirdFragmentViewModel
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.FragmentThirdBinding
 import com.example.talks.gallery.GalleryActivity
-import com.example.talks.others.Constants
 import com.example.talks.others.Helper
 import com.example.talks.others.dialog.UploadingDialog
 import com.example.talks.others.encryption.Encryption
@@ -178,23 +184,20 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         viewModel.existingUserData.observe(viewLifecycleOwner, {
             if (it != null) {
                 retrievedImageUrl =
-                    Encryption().decrypt(it["user_image"], encryptionKey).toString()
+                    Encryption().decrypt(it[USER_IMAGE_URL], encryptionKey).toString()
 
-                binding.thirdFragmentNameEditText.setText(it["user_name"])
-                binding.thirdFragmentBioEditText.setText(it["userBio"])
+                binding.thirdFragmentNameEditText.setText(it[USER_NAME])
+                binding.thirdFragmentBioEditText.setText(it[USER_BIO])
 
                 if (Helper.getImage() == null) {
                     Glide.with(this).load(retrievedImageUrl)
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .placeholder(R.drawable.ic_baseline_person_24)
                         .into(binding.thirdFragmentUserImage)
-                    binding.progressBar.visibility = View.GONE
-
                 }
             } else {
                 Glide.with(this).load(R.drawable.ic_baseline_person_24)
                     .into(binding.thirdFragmentUserImage)
-                binding.progressBar.visibility = View.GONE
             }
         })
 
@@ -202,12 +205,12 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             if (it != null) {
                 val image = Encryption().encrypt(it, encryptionKey)
                 val user = hashMapOf(
-                    "phone_number" to "$phoneNumber",
-                    "user_name" to getNameFromEditText(),
-                    "user_bio" to getBioFromEditText(),
-                    "user_image_url" to image,
-                    "user_UID" to userUid,
-                    "user_active_status" to "active now",
+                    USER_PHONE_NUMBER to "$phoneNumber",
+                    USER_NAME to getNameFromEditText(),
+                    USER_BIO to getBioFromEditText(),
+                    USER_IMAGE_URL to image,
+                    USER_UNIQUE_ID to userUid,
+                    USER_STATUS to "active now",
                 )
                 viewModel.addUserToFirebaseDatabase(user)
             }
@@ -216,7 +219,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         viewModel.localUserData.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()) {
                 val decryptedImageUrl =
-                    Encryption().decrypt(it["user_image"], encryptionKey)
+                    Encryption().decrypt(it[USER_IMAGE_URL], encryptionKey)
 
                 lifecycleScope.launch(Dispatchers.IO) {
 
@@ -228,11 +231,11 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                     }
                     val dbUser =
                         User(
-                            phoneNumber = it["phone_number"],
-                            userName = it["user_name"],
+                            phoneNumber = it[USER_PHONE_NUMBER],
+                            userName = it[USER_NAME],
                             profileImageUrl = decryptedImageUrl,
-                            bio = it["user_bio"],
-                            firebaseAuthUID = it["user_id"]
+                            bio = it[USER_BIO],
+                            firebaseAuthUID = it[USER_UNIQUE_ID]
                         ).apply {
                             imageLocalPath = imagePath
                         }
@@ -249,7 +252,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 //                val date = CalendarManager.getCurrentDateTime()
 
                 lifecycleScope.launch {
-                    prefs.edit().putInt(Constants.KEY_AUTH_STATE, Constants.AUTH_STATE_COMPLETE).apply()
+                    prefs.edit().putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_COMPLETE).apply()
                     delay(1000L)
                     dialog.dismiss()
                     startActivity(Intent(context, HomeScreenActivity::class.java))
@@ -279,7 +282,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
     @RequiresApi(Build.VERSION_CODES.O)
     private fun setClickListeners() {
-        binding.thirdFragmentUserImage.setOnClickListener {
+        binding.changeImageFab.setOnClickListener {
             if (hasStoragePermissions()) {
                 navigateToGalleryActivity()
             }
@@ -310,7 +313,6 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             Glide.with(binding.root).load(image).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .placeholder(R.drawable.ic_baseline_person_24)
                 .into(binding.thirdFragmentUserImage)
-            binding.progressBar.visibility = View.GONE
         }
     }
 
@@ -334,12 +336,12 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             lifecycleScope.launch {
                 val encryptedImage = Encryption().encrypt(retrievedImageUrl, encryptionKey)
                 val user = hashMapOf(
-                    "phone_number" to "$phoneNumber",
-                    "user_name" to getNameFromEditText(),
-                    "user_bio" to getBioFromEditText(),
-                    "user_image_url" to encryptedImage,
-                    "user_UID" to userUid,
-                    "user_active_status" to "active now",
+                    USER_PHONE_NUMBER to "$phoneNumber",
+                    USER_NAME to getNameFromEditText(),
+                    USER_BIO to getBioFromEditText(),
+                    USER_IMAGE_URL to encryptedImage,
+                    USER_UNIQUE_ID to userUid,
+                    USER_STATUS to "active now",
                 )
                 viewModel.addUserToFirebaseDatabase(user)
             }

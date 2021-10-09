@@ -21,8 +21,8 @@
 
 
     <!--    first fragment-->
-    <string name="enterPhoneNumber">Enter your phone number</string>
-    <string name="verificationInfoText">Talks will send an SMS message to verify your phone number</string>
+    <string name="enterPhoneNumber">Enter your \nPhone number</string>
+    <string name="verificationInfoText">You will receive a 6-digit verification code</string>
     <string name="editTextHint">phone number</string>
     <string name="careerChargesText">career SMS charges may apply</string>
     <string name="proceedForVerificationButtonText">Verify</string>

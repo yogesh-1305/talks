@@ -7,15 +7,17 @@
     android:background="#FFFFFF"
     tools:context=".ui.authentication.fragments.ThirdFragment">
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/textView12"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:text="Update your profile"
-        android:textAllCaps="true"
-        android:textColor="#00C853"
-        android:textSize="14sp"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:fontFamily="@font/roboto"
+        android:text="Update\nyour profile"
+        android:textColor="#707070"
+        android:textSize="35sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -25,11 +27,12 @@
         android:layout_width="150dp"
         android:layout_height="150dp"
         android:layout_marginTop="32dp"
-        app:civ_border_color="@color/teal_200"
+        app:civ_border_color="@color/transparent"
         app:civ_border_width="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView12" />
+        app:layout_constraintTop_toBottomOf="@+id/textView12"
+        tools:src="@drawable/ic_baseline_person_24" />
 
 
     <com.google.android.material.textfield.TextInputLayout
@@ -38,12 +41,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="32dp"
         android:layout_marginEnd="32dp"
         android:focusable="auto"
-        android:focusedByDefault="true"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusTopStart="10dp"
         android:hapticFeedbackEnabled="true"
-        android:hint="username"
+        android:hint="Username"
         app:boxStrokeColor="@color/teal_700"
         app:counterEnabled="true"
         app:counterMaxLength="15"
@@ -56,7 +62,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView13"
+        app:layout_constraintTop_toBottomOf="@+id/third_fragment_user_image"
         app:startIconDrawable="@drawable/ic_baseline_person_color">
 
         <com.google.android.material.textfield.TextInputEditText
@@ -65,8 +71,6 @@
             android:layout_height="wrap_content"
             android:contextClickable="true"
             android:cursorVisible="true"
-            android:defaultFocusHighlightEnabled="true"
-            android:focusedByDefault="true"
             android:imeOptions="actionNext"
             android:singleLine="true"
             android:textIsSelectable="true" />
@@ -81,7 +85,10 @@
         android:layout_marginTop="8dp"
         android:layout_marginEnd="32dp"
         android:focusable="auto"
-        android:focusedByDefault="true"
+        app:boxCornerRadiusBottomEnd="10dp"
+        app:boxCornerRadiusBottomStart="10dp"
+        app:boxCornerRadiusTopEnd="10dp"
+        app:boxCornerRadiusTopStart="10dp"
         android:hapticFeedbackEnabled="true"
         android:hint="bio (optional)"
         app:boxStrokeColor="@color/teal_700"
@@ -105,14 +112,12 @@
             android:layout_height="wrap_content"
             android:contextClickable="true"
             android:cursorVisible="true"
-            android:defaultFocusHighlightEnabled="true"
-            android:focusedByDefault="true"
             android:imeOptions="actionDone"
             android:singleLine="true"
             android:textIsSelectable="true" />
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/save_and_continue_button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -120,31 +125,27 @@
         android:layout_marginTop="16dp"
         android:layout_marginEnd="32dp"
         android:text="Proceed"
+        android:textColor="@color/white"
+        android:background="@drawable/shape_default_button"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/thirdFragBioInputLayout" />
 
-    <TextView
-        android:id="@+id/textView13"
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/change_image_fab"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:text="Tap on image to Change"
-        android:textColor="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/third_fragment_user_image" />
-
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:src="@drawable/camera_change"
+        app:fabSize="normal"
+        app:backgroundTint="@color/black"
+        app:tint="@color/white"
         app:layout_constraintBottom_toBottomOf="@+id/third_fragment_user_image"
         app:layout_constraintEnd_toEndOf="@+id/third_fragment_user_image"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="@+id/third_fragment_user_image"
-        app:layout_constraintTop_toTopOf="@+id/third_fragment_user_image" />
+        app:layout_constraintTop_toTopOf="@+id/third_fragment_user_image"
+        app:layout_constraintVertical_bias="1.0" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
