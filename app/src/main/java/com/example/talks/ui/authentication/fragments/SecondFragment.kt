@@ -10,19 +10,15 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.example.talks.R
-import com.example.talks.data.viewmodels.authentication.fragments.SecondFragmentViewModel
-import com.example.talks.databinding.FragmentSecondBinding
 import com.example.talks.constants.LocalConstants
 import com.example.talks.data.viewmodels.authentication.activity.MainActivityViewModel
+import com.example.talks.databinding.FragmentSecondBinding
 import com.example.talks.others.dialog.WaitingDialog
-import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_second.*
@@ -39,13 +35,12 @@ class SecondFragment : Fragment() {
     private val viewModel: MainActivityViewModel by activityViewModels()
 
     // firebase auth instance
-    private lateinit var auth: FirebaseAuth
+    @Inject
+    lateinit var auth: FirebaseAuth
 
     @Inject
     lateinit var prefs: SharedPreferences
 
-    //    private lateinit var otpTextView: TextInputEditText
-//    private lateinit var resendOTPTextView: TextView
     private var phoneNumber: String? = null
     private lateinit var dialog: WaitingDialog
 
@@ -57,32 +52,63 @@ class SecondFragment : Fragment() {
 
         phoneNumber = prefs.getString("phoneNumber", "")
         binding.enteredPhoneNumber.text = phoneNumber?.formatForScreen() ?: "Number Not Found"
-//        val waitingText = binding.waitingInstructionsTextView
-//        waitingText.text =
-//            "Waiting to automatically detect an SMS sent to \'$phoneNumber\'"
-//        otpTextView = binding.otpEditText
 
-        dialog = activity?.let { WaitingDialog(it) }!!
+        dialog = WaitingDialog(requireActivity())
 
-        // Firebase initialization
-//        context?.let { FirebaseApp.initializeApp(it) }
-        auth = FirebaseAuth.getInstance()
-
-
+        // send verification code on given phone number
         viewModel.sendVerificationCode(phoneNumber, requireActivity(), auth)
 
+        // start count down timer of 60s
+        startCountdownForResendOTP(phoneNumber!!)
+
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setClickListeners() // all click listeners in this fragment
+
+        subscribeToObservers() // all live data observers
+    }
+
+    @SuppressLint("LogNotTimber")
+    private fun subscribeToObservers() {
+
+        // firebase verification id for otp auth
         viewModel.verificationID.observe(viewLifecycleOwner, {
             if (it != null) {
                 Log.d("verification id ===", it)
             }
         })
 
+        // 6 digit sms code
         viewModel.smsCode.observe(viewLifecycleOwner, {
             Log.d("verification code ===", it ?: "no code")
             otpScreenProgressBar.visibility = View.VISIBLE
             binding.otpEditText.setText(it)
         })
 
+        // once user is successfully authenticated
+        viewModel.isUserLoggedIn.observe(viewLifecycleOwner, {
+            if (it) {
+                // Update authentication state in shared prefs
+                prefs.edit()
+                    .putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_ADD_DATA)
+                    .apply()
+                dialog.dismiss()
+
+                // navigate to third fragment
+                Navigation.findNavController(binding.root)
+                    .navigate(R.id.action_secondFragment_to_thirdFragment)
+            } else {
+                dialog.dismiss()
+                showAlertDialogForIncorrectOtp()
+            }
+        })
+    }
+
+    private fun setClickListeners() {
         // OTP Handler
         binding.otpEditText.addTextChangedListener {
             if (it?.length == 6) {
@@ -91,10 +117,6 @@ class SecondFragment : Fragment() {
             }
         }
 
-        // Resend OTP
-//        binding.resendOtpTextView = binding.resendOtpTextView
-        startCountdownForResendOTP(phoneNumber!!)
-
         // Revert back to phone number entering screen i.e. First Fragment.
         binding.wrongNumberText.setOnClickListener {
             view?.let { it1 ->
@@ -102,23 +124,6 @@ class SecondFragment : Fragment() {
                     .navigate(R.id.action_secondFragment_to_firstFragment2)
             }
         }
-
-        viewModel.isUserLoggedIn.observe(viewLifecycleOwner, {
-            if (it) {
-
-                prefs.edit()
-                    .putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_ADD_DATA)
-                    .apply()
-                dialog.dismiss()
-                Navigation.findNavController(binding.root)
-                    .navigate(R.id.action_secondFragment_to_thirdFragment)
-            } else {
-                dialog.dismiss()
-                showAlertDialogForIncorrectOtp()
-            }
-        })
-
-        return binding.root
     }
 
     private fun startCountdownForResendOTP(phoneNumber: String) {
