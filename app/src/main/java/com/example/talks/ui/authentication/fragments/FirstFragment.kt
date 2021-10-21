@@ -40,11 +40,11 @@ class FirstFragment : Fragment(), TextView.OnEditorActionListener {
     ): View {
 
         binding = FragmentFirstBinding.inflate(inflater, container, false)
+        binding.editTextPhone.requestFocus()
 
         binding.nextButton.setOnClickListener {
             val countryCode = getCountryCode()
             val phoneNumber = getPhoneNumber()
-//            val countryName = getCountryName()
 
             if (NetworkManager().isDataConnected(context)) {
                 if (phoneNumber.length == 10) {

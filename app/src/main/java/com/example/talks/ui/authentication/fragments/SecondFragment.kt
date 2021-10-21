@@ -49,6 +49,7 @@ class SecondFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentSecondBinding.inflate(inflater, container, false)
+        binding.otpEditText.requestFocus()
 
         phoneNumber = prefs.getString("phoneNumber", "")
         binding.enteredPhoneNumber.text = phoneNumber?.formatForScreen() ?: "Number Not Found"

@@ -120,6 +120,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         registerForPermissionCallbacks()
         requestContactsPermission()
 
+        binding.thirdFragmentBioEditText.setOnEditorActionListener(this)
     }
 
     private fun registerForPermissionCallbacks() {
@@ -354,12 +355,21 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
-        if (actionId == EditorInfo.IME_ACTION_DONE) {
-            startUploadProcess()
-            binding.root.hideKeyboard()
-            return true
+        return when (actionId) {
+            EditorInfo.IME_ACTION_NEXT -> {
+                binding.thirdFragmentBioEditText.requestFocus()
+                true
+            }
+            EditorInfo.IME_ACTION_DONE -> {
+                startUploadProcess()
+                binding.root.hideKeyboard()
+                Toast.makeText(requireContext(), "tapped", Toast.LENGTH_SHORT).show()
+                true
+            }
+            else -> {
+                false
+            }
         }
-        return false
     }
 
 
