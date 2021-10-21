@@ -18,22 +18,10 @@
             app:popExitAnim="@anim/to_right" />
         <action
             android:id="@+id/action_homeScreenFragment_to_contactsFragment"
-            app:destination="@id/contactsFragment" />
+            app:destination="@id/contactsFragment"
+            app:enterAnim="@anim/from_right"
+            app:popExitAnim="@anim/to_right" />
     </fragment>
-    <activity
-        android:id="@+id/chatActivity"
-        android:name="com.example.talks.ui.chat.activity.ChatActivity"
-        android:label="activity_chat"
-        tools:layout="@layout/activity_chat">
-        <argument
-            android:name="phoneNumber"
-            app:argType="string" />
-    </activity>
-    <activity
-        android:id="@+id/contactListActivity"
-        android:name="com.example.talks.ui.contacts.activity.ContactListActivity"
-        android:label=""
-        tools:layout="@layout/activity_contact_list" />
     <fragment
         android:id="@+id/videoRoomFragment"
         android:name="com.example.talks.ui.meet.VideoRoomFragment"
@@ -56,6 +44,9 @@
         tools:layout="@layout/fragment_contacts" >
         <action
             android:id="@+id/action_contactsFragment_to_chatFragment"
-            app:destination="@id/chatFragment" />
+            app:destination="@id/chatFragment"
+            app:enterAnim="@anim/from_right"
+            app:popExitAnim="@anim/to_right"
+            app:popUpToInclusive="true" />
     </fragment>
 </navigation>

@@ -11,7 +11,6 @@
         android:id="@+id/appBarLayout2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:elevation="2dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -19,10 +18,10 @@
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/tb_home"
+            app:menu="@menu/home_screen_menu"
             style="@style/Widget.MaterialComponents.Toolbar.Primary"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:menu="@menu/home_screen_menu"
             android:background="?android:windowBackground"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

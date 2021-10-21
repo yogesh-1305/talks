@@ -10,15 +10,21 @@ import androidx.core.net.toFile
 import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.talks.constants.ServerConstants
 import com.example.talks.others.calendar.CalendarManager
 import com.example.talks.data.model.Message
+import com.example.talks.data.model.Message.Companion.toTextMessage
+import com.example.talks.data.model.TextMessage
 import com.example.talks.data.viewmodels.db.TalksViewModel
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.google.firebase.storage.UploadTask
+import dagger.hilt.android.lifecycle.HiltViewModel
 import id.zelory.compressor.Compressor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -27,72 +33,57 @@ import java.io.FileOutputStream
 import java.nio.file.Files
 import java.nio.file.Paths
 import java.util.*
+import javax.inject.Inject
 
-class ChatViewModel(
-    private val senderID: String?,
-    private val receiverID: String?,
-    val databaseViewModel: TalksViewModel
+@HiltViewModel
+class ChatViewModel @Inject constructor(
+    val firebaseAuth: FirebaseAuth,
+    val db: FirebaseFirestore
 ) : ViewModel() {
 
-//    fun sendMessage(message: Message) {
-//        viewModelScope.launch(Dispatchers.IO) {
-////            if (senderID != null && receiverID != null) {
-////
-////                val dbRef = Firebase.database.getReference("talks_database_chats")
-////                val messageKey = dbRef.push().key.toString()
-////
-////                val message = Message(
-////                    receiverID, messageKey, "/text",
-////                ).apply {
-////                    messageText = text
-////                    status = "offline"
-////                    creationTime = time
-////                    sentByMe = true
-////                }
-////                databaseViewModel.addMessage(message)
-////
-////                dbRef.child(senderID.toString()).child(messageKey).setValue(message)
-////                    .addOnCompleteListener {
-////                        if (it.isComplete) {
-////                            setMessageToReceiverEnd(
-////                                messageKey,
-////                                dbRef,
-////                                text,
-////                                time
-////                            )
-////                        } else {
-////                            Log.i("result===", it.result.toString())
-////                        }
-////                    }
-////            }
-//        }
-//    }
-//
-//    private fun setMessageToReceiverEnd(
-//        messageKey: String,
-//        dbRef: DatabaseReference,
-//        text: String,
-//        time: String
-//    ) {
-//
-//        if (senderID != null && receiverID != null) {
-//            val message = Message(
-//                senderID, messageKey, "/text",
-//            ).apply {
-//                messageText = text
-//                status = "received"
-//                creationTime = time
-//                sentByMe = false
-//            }
-//            dbRef.child(receiverID).child(messageKey).setValue(message)
-//                .addOnSuccessListener {
-//                    Log.i("message===", "set to rec end $it")
-//                }
-//        }
-//
-//    }
-//
-//
+    fun sendMessage(message: Message, id_other: String, dbViewModel: TalksViewModel) {
+        viewModelScope.launch(Dispatchers.IO) {
+
+            dbViewModel.addMessage(message)
+
+            val textMessage = message.toTextMessage()
+            val messageKey = message.creationTime.toString()
+
+            db.collection(ServerConstants.FIREBASE_DB_NAME)
+                .document(firebaseAuth.currentUser?.uid.toString())
+                .collection("user_chats").document(messageKey).set(textMessage)
+                .addOnSuccessListener {
+                    setMessageToReceiverEnd(
+                        messageKey,
+                        id_other,
+                        textMessage
+                    )
+                }
+        }
+    }
+
+    private fun setMessageToReceiverEnd(
+        messageKey: String,
+        id_other: String,
+        message: TextMessage
+    ) {
+
+        val newMessage = message.copy(
+            chatId = firebaseAuth.currentUser?.phoneNumber.toString(),
+            status = "received",
+            sentByMe = false
+        )
+
+        db.collection(ServerConstants.FIREBASE_DB_NAME)
+            .document(id_other)
+            .collection("user_chats").document(messageKey).set(newMessage)
+            .addOnSuccessListener {
+                Log.i("message===", "set to rec end $it")
+            }
+    }
+
+
+
 //    private var storageRef = FirebaseStorage.getInstance()
 //    fun uploadImageToStorage(images: List<Uri>, userId: String?, time: String, context: Context) {
 //        viewModelScope.launch(Dispatchers.IO) {

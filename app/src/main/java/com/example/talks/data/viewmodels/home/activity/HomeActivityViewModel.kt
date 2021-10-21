@@ -16,6 +16,7 @@ import com.example.talks.constants.ServerConstants
 import com.example.talks.constants.ServerConstants.FIREBASE_DB_NAME
 import com.example.talks.data.model.ChatListItem
 import com.example.talks.data.model.Message
+import com.example.talks.data.model.Message.Companion.toTextMessage
 import com.example.talks.data.model.TalksContact
 import com.example.talks.data.model.TextMessage
 import com.example.talks.data.viewmodels.db.TalksViewModel
@@ -80,71 +81,18 @@ class HomeActivityViewModel
                     }
                 }
             }
-
-//            Firebase.database.getReference("talks_database").get()
-//                .addOnSuccessListener {
-//
-//                    for (data in it.children) {
-//
-//                        val contactNumber = data.child("phone_number").value.toString()
-//                        val contactUserName = data.child("user_name").value.toString()
-//                        val contactImageUrl = data.child("user_image_url").value.toString()
-//                        val contactBio = data.child("user_bio").value.toString()
-//                        val contactId = data.child("userUID").value.toString()
-//
-//                        val decryptedImage =
-//                            Encryption().decrypt(contactImageUrl, encryptionKey)
-//                        val user = TalksContact(
-//                            contactNumber,
-//                            contactNameList[contactNumber]
-//                        ).apply {
-//                            this.contactUserName = contactUserName
-//                            this.contactImageUrl = decryptedImage.toString()
-//                            this.uId = contactId
-//                            this.isTalksUser = true
-//                            this.contactBio = contactBio
-//                        }
-//                        databaseViewModel.updateUser(user)
-//
-//                    }
-//                }
         }
     }
-
-//    fun getUserDataFromServer(phoneNumber: String) {
-//        val dbRef = Firebase.database.getReference("talks_database")
-//        dbRef.child(phoneNumber).addChildEventListener(object : ChildEventListener {
-//            override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun onChildChanged(snapshot: DataSnapshot, previousChildName: String?) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun onChildRemoved(snapshot: DataSnapshot) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-//                TODO("Not yet implemented")
-//            }
-//
-//            override fun onCancelled(error: DatabaseError) {
-//                TODO("Not yet implemented")
-//            }
-//        })
-//    }
-
 
     fun readMessagesFromServer(userId: String?, talksVM: TalksViewModel) {
         viewModelScope.launch(Dispatchers.IO) {
 
             firebaseAuth.currentUser?.let {
                 db.collection(FIREBASE_DB_NAME).document(it.uid).collection("user_chats")
+                    .whereEqualTo("sentByMe", false)
                     .addSnapshotListener { snapshot, error ->
                         if (snapshot != null) {
-                            for (document in snapshot.documents){
+                            for (document in snapshot.documents) {
                                 val message = document.toObject(Message::class.java)
                                 if (message != null) {
                                     talksVM.addMessage(message)
@@ -156,131 +104,6 @@ class HomeActivityViewModel
             }
         }
 
-//            val dbRef = Firebase.database.getReference("talks_database_chats")
-//            if (userId != null) {
-//                dbRef.child(userId).addChildEventListener(object : ChildEventListener {
-//                    override fun onChildAdded(snapshot: DataSnapshot, previousChildName: String?) {
-//
-//                            val chatId = snapshot.child("chatId").value.toString()
-//                            val messageID = snapshot.key.toString()
-//                            val messageType = snapshot.child("messageType").value.toString()
-//                            val messageText = snapshot.child("messageText").value.toString()
-//                            val status = snapshot.child("status").value.toString()
-//                            val messageCreationTime =
-//                                snapshot.child("creationTime").value.toString()
-//                            val deliveryTime = snapshot.child("deliveryTime").value.toString()
-//                            val seenTime = snapshot.child("seenTime").value.toString()
-//                            val mediaSize = snapshot.child("mediaSize").value.toString()
-//                            val mediaDuration = snapshot.child("mediaDuration").value.toString()
-//                            val mediaCaption = snapshot.child("mediaCaption").value.toString()
-//                            val mediaUrl = snapshot.child("mediaUrl").value.toString()
-//                            val mediaThumbnailString =
-//                                snapshot.child("mediaThumbnailString").value.toString()
-//                            val sentByMe = snapshot.child("sentByMe").value as Boolean?
-//                            val deleted = snapshot.child("deleted").value as Boolean?
-//
-//                            val message = Message(
-//                                id = 0,
-//                                chatId = chatId,
-//                                messageID = messageID,
-//                                messageType = messageType,
-//                                messageText = messageText,
-//                                status = status,
-//                                creationTime = messageCreationTime,
-//                                deliveryTime = deliveryTime,
-//                                seenTime = seenTime,
-//                                mediaSize = mediaSize,
-//                                mediaDuration = mediaDuration,
-//                                mediaCaption = mediaCaption,
-//                                mediaUrl = mediaUrl,
-//                                mediaThumbnailString = mediaThumbnailString,
-//                                sentByMe = sentByMe,
-//                                deleted = deleted
-//                            )
-//                            talksVM.addMessage(message)
-//                    }
-//
-//                    override fun onChildChanged(
-//                        snapshot: DataSnapshot,
-//                        previousChildName: String?
-//                    ) {
-//                        val status = snapshot.child("status").value.toString()
-//                        val deliveryTime = snapshot.child("deliveryTime").value.toString()
-//                        val seenTime = snapshot.child("seenTime").value.toString()
-//                        val deleted = snapshot.child("deleted").value as Boolean?
-//                    }
-//
-//                    override fun onChildRemoved(snapshot: DataSnapshot) {
-//                    }
-//
-//                    override fun onChildMoved(snapshot: DataSnapshot, previousChildName: String?) {
-//                        TODO("Not yet implemented")
-//                    }
-//
-//                    override fun onCancelled(error: DatabaseError) {
-//                        TODO("Not yet implemented")
-//                    }
-//
-//                })
-//            }
-//        }
-
-    }
-
-    fun sendMessage(message: TextMessage, id_other: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-
-            val messageKey = message.creationTime.toString()
-            db.collection(FIREBASE_DB_NAME)
-                .document(firebaseAuth.currentUser?.uid.toString())
-                .collection("user_chats").document(messageKey).set(message)
-                .addOnSuccessListener {
-                    setMessageToReceiverEnd(
-                        messageKey,
-                        id_other,
-                        message
-                    )
-                }
-
-//            dbReference.child(firebaseAuth.currentUser?.phoneNumber.toString()).child(messageKey)
-//                .setValue(message)
-//                .addOnCompleteListener {
-//                    if (it.isComplete) {
-//                        setMessageToReceiverEnd(
-//                            messageKey,
-//                            id_other,
-//                            message
-//                        )
-//                    } else {
-//                        Log.i("result===", it.result.toString())
-//                    }
-//                }
-        }
-    }
-
-    private fun setMessageToReceiverEnd(
-        messageKey: String,
-        id_other: String,
-        message: TextMessage
-    ) {
-
-        val newMessage = message.copy(
-            chatId = firebaseAuth.currentUser?.phoneNumber.toString(),
-            status = "received",
-            sentByMe = false
-        )
-
-        db.collection(FIREBASE_DB_NAME)
-            .document(id_other)
-            .collection("user_chats").document(messageKey).set(newMessage)
-            .addOnSuccessListener {
-                Log.i("message===", "set to rec end $it")
-            }
-//            dbReference.child(id_other).child(messageKey)
-//                .setValue(newMessage)
-//                .addOnSuccessListener {
-//                    Log.i("message===", "set to rec end $it")
-//                }
     }
 
     val contactData: MutableLiveData<TalksContact> by lazy {

@@ -25,8 +25,8 @@ interface TalksDao {
     @Query("SELECT * FROM user_data ORDER BY id ASC")
     fun readUserData(): LiveData<List<User>>
 
-    @Query("SELECT * FROM talks_contacts WHERE uId = :userId")
-    fun readSingleContact(userId: String): LiveData<TalksContact>
+    @Query("SELECT * FROM talks_contacts WHERE contact_number = :userPhoneNumber")
+    fun readSingleContact(userPhoneNumber: String): LiveData<TalksContact>
 
     @Query("SELECT * FROM talks_contacts WHERE isTalksUser = '1' ORDER BY contactName ASC")
     fun readContacts(): LiveData<List<TalksContact>>

@@ -60,7 +60,7 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
         talksDao.updateChatChannel(contact_number, messageID)
     }
 
-    suspend fun readSingleContact(userId: String): LiveData<TalksContact> {
-        return talksDao.readSingleContact(userId)
+    suspend fun readSingleContact(userPhoneNumber: String): LiveData<TalksContact> {
+        return talksDao.readSingleContact(userPhoneNumber)
     }
 }

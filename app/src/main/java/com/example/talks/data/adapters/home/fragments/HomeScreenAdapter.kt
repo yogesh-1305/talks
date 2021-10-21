@@ -1,13 +1,9 @@
 package com.example.talks.data.adapters.home.fragments
 
 import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.navigation.Navigation
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
@@ -16,7 +12,6 @@ import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.R
 import com.example.talks.others.calendar.CalendarManager
-import com.example.talks.ui.chat.activity.ChatActivity
 import com.example.talks.data.model.ChatListQueriedData
 import com.example.talks.databinding.ChatListItemBinding
 import com.example.talks.ui.home.fragments.HomeScreenFragmentDirections

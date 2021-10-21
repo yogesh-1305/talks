@@ -41,12 +41,12 @@ class ContactListActivity : AppCompatActivity() {
 
         talksViewModel.readAllContacts.observe(this, {
             it?.let {
-                contactsList = it as ArrayList<TalksContact>
-                adapter = ContactAdapter(contactsList, this)
-                recyclerView.adapter = adapter
-
-                binding.contactScreenToolbar.title = "Contacts"
-                binding.contactScreenToolbar.subtitle = contactsList.size.toString()
+//                contactsList = it as ArrayList<TalksContact>
+//                adapter = ContactAdapter(contactsList, this)
+//                recyclerView.adapter = adapter
+//
+//                binding.contactScreenToolbar.title = "Contacts"
+//                binding.contactScreenToolbar.subtitle = contactsList.size.toString()
             }
         })
         binding.contactScreenToolbar.setNavigationOnClickListener { finish() }
