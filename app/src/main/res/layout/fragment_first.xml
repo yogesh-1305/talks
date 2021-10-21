@@ -9,11 +9,11 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content">
 
         <com.hbb20.CountryCodePicker
             android:id="@+id/countryCodePicker"
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="55dp"
             android:layout_marginStart="32dp"
             android:layout_marginTop="8dp"
@@ -21,7 +21,7 @@
             android:background="@drawable/shape_country_code_picker"
             android:padding="10dp"
             android:paddingHorizontal="20dp"
-            android:textAlignment="center"
+            android:gravity="center"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView4" />
@@ -79,6 +79,7 @@
             app:endIconCheckable="true"
             app:endIconMode="clear_text"
             app:errorEnabled="true"
+            app:prefixText="+91"
             app:helperTextTextColor="#D50000"
             app:hintTextColor="@color/teal_700"
             app:layout_constraintEnd_toEndOf="parent"
