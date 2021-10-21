@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupNavController()
-        verifyStateAndNavigateToHomeScreen()
+        authScreenStateHandler()
 
     }
 
@@ -61,9 +61,9 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
-    private fun verifyStateAndNavigateToHomeScreen() {
+    private fun authScreenStateHandler() {
 
-        when (prefs.getInt(KEY_AUTH_STATE, AUTH_STATE_ADD_DATA)) {
+        when (prefs.getInt(KEY_AUTH_STATE, 0)) {
 
             AUTH_STATE_COMPLETE -> {
                 startActivity(Intent(applicationContext, HomeScreenActivity::class.java))
@@ -75,9 +75,7 @@ class MainActivity : AppCompatActivity() {
             AUTH_STATE_ADD_OTP, AUTH_STATE_ADD_NUMBER -> {
                 findNavController(R.id.auth_activity_nav_host).navigate(R.id.firstFragment)
             }
-            0 -> {
-                /* NO_OP */
-            }
+            0 -> { /* NO_OP */ }
         }
 
 

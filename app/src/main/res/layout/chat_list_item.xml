@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/chatListItemLayout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -20,7 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/chatListName"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -30,39 +31,42 @@
         android:fontFamily="@font/prompt"
         android:text="TextView"
         android:textSize="15sp"
-        android:textStyle="normal"
+        android:textStyle="bold"
         app:layout_constraintBottom_toTopOf="@+id/chatListLatestMessage"
         app:layout_constraintEnd_toStartOf="@+id/chatListTimeStamp"
         app:layout_constraintStart_toEndOf="@+id/chatListImage"
         app:layout_constraintTop_toTopOf="@+id/chatListImage"
         app:layout_constraintVertical_bias="0.0" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/chatListLatestMessage"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
         android:elevation="2dp"
         android:fontFamily="@font/prompt"
-        android:maxLines="1"
-        android:text="TextView"
+        android:maxLines="2"
         android:textSize="12sp"
+        app:layout_constraintBottom_toBottomOf="@+id/chatListImage"
         app:layout_constraintEnd_toStartOf="@+id/chatListMuteImage"
-        app:layout_constraintStart_toEndOf="@+id/chatListImage"
-        app:layout_constraintTop_toBottomOf="@+id/chatListName" />
+        app:layout_constraintStart_toEndOf="@+id/message_mediaType_image"
+        app:layout_constraintTop_toBottomOf="@+id/chatListName"
+        tools:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. " />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/chatListTimeStamp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:elevation="2dp"
         android:maxLines="1"
-        android:text="2:33pm"
+        android:fontFamily="@font/prompt"
+        tools:text="Today, 2:33pm"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/chatListName" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/chatListUnreadMessageCount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -73,28 +77,51 @@
         android:paddingVertical="2dp"
         android:text="3"
         android:textAlignment="center"
-        android:visibility="invisible"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp" />
 
-    <ImageView
+    <androidx.constraintlayout.utils.widget.ImageFilterView
         android:id="@+id/chatListPinImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:visibility="invisible"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/chatListUnreadMessageCount"
         app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp"
         app:srcCompat="@drawable/emoji_emotions_24px" />
 
-    <ImageView
+    <androidx.constraintlayout.utils.widget.ImageFilterView
         android:id="@+id/chatListMuteImage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:visibility="invisible"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/chatListPinImage"
         app:layout_constraintTop_toBottomOf="@+id/chatListTimeStamp"
+        app:srcCompat="@drawable/emoji_emotions_24px" />
+
+    <androidx.constraintlayout.utils.widget.ImageFilterView
+        android:id="@+id/sent_message_status_image"
+        android:layout_width="18dp"
+        android:layout_height="18dp"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"
+        app:layout_constraintStart_toEndOf="@+id/chatListImage"
+        app:layout_constraintTop_toTopOf="@+id/chatListLatestMessage"
+        app:srcCompat="@drawable/double_tick" />
+
+    <androidx.constraintlayout.utils.widget.ImageFilterView
+        android:id="@+id/message_mediaType_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="@+id/chatListImage"
+        app:layout_constraintStart_toEndOf="@+id/sent_message_status_image"
+        app:layout_constraintTop_toBottomOf="@+id/chatListName"
         app:srcCompat="@drawable/emoji_emotions_24px" />
 
 

@@ -10,15 +10,15 @@
         android:label=""
         tools:layout="@layout/fragment_home_screen" >
         <action
-            android:id="@+id/action_homeScreenFragment_to_chatActivity"
-            app:destination="@id/chatActivity"
+            android:id="@+id/action_homeScreenFragment_to_chatFragment"
+            app:destination="@id/chatFragment"
             app:enterAnim="@anim/from_right"
             app:exitAnim="@anim/to_left"
             app:popEnterAnim="@anim/from_left"
             app:popExitAnim="@anim/to_right" />
         <action
-            android:id="@+id/action_homeScreenFragment_to_contactListActivity"
-            app:destination="@id/contactListActivity" />
+            android:id="@+id/action_homeScreenFragment_to_contactsFragment"
+            app:destination="@id/contactsFragment" />
     </fragment>
     <activity
         android:id="@+id/chatActivity"
@@ -39,4 +39,23 @@
         android:name="com.example.talks.ui.meet.VideoRoomFragment"
         android:label=""
         tools:layout="@layout/fragment_video_room" />
+    <fragment
+        android:id="@+id/chatFragment"
+        android:name="com.example.talks.ChatFragment"
+        android:label="fragment_chat"
+        tools:layout="@layout/fragment_chat" >
+        <argument
+            android:name="chat_user_phone"
+            app:argType="string"
+            android:defaultValue="0" />
+    </fragment>
+    <fragment
+        android:id="@+id/contactsFragment"
+        android:name="com.example.talks.ContactsFragment"
+        android:label="fragment_contacts"
+        tools:layout="@layout/fragment_contacts" >
+        <action
+            android:id="@+id/action_contactsFragment_to_chatFragment"
+            app:destination="@id/chatFragment" />
+    </fragment>
 </navigation>

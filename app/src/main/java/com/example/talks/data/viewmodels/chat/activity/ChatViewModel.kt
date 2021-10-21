@@ -34,155 +34,155 @@ class ChatViewModel(
     val databaseViewModel: TalksViewModel
 ) : ViewModel() {
 
-    fun sendMessage(text: String, time: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            if (senderID != null && receiverID != null) {
-
-                val dbRef = Firebase.database.getReference("talks_database_chats")
-                val messageKey = dbRef.push().key.toString()
-
-                val message = Message(
-                    receiverID, messageKey, "/text",
-                ).apply {
-                    messageText = text
-                    status = "offline"
-                    creationTime = time
-                    sentByMe = true
-                }
-                databaseViewModel.addMessage(message)
-
-                dbRef.child(senderID.toString()).child(messageKey).setValue(message)
-                    .addOnCompleteListener {
-                        if (it.isComplete) {
-                            setMessageToReceiverEnd(
-                                messageKey,
-                                dbRef,
-                                text,
-                                time
-                            )
-                        } else {
-                            Log.i("result===", it.result.toString())
-                        }
-                    }
-            }
-        }
-    }
-
-    private fun setMessageToReceiverEnd(
-        messageKey: String,
-        dbRef: DatabaseReference,
-        text: String,
-        time: String
-    ) {
-
-        if (senderID != null && receiverID != null) {
-            val message = Message(
-                senderID, messageKey, "/text",
-            ).apply {
-                messageText = text
-                status = "received"
-                creationTime = time
-                sentByMe = false
-            }
-            dbRef.child(receiverID).child(messageKey).setValue(message)
-                .addOnSuccessListener {
-                    Log.i("message===", "set to rec end $it")
-                }
-        }
-
-    }
-
-
-    private var storageRef = FirebaseStorage.getInstance()
-    fun uploadImageToStorage(images: List<Uri>, userId: String?, time: String, context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            for (image in images) {
-                setImageMessageInDatabase(image, time)
-                val ref =
-                    storageRef.getReference(userId.toString()).child(UUID.randomUUID().toString())
-                val imageCompressed = Compressor.compress(context, image.toFile())
-                val task = ref.putFile(imageCompressed.toUri())
-                task.addOnSuccessListener {
-                    getDownloadUrl(task, ref)
-                }
-            }
-        }
-    }
-
-    private fun getDownloadUrl(uploadTask: UploadTask, reference: StorageReference) {
-        uploadTask.continueWithTask {
-            if (!it.isSuccessful) {
-                it.exception?.let { exception ->
-                    throw exception
-                }
-            }
-            reference.downloadUrl
-        }.addOnCompleteListener {
-            if (it.isSuccessful) {
-                Log.i("url+++", it.result.toString())
-            } else {
-                Log.i("url+++", it.exception?.message.toString())
-            }
-        }
-    }
-
-    private fun setImageMessageInDatabase(image: Uri, time: String) {
-        viewModelScope.launch(Dispatchers.IO) {
-            val dbRef = Firebase.database.getReference("talks_database_chats")
-            val messageKey = dbRef.push().key.toString()
-
-            val message = Message(
-                receiverID.toString(), messageKey, "/image",
-            ).apply {
-                status = "offline"
-                creationTime = time
-                mediaLocalPath = image.path
-                sentByMe = true
-            }
-            databaseViewModel.addMessage(message)
-        }
-    }
-
-
-    private fun convertImageToString(image: File): String {
-        val bytes = Files.readAllBytes(Paths.get(image.toURI()))
-        return Base64.getEncoder().encodeToString(bytes)
-    }
-
-    private fun generateImageName(): String {
-        val date = CalendarManager.getDateForImage()
-        val id = Random().nextInt(99999)
-        return "IMG-$date-T$id"
-    }
-
-    private fun getImageSize(image: Uri, context: Context) {
-    }
-
-    private fun getBitmapFromFile(image: File): Bitmap {
-        return BitmapFactory.decodeFile(image.path)
-    }
-
-    private val talksFolder = File(Environment.getExternalStorageDirectory(), "Talks")
-    private fun saveImageInLocalStorage(image: Bitmap) {
-        if (talksFolder.exists()) {
-            val imageFile = File(
-                talksFolder.absolutePath + File.separator + "Sent Images",
-                "${generateImageName()}.jpeg"
-            )
-
-            if (!imageFile.exists()) {
-                try {
-                    val outputStream = FileOutputStream(imageFile)
-                    image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
-                    outputStream.flush()
-                    outputStream.close()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-        }
-
-    }
+//    fun sendMessage(message: Message) {
+//        viewModelScope.launch(Dispatchers.IO) {
+////            if (senderID != null && receiverID != null) {
+////
+////                val dbRef = Firebase.database.getReference("talks_database_chats")
+////                val messageKey = dbRef.push().key.toString()
+////
+////                val message = Message(
+////                    receiverID, messageKey, "/text",
+////                ).apply {
+////                    messageText = text
+////                    status = "offline"
+////                    creationTime = time
+////                    sentByMe = true
+////                }
+////                databaseViewModel.addMessage(message)
+////
+////                dbRef.child(senderID.toString()).child(messageKey).setValue(message)
+////                    .addOnCompleteListener {
+////                        if (it.isComplete) {
+////                            setMessageToReceiverEnd(
+////                                messageKey,
+////                                dbRef,
+////                                text,
+////                                time
+////                            )
+////                        } else {
+////                            Log.i("result===", it.result.toString())
+////                        }
+////                    }
+////            }
+//        }
+//    }
+//
+//    private fun setMessageToReceiverEnd(
+//        messageKey: String,
+//        dbRef: DatabaseReference,
+//        text: String,
+//        time: String
+//    ) {
+//
+//        if (senderID != null && receiverID != null) {
+//            val message = Message(
+//                senderID, messageKey, "/text",
+//            ).apply {
+//                messageText = text
+//                status = "received"
+//                creationTime = time
+//                sentByMe = false
+//            }
+//            dbRef.child(receiverID).child(messageKey).setValue(message)
+//                .addOnSuccessListener {
+//                    Log.i("message===", "set to rec end $it")
+//                }
+//        }
+//
+//    }
+//
+//
+//    private var storageRef = FirebaseStorage.getInstance()
+//    fun uploadImageToStorage(images: List<Uri>, userId: String?, time: String, context: Context) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            for (image in images) {
+//                setImageMessageInDatabase(image, time)
+//                val ref =
+//                    storageRef.getReference(userId.toString()).child(UUID.randomUUID().toString())
+//                val imageCompressed = Compressor.compress(context, image.toFile())
+//                val task = ref.putFile(imageCompressed.toUri())
+//                task.addOnSuccessListener {
+//                    getDownloadUrl(task, ref)
+//                }
+//            }
+//        }
+//    }
+//
+//    private fun getDownloadUrl(uploadTask: UploadTask, reference: StorageReference) {
+//        uploadTask.continueWithTask {
+//            if (!it.isSuccessful) {
+//                it.exception?.let { exception ->
+//                    throw exception
+//                }
+//            }
+//            reference.downloadUrl
+//        }.addOnCompleteListener {
+//            if (it.isSuccessful) {
+//                Log.i("url+++", it.result.toString())
+//            } else {
+//                Log.i("url+++", it.exception?.message.toString())
+//            }
+//        }
+//    }
+//
+//    private fun setImageMessageInDatabase(image: Uri, time: String) {
+//        viewModelScope.launch(Dispatchers.IO) {
+//            val dbRef = Firebase.database.getReference("talks_database_chats")
+//            val messageKey = dbRef.push().key.toString()
+//
+//            val message = Message(
+//                receiverID.toString(), messageKey, "/image",
+//            ).apply {
+//                status = "offline"
+//                creationTime = time
+//                mediaLocalPath = image.path
+//                sentByMe = true
+//            }
+//            databaseViewModel.addMessage(message)
+//        }
+//    }
+//
+//
+//    private fun convertImageToString(image: File): String {
+//        val bytes = Files.readAllBytes(Paths.get(image.toURI()))
+//        return Base64.getEncoder().encodeToString(bytes)
+//    }
+//
+//    private fun generateImageName(): String {
+//        val date = CalendarManager.getDateForImage()
+//        val id = Random().nextInt(99999)
+//        return "IMG-$date-T$id"
+//    }
+//
+//    private fun getImageSize(image: Uri, context: Context) {
+//    }
+//
+//    private fun getBitmapFromFile(image: File): Bitmap {
+//        return BitmapFactory.decodeFile(image.path)
+//    }
+//
+//    private val talksFolder = File(Environment.getExternalStorageDirectory(), "Talks")
+//    private fun saveImageInLocalStorage(image: Bitmap) {
+//        if (talksFolder.exists()) {
+//            val imageFile = File(
+//                talksFolder.absolutePath + File.separator + "Sent Images",
+//                "${generateImageName()}.jpeg"
+//            )
+//
+//            if (!imageFile.exists()) {
+//                try {
+//                    val outputStream = FileOutputStream(imageFile)
+//                    image.compress(Bitmap.CompressFormat.JPEG, 100, outputStream)
+//                    outputStream.flush()
+//                    outputStream.close()
+//                } catch (e: Exception) {
+//                    e.printStackTrace()
+//                }
+//            }
+//        }
+//
+//    }
 
 
 }

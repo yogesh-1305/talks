@@ -71,10 +71,10 @@
                 android:layout_height="match_parent"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintHorizontal_bias="0.0"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintVertical_bias="0.508" />
+                app:layout_constraintVertical_bias="0.0" />
 
             <ImageView
                 android:id="@+id/chatMenuButton"
@@ -135,7 +135,7 @@
             android:layout_height="match_parent">
 
             <ImageView
-                android:id="@+id/emojiButton"
+                android:id="@+id/btn_chat_emoji"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
@@ -147,18 +147,18 @@
                 app:layout_constraintVertical_bias="0.0" />
 
             <com.vanniktech.emoji.EmojiEditText
-                android:id="@+id/messageEditText"
+                android:id="@+id/et_chat"
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:hint="send a message..."
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/attachButton"
+                app:layout_constraintEnd_toStartOf="@+id/btn_chat_attach"
                 app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toEndOf="@+id/emojiButton"
+                app:layout_constraintStart_toEndOf="@+id/btn_chat_emoji"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/attachButton"
+                android:id="@+id/btn_chat_attach"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="2dp"
@@ -166,11 +166,11 @@
                 android:rotation="-53"
                 android:src="@drawable/ic_baseline_attachment_24"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/micButton"
+                app:layout_constraintEnd_toStartOf="@+id/btn_mic_and_send"
                 app:layout_constraintTop_toTopOf="parent" />
 
             <ImageView
-                android:id="@+id/micButton"
+                android:id="@+id/btn_mic_and_send"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="2dp"

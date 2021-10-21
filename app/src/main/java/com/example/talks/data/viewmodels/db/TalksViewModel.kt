@@ -83,7 +83,7 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
         }
     }
 
-    suspend fun readSingleContact(phoneNumber: String): LiveData<TalksContact> {
-        return repository.readSingleContact(phoneNumber)
+    suspend fun readSingleContact(userId: String): LiveData<TalksContact> {
+        return repository.readSingleContact(userId)
     }
 }

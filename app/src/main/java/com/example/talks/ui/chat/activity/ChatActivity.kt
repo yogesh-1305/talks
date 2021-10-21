@@ -35,14 +35,14 @@ import java.util.*
 class ChatActivity : AppCompatActivity() {
 
     private val databaseViewModel: TalksViewModel by viewModels()
-    private lateinit var viewModelFactory: ChatViewModelFactory
-    private val viewModel: ChatViewModel by viewModels() { viewModelFactory }
+//    private lateinit var viewModelFactory: ChatViewModelFactory
+//    private val viewModel: ChatViewModel by viewModels() { viewModelFactory }
     private lateinit var binding: ActivityChatBinding
 
     private lateinit var chatAdapter: ChatAdapter
 
     private var auth = FirebaseAuth.getInstance()
-    private var senderPhoneNumber = auth.currentUser?.phoneNumber
+    private var senderPhoneNumber = auth.currentUser
     private var senderIdentity = auth.currentUser?.uid
 
     private var isTextEmpty = true
@@ -65,8 +65,8 @@ class ChatActivity : AppCompatActivity() {
         val intent = intent
         val phoneNumber = intent.getStringExtra("contactNumber")
 
-        viewModelFactory =
-            ChatViewModelFactory(senderPhoneNumber, phoneNumber, databaseViewModel)
+//        viewModelFactory =
+//            ChatViewModelFactory(senderPhoneNumber, phoneNumber, databaseViewModel)
 
         if (phoneNumber != null) {
             observeUserData(phoneNumber)
@@ -87,18 +87,18 @@ class ChatActivity : AppCompatActivity() {
             finish()
         }
 
-        messageEditText.addTextChangedListener {
+        et_chat.addTextChangedListener {
 
             if (it != null) {
                 if (it.isEmpty()) {
                     isTextEmpty = true
-                    attachButton.visibility = View.VISIBLE
-                    micButton.setImageResource(R.drawable.ic_baseline_mic_24)
+                    btn_chat_attach.visibility = View.VISIBLE
+                    btn_mic_and_send.setImageResource(R.drawable.ic_baseline_mic_24)
                 } else {
                     messageToBeSent = it.toString()
                     isTextEmpty = false
-                    attachButton.visibility = View.GONE
-                    micButton.setImageResource(R.drawable.ic_baseline_send_24)
+                    btn_chat_attach.visibility = View.GONE
+                    btn_mic_and_send.setImageResource(R.drawable.ic_baseline_send_24)
                 }
             }
         }
@@ -119,33 +119,33 @@ class ChatActivity : AppCompatActivity() {
             startActivity(callingIntent)
         }
 
-        micButton.setOnClickListener {
+        btn_mic_and_send.setOnClickListener {
             when {
                 isTextEmpty -> {
                     Toast.makeText(this, "mic process", Toast.LENGTH_SHORT).show()
                 }
                 else -> {
-                    binding.messageEditText.text = null
+//                    binding.messageEditText.text = null
                     val time = CalendarManager.getCurrentDateTime()
-                    viewModel.sendMessage(messageToBeSent, time)
+//                    viewModel.sendMessage(messageToBeSent, time)
                 }
             }
         }
 
         var emojiIconShown = true
-        emojiPopup = EmojiPopup.Builder.fromRootView(chatActivityRootView).build(messageEditText)
-        emojiButton.setOnClickListener {
+        emojiPopup = EmojiPopup.Builder.fromRootView(chatActivityRootView).build(et_chat)
+        btn_chat_emoji.setOnClickListener {
             emojiPopup.toggle()
             emojiIconShown = if (emojiIconShown) {
-                emojiButton.setImageResource(R.drawable.keyboard_icon)
+                btn_chat_emoji.setImageResource(R.drawable.keyboard_icon)
                 false
             } else {
-                emojiButton.setImageResource(R.drawable.emoji_emotions_24px)
+                btn_chat_emoji.setImageResource(R.drawable.emoji_emotions_24px)
                 true
             }
         }
 
-        attachButton.setOnClickListener {
+        btn_chat_attach.setOnClickListener {
             val attachmentIntent = Intent(this, AttachmentsActivity::class.java)
             startActivity(attachmentIntent)
         }
@@ -155,20 +155,20 @@ class ChatActivity : AppCompatActivity() {
             chatChannelPhoneNumbers = it as ArrayList<String>
         })
         databaseViewModel.lastAddedMessage.observe(this, {
-            if (it != null) {
-                if (!chatChannelPhoneNumbers.contains(it.chatId)) {
-                    val chatListItem =
-                        ChatListItem(contactNumber = it.chatId, messageID = it.messageID)
-                    databaseViewModel.createChatChannel(chatListItem)
-                    Timber.d("${it.messageID} at creation====")
-                } else {
-                    Timber.d("${it.messageID} at update====")
-                    databaseViewModel.updateChatChannel(
-                        contact_number = it.chatId,
-                        messageID = it.messageID.toString()
-                    )
-                }
-            }
+//            if (it != null) {
+//                if (!chatChannelPhoneNumbers.contains(it.chatId)) {
+//                    val chatListItem =
+//                        ChatListItem(contactNumber = it.chatId, messageID = it.messageID)
+//                    databaseViewModel.createChatChannel(chatListItem)
+//                    Timber.d("${it.messageID} at creation====")
+//                } else {
+//                    Timber.d("${it.messageID} at update====")
+//                    databaseViewModel.updateChatChannel(
+//                        contact_number = it.chatId,
+//                        messageID = it.messageID.toString()
+//                    )
+//                }
+//            }
         })
     }
 
@@ -187,12 +187,12 @@ class ChatActivity : AppCompatActivity() {
         super.onResume()
         val imagesToSend = Helper.getImages()
         if (!imagesToSend.isNullOrEmpty()) {
-            viewModel.uploadImageToStorage(
-                imagesToSend,
-                senderIdentity,
-                CalendarManager.getCurrentDateTime(),
-                applicationContext
-            )
+//            viewModel.uploadImageToStorage(
+//                imagesToSend,
+//                senderIdentity,
+//                CalendarManager.getCurrentDateTime(),
+//                applicationContext
+//            )
         }
     }
 

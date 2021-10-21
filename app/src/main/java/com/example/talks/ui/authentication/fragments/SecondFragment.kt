@@ -12,12 +12,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.Navigation
 import com.example.talks.R
 import com.example.talks.data.viewmodels.authentication.fragments.SecondFragmentViewModel
 import com.example.talks.databinding.FragmentSecondBinding
 import com.example.talks.constants.LocalConstants
+import com.example.talks.data.viewmodels.authentication.activity.MainActivityViewModel
 import com.example.talks.others.dialog.WaitingDialog
 import com.google.android.material.textfield.TextInputEditText
 import com.google.firebase.auth.FirebaseAuth
@@ -33,7 +35,7 @@ class SecondFragment : Fragment() {
     private lateinit var binding: FragmentSecondBinding
 
     // view model instance
-    private lateinit var viewModel: SecondFragmentViewModel
+    private val viewModel: MainActivityViewModel by activityViewModels()
 
     // firebase auth instance
     private lateinit var auth: FirebaseAuth
@@ -51,7 +53,6 @@ class SecondFragment : Fragment() {
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
         binding = FragmentSecondBinding.inflate(inflater, container, false)
-        viewModel = ViewModelProvider(this).get(SecondFragmentViewModel::class.java)
 
         phoneNumber = prefs.getString("phoneNumber", "")
         binding.enteredPhoneNumber.text = phoneNumber?.formatForScreen() ?: "Number Not Found"

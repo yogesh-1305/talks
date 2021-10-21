@@ -5,16 +5,20 @@ import android.annotation.SuppressLint
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
+import android.graphics.drawable.Drawable
+import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
 import android.view.Menu
+import android.view.View
 import android.webkit.*
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
+import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -35,6 +39,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.novoda.merlin.Merlin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_calling.*
+import kotlinx.android.synthetic.main.activity_home_screen.*
 import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
@@ -43,9 +48,9 @@ import kotlin.collections.HashMap
 @AndroidEntryPoint
 class HomeScreenActivity : AppCompatActivity() {
 
-    private lateinit var toolbar: Toolbar
     private lateinit var navController: NavController
-    private lateinit var appBarConfiguration: AppBarConfiguration
+
+    //    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var destinationChangedListener: NavController.OnDestinationChangedListener
 
     private lateinit var bottomNavigationView: BottomNavigationView
@@ -70,45 +75,46 @@ class HomeScreenActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        toolbar = findViewById(R.id.toolbar)
-        setSupportActionBar(toolbar)
         auth = FirebaseAuth.getInstance()
 
         if (isPermissionGranted()) {
             readContacts()
         }
+        viewModel.testValue = 1
         viewModel.readMessagesFromServer(auth.currentUser?.phoneNumber, databaseViewModel)
 
         databaseViewModel.getChatListPhoneNumbers.observe(this, {
             chatChannelPhoneNumbers = it as ArrayList<String>
         })
         databaseViewModel.lastAddedMessage.observe(this, {
-            if (it != null) {
-                if (!chatChannelPhoneNumbers.contains(it.chatId)) {
-                    val chatListItem =
-                        ChatListItem(contactNumber = it.chatId, messageID = it.messageID)
-                    databaseViewModel.createChatChannel(chatListItem)
-                    Timber.d("${it.messageID} at creation====")
-                } else {
-                    Timber.d("${it.messageID} at update====")
-                    databaseViewModel.updateChatChannel(
-                        contact_number = it.chatId,
-                        messageID = it.messageID.toString()
-                    )
-                }
-            }
+//            if (it != null) {
+//                if (!chatChannelPhoneNumbers.contains(it.chatId)) {
+//                    val chatListItem =
+//                        ChatListItem(contactNumber = it.chatId, messageID = it.messageID)
+//                    databaseViewModel.createChatChannel(chatListItem)
+//                    Timber.d("${it.messageID} at creation====")
+//                } else {
+//                    Timber.d("${it.messageID} at update====")
+//                    it.chatId?.let { it1 ->
+//                        databaseViewModel.updateChatChannel(
+//                            contact_number = it1,
+//                            messageID = it.messageID.toString()
+//                        )
+//                    }
+//                }
+//            }
         })
 
         bottomNavigationView = binding.homeBottomNav
         navController = findNavController(R.id.fragment_home_nav)
         bottomNavigationView.setupWithNavController(navController)
-        appBarConfiguration = AppBarConfiguration(
-            setOf(
-                R.id.homeScreenFragment,
-                R.id.videoRoomFragment,
-            )
-        )
-        setupActionBarWithNavController(navController, appBarConfiguration)
+//        appBarConfiguration = AppBarConfiguration(
+//            setOf(
+//                R.id.homeScreenFragment,
+//                R.id.videoRoomFragment,
+//            )
+//        )
+//        setupActionBarWithNavController(navController, appBarConfiguration)
 
         databaseViewModel.readContactPhoneNumbers.observe(this, {
             if (it != null) {
@@ -126,40 +132,51 @@ class HomeScreenActivity : AppCompatActivity() {
 
         destinationChangedListener =
             NavController.OnDestinationChangedListener { _, destination, _ ->
-
-                if (destination.id == R.id.homeScreenFragment) {
-                    binding.toolbarUsername.text = "Talks"
-                } else if (destination.id == R.id.videoRoomFragment) {
-                    binding.toolbarUsername.text = "Room"
+                when (destination.id) {
+                    R.id.homeScreenFragment -> {
+                        fab_home_activity.show()
+                    }
+                    R.id.chatFragment -> {
+                        fab_home_activity.hide()
+                    }
                 }
-
             }
     }
 
     override fun onStart() {
         super.onStart()
 
-        databaseViewModel.readAllUserData.observe(this, {
-            val user1 = it[0]
-            Glide.with(this).load(user1.imageLocalPath ?: user1.profileImageUrl).diskCacheStrategy(
-                DiskCacheStrategy.AUTOMATIC
-            ).placeholder(R.drawable.ic_baseline_person_24).into(binding.toolbarDP)
-        })
-
-        binding.toolbarDP.setOnClickListener {
-            val intent = Intent(this, ProfileSettingsActivity::class.java)
-            startActivity(intent)
+        fab_home_activity.setOnClickListener {
+            findNavController(R.id.fragment_home_nav)
+                .navigate(R.id.action_homeScreenFragment_to_contactsFragment)
         }
+
+//        databaseViewModel.readAllUserData.observe(this, {
+//            val user1 = it[0]
+//
+////            val inputStream = contentResolver.openInputStream(user1.imageLocalPath!!.toUri())
+////            val imageDrawable = Drawable.createFromStream(inputStream, user1.imageLocalPath.toString())
+////            binding.toolbar.navigationIcon = imageDrawable
+//
+////            Glide.with(this).load(user1.imageLocalPath ?: user1.profileImageUrl).diskCacheStrategy(
+////                DiskCacheStrategy.AUTOMATIC
+////            ).placeholder(R.drawable.ic_baseline_person_24).into()
+//        })
+
+//        binding.toolbarDP.setOnClickListener {
+//            val intent = Intent(this, ProfileSettingsActivity::class.java)
+//            startActivity(intent)
+//        }
 
         // works when network is connected
         merlin = Merlin.Builder().withConnectableCallbacks()
             .build(this).apply {
                 registerConnectable {
-                    viewModel.readPeerConnections(
-                        this@HomeScreenActivity,
-                        auth.currentUser?.uid.toString(),
-                        contactNamesWithPhoneNumberAsKey
-                    )
+//                    viewModel.readPeerConnections(
+//                        this@HomeScreenActivity,
+//                        auth.currentUser?.uid.toString(),
+//                        contactNamesWithPhoneNumberAsKey
+//                    )
                 }
             }
     }
@@ -174,10 +191,6 @@ class HomeScreenActivity : AppCompatActivity() {
 
         navController.removeOnDestinationChangedListener(destinationChangedListener)
         super.onPause()
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        return super.onCreateOptionsMenu(menu)
     }
 
 
@@ -241,4 +254,13 @@ class HomeScreenActivity : AppCompatActivity() {
             true
         }
     }
+
+    private fun View.hide() {
+        this.visibility = View.INVISIBLE
+    }
+
+    private fun View.show() {
+        this.visibility = View.VISIBLE
+    }
+
 }

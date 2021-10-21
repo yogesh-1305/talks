@@ -1,10 +1,14 @@
 package com.example.talks.data.adapters.home.fragments
 
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
+import androidx.navigation.Navigation
+import androidx.navigation.findNavController
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -15,27 +19,34 @@ import com.example.talks.others.calendar.CalendarManager
 import com.example.talks.ui.chat.activity.ChatActivity
 import com.example.talks.data.model.ChatListQueriedData
 import com.example.talks.databinding.ChatListItemBinding
+import com.example.talks.ui.home.fragments.HomeScreenFragmentDirections
 import java.lang.IllegalArgumentException
 
-class HomeScreenAdapter(val context: Context?) :
+class HomeScreenAdapter(val context: Activity) :
     RecyclerView.Adapter<HomeScreenAdapter.HomeScreenViewHolder>() {
 
     class HomeScreenViewHolder(val binding: ChatListItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
     private val diffCallback = object : DiffUtil.ItemCallback<ChatListQueriedData>() {
-        override fun areItemsTheSame(oldItem: ChatListQueriedData, newItem: ChatListQueriedData): Boolean {
+        override fun areItemsTheSame(
+            oldItem: ChatListQueriedData,
+            newItem: ChatListQueriedData
+        ): Boolean {
             return oldItem.contact_number == newItem.contact_number
         }
 
-        override fun areContentsTheSame(oldItem: ChatListQueriedData, newItem: ChatListQueriedData): Boolean {
+        override fun areContentsTheSame(
+            oldItem: ChatListQueriedData,
+            newItem: ChatListQueriedData
+        ): Boolean {
             return oldItem.hashCode() == newItem.hashCode()
         }
     }
 
     private val differ = AsyncListDiffer(this, diffCallback)
 
-    fun submitChatList(list:List<ChatListQueriedData>) = differ.submitList(list)
+    fun submitChatList(list: List<ChatListQueriedData>) = differ.submitList(list)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeScreenViewHolder {
         return HomeScreenViewHolder(
@@ -60,13 +71,14 @@ class HomeScreenAdapter(val context: Context?) :
         }
         if (item.contactName == null || item.contactName == "") {
             view.chatListName.text = item.contact_number
-            Log.d("====", "${item.contact_number}====== contact number in adapter")
         } else {
-            Log.d("====2", "${item.contact_number}====== contact number in adapter")
             view.chatListName.text = item.contactName
         }
 
-        when (item.messageType){
+        if (item.sentByMe == true) view.sentMessageStatusImage.visibility =
+            View.VISIBLE else view.sentMessageStatusImage.visibility = View.GONE
+
+        when (item.messageType) {
             "/text" -> {
                 view.chatListLatestMessage.text = item.messageText
             }
@@ -78,23 +90,28 @@ class HomeScreenAdapter(val context: Context?) :
             }
         }
 
-        view.chatListTimeStamp.text = checkForDate(item.creationTime.toString())
+        view.chatListTimeStamp.text = item.creationTime.toString()
 
         ///////////////////////////////////////////////////////////////////////////////////
         view.chatListItemLayout.setOnClickListener {
-            val intent = Intent(context, ChatActivity::class.java)
-            intent.putExtra("contactNumber", item.contact_number)
-            context?.startActivity(intent)
+            val action = HomeScreenFragmentDirections
+                .actionHomeScreenFragmentToChatFragment(item.contact_id.toString())
+
+            context.findNavController(R.id.fragment_home_nav)
+                .navigate(action)
+//            val intent = Intent(context, ChatActivity::class.java)
+//            intent.putExtra("contactNumber", item.contact_number)
+//            context?.startActivity(intent)
         }
 
     }
 
-   ////////////////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////////////////
     private val yesterdayDate = CalendarManager.getYesterdayDatDate()
-    val todayDate = CalendarManager.getTodayDate()
+    private val todayDate = CalendarManager.getTodayDate()
 
-    private fun checkForDate(timeString: String): String{
-        return when (val messageDate = timeString.substring(0,10)) {
+    private fun checkForDate(timeString: String): String {
+        return when (val messageDate = timeString.substring(0, 10)) {
             todayDate -> {
                 getTime(timeString)
             }
@@ -107,8 +124,8 @@ class HomeScreenAdapter(val context: Context?) :
         }
     }
 
-    private fun getTime(timeString: String): String{
-        val hours = timeString.substring(11,13).toInt()
+    private fun getTime(timeString: String): String {
+        val hours = timeString.substring(11, 13).toInt()
         return when {
             hours > 12 -> {
                 val newHours = hours - 12
@@ -118,14 +135,15 @@ class HomeScreenAdapter(val context: Context?) :
                 "12:${timeString.substring(14, 16)} AM"
             }
             hours < 12 -> {
-                "${timeString.substring(11,16)} AM"
+                "${timeString.substring(11, 16)} AM"
             }
             else -> {
                 throw IllegalArgumentException("Date Inaccurate (HomeScreenAdapter)")
             }
         }
     }
-//////////////////////////////////////////////////////////////////////////////
+
+    //////////////////////////////////////////////////////////////////////////////
     override fun getItemCount(): Int {
         return differ.currentList.size
     }

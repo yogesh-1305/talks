@@ -2,8 +2,10 @@ package com.example.talks.data.adapters.chat.activity
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.AsyncListDiffer
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -12,6 +14,7 @@ import com.example.talks.databinding.CustomReceiverMessagesBinding
 import com.example.talks.databinding.CustomSenderMessagesBinding
 import com.example.talks.databinding.ReceiverChatImageLayoutBinding
 import com.example.talks.databinding.SenderChatImageLayoutBinding
+import java.time.LocalDateTime
 
 class ChatAdapter(
     val context: Context?,
@@ -35,6 +38,7 @@ class ChatAdapter(
 
     inner class SenderTextViewHolder(val binding: CustomSenderMessagesBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        @RequiresApi(Build.VERSION_CODES.O)
         fun bind(message: Message) {
             binding.chatSentText.text = message.messageText
             binding.senderTextMessageTime.text = getTime(message.creationTime.toString())
@@ -43,6 +47,7 @@ class ChatAdapter(
 
     inner class ReceiverTextViewHolder(val binding: CustomReceiverMessagesBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        @RequiresApi(Build.VERSION_CODES.O)
         fun bind(message: Message) {
             binding.chatReceivedText.text = message.messageText
             binding.receiverTextMessageTime.text = getTime(message.creationTime.toString())
@@ -51,6 +56,7 @@ class ChatAdapter(
 
     inner class SenderImageViewHolder(val binding: SenderChatImageLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        @RequiresApi(Build.VERSION_CODES.O)
         fun bind(message: Message) {
             binding.chatSenderImageView.setImageURI(Uri.parse(message.mediaLocalPath))
             binding.chatSenderImageTime.text = getTime(message.creationTime.toString())
@@ -59,28 +65,22 @@ class ChatAdapter(
 
     inner class ReceiverImageViewHolder(val binding: ReceiverChatImageLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
+        @RequiresApi(Build.VERSION_CODES.O)
         fun bind(message: Message) {
             binding.chatReceiverImageView.setImageURI(Uri.parse(message.mediaLocalPath))
             binding.chatReceiverImageTime.text = getTime(message.creationTime.toString())
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun getTime(timeString: String): String {
-        val hours = timeString.substring(11, 13).toInt()
-        return when {
-            hours > 12 -> {
-                val newHours = hours - 12
-                "$newHours:${timeString.substring(14, 16)} PM"
-            }
-            hours == 0 -> {
-                "12:${timeString.substring(14, 16)} AM"
-            }
-            hours < 12 -> {
-                "${timeString.substring(11, 16)} AM"
-            }
-            else -> {
-                throw java.lang.IllegalArgumentException("Date is Inaccurate!")
-            }
+        val time = LocalDateTime.parse(timeString)
+        val hours = time.hour
+        val min = time.minute
+        return if (hours > 12){
+            "${hours - 12}:$min pm"
+        }else {
+            "$hours:$min am"
         }
     }
 
@@ -120,6 +120,7 @@ class ChatAdapter(
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val message = differ.currentList[position]
 

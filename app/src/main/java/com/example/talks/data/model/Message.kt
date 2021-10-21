@@ -4,27 +4,64 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 @Entity(tableName = "talks_messages", indices = [Index(value = ["messageID"], unique = true)])
 data class
 Message(
-    @ColumnInfo(name = "chatID") var chatId: String,
-    @ColumnInfo(name = "messageID") var messageID: String?,
-    var messageType: String?
-) {
     @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
-    var messageText: String? = null
-    var status: String? = null
-    var creationTime: String? = null
-    var deliveryTime: String? = null
-    var seenTime: String? = null
-    var mediaSize: String? = null
-    var mediaDuration: String? = null
-    var mediaCaption: String? = null
-    var mediaUrl: String? = null
-    var mediaThumbnailString: String? = null
-    var mediaLocalPath: String? = null
-    var sentByMe: Boolean? = null
-    var deleted: Boolean? = null
+    val id: Int = 0,
+    @ColumnInfo(name = "chatID")
+    val chatId: String? = null,
+    @ColumnInfo(name = "messageID")
+    val messageID: String? = null,
+    val messageType: String? = null,
+    val messageText: String? = null,
+    val status: String? = null,
+    val creationTime: String? = null,
+    val deliveryTime: String? = null,
+    val seenTime: String? = null,
+    val mediaSize: String? = null,
+    val mediaDuration: String? = null,
+    val mediaCaption: String? = null,
+    val mediaUrl: String? = null,
+    val mediaThumbnailString: String? = null,
+    val mediaLocalPath: String? = null,
+    val sentByMe: Boolean? = null,
+    val deleted: Boolean? = null,
+) {
+    constructor() : this(
+        0, "", "", "", "",
+        "", "", "", "", "",
+        "", "", "", "", "", null, null
+    )
+
+    companion object {
+        fun Message.toTextMessage(): TextMessage {
+            return TextMessage(
+                chatId = chatId,
+                messageID = messageID,
+                messageType = messageType,
+                messageText = messageText,
+                status = status,
+                creationTime = creationTime,
+                deliveryTime = deliveryTime,
+                seenTime = seenTime,
+                sentByMe = sentByMe
+            )
+        }
+    }
 }
+
+data class TextMessage(
+    val chatId: String? = null,
+    val messageID: String? = null,
+    val messageType: String?,
+    val messageText: String? = null,
+    val status: String? = null,
+    val creationTime: String? = null,
+    val deliveryTime: String? = null,
+    val seenTime: String? = null,
+    val sentByMe: Boolean? = null
+)

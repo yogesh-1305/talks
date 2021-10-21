@@ -13,10 +13,9 @@ class CalendarManager {
 
     companion object {
 
-        fun getCurrentDateTime(): String {
-            val current = LocalDateTime.now()
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
-            return current.format(formatter)
+        fun getCurrentDateTime(): LocalDateTime? {
+            val string = "2021-10-17T10:12:15.872"
+            return LocalDateTime.now()
         }
 
         fun getYesterdayDatDate(): String{

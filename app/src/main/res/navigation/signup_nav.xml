@@ -14,6 +14,8 @@
         <action
             android:id="@+id/action_welcomeFragment_to_firstFragment"
             app:destination="@id/firstFragment"
+            app:enterAnim="@anim/from_right"
+            app:exitAnim="@anim/to_left"
             app:popUpTo="@id/welcomeFragment"
             app:popUpToInclusive="true" />
     </fragment>

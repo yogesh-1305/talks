@@ -14,6 +14,10 @@ import android.content.SharedPreferences
 import com.example.talks.database.db.TalksDatabase
 import com.example.talks.constants.LocalConstants.DATABASE_NAME
 import com.example.talks.constants.LocalConstants.SHARED_PREFERENCES_NAME
+import com.google.firebase.database.ktx.database
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
+import javax.inject.Named
 import javax.inject.Singleton
 
 @Module
@@ -23,6 +27,15 @@ object AppModule {
     @Singleton
     @Provides
     fun provideFirebaseAuth() = FirebaseAuth.getInstance()
+
+    @Provides
+    @Named("CHAT")
+    fun provideFirebaseChatDatabaseInstance() =
+        Firebase.database.getReference("talks_database_chats")
+
+    @Singleton
+    @Provides
+    fun provideFirestoreInstance() = Firebase.firestore
 
     @Singleton
     @Provides

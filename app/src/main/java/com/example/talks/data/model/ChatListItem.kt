@@ -5,12 +5,12 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "chat_list")
+@Entity(tableName = "chat_list", indices = [Index(value = ["contactNumber"], unique = true)])
 data class ChatListItem(
     @ColumnInfo(name = "contactNumber")
     var contactNumber: String?,
     @ColumnInfo(name = "messageID")
-    var messageID: String?,
+    var latestMessageTime: String?,
 ) {
     @PrimaryKey(autoGenerate = true)
     var id: Int = 0

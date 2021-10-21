@@ -8,67 +8,6 @@
     android:background="?colorSecondary"
     tools:context=".ui.home.activity.HomeScreenActivity">
 
-    <com.google.android.material.appbar.AppBarLayout
-        android:id="@+id/appBarLayout2"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:elevation="2dp"
-        app:layout_constraintBottom_toTopOf="@+id/fragment_home_nav"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:layout_width="match_parent"
-            android:layout_height="45dp">
-
-            <androidx.appcompat.widget.Toolbar
-                android:id="@+id/toolbar"
-                style="@style/Theme.Talks"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:elevation="2dp"
-                android:background="?colorSecondary"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
-
-            <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/toolbarDP"
-                android:layout_width="35dp"
-                android:layout_height="0dp"
-                android:layout_marginStart="16dp"
-                android:elevation="2dp"
-                android:src="@drawable/ic_baseline_home_24"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="@+id/toolbar"
-                app:layout_constraintTop_toTopOf="parent" />
-
-            <TextView
-                android:id="@+id/toolbarUsername"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:fontFamily="sans-serif"
-                android:text="TextView"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                android:elevation="2dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.5"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-    </com.google.android.material.appbar.AppBarLayout>
-
-
     <fragment
         android:id="@+id/fragment_home_nav"
         android:name="androidx.navigation.fragment.NavHostFragment"
@@ -78,7 +17,7 @@
         app:layout_constraintBottom_toTopOf="@+id/homeBottomNav"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/appBarLayout2"
+        app:layout_constraintTop_toTopOf="parent"
         app:navGraph="@navigation/home_nav"
         tools:ignore="FragmentTagUsage" />
 
@@ -87,11 +26,24 @@
         android:layout_width="match_parent"
         android:layout_height="45dp"
         android:background="?colorSecondary"
+        android:visibility="gone"
         app:labelVisibilityMode="unlabeled"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
         app:menu="@menu/nav_drawer_menu" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_home_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/black"
+        android:clickable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:srcCompat="@drawable/chat_icon" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

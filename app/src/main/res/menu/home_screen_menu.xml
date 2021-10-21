@@ -6,4 +6,28 @@
         android:title="Search"
         app:showAsAction="always"
         android:icon="@drawable/ic_baseline_search_24"/>
+    <item
+        android:id="@+id/home_screen_new_chat_button"
+        android:title="New Chat"
+        android:icon="@drawable/ic_baseline_search_24"/>
+
+    <item
+        android:id="@+id/home_screen_new_group_button"
+        android:title="New Group"
+        android:icon="@drawable/ic_baseline_search_24"/>
+
+    <item
+        android:id="@+id/home_screen_starred_button"
+        android:title="Saved Messages"
+        android:icon="@drawable/ic_baseline_search_24"/>
+
+    <item
+        android:id="@+id/home_screen_web_button"
+        android:title="Talks Web"
+        android:icon="@drawable/ic_baseline_search_24"/>
+
+    <item
+        android:id="@+id/home_screen_setting_button"
+        android:title="Settings"
+        android:icon="@drawable/ic_baseline_search_24"/>
 </menu>

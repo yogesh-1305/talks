@@ -43,4 +43,20 @@ object ConversionUtility {
         }
     }
 
+    suspend fun String.toBitmapDrawable(context: Context): BitmapDrawable? {
+        return try {
+            val loading = ImageLoader(context)
+            val request: ImageRequest = ImageRequest.Builder(context)
+                .data(this)
+                .build()
+
+            val result: SuccessResult = loading.execute(request) as SuccessResult
+            val bitmap = result.drawable
+            (bitmap as BitmapDrawable)
+
+        } catch (e: Exception) {
+            null
+        }
+    }
+
 }

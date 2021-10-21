@@ -22,6 +22,7 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
@@ -37,7 +38,7 @@ import com.example.talks.constants.ServerConstants.USER_STATUS
 import com.example.talks.constants.ServerConstants.USER_UNIQUE_ID
 import com.example.talks.data.model.TalksContact
 import com.example.talks.data.model.User
-import com.example.talks.data.viewmodels.authentication.fragments.ThirdFragmentViewModel
+import com.example.talks.data.viewmodels.authentication.activity.MainActivityViewModel
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.FragmentThirdBinding
 import com.example.talks.gallery.GalleryActivity
@@ -67,7 +68,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
     // View Models
     private val talksViewModel: TalksViewModel by viewModels()
-    private val viewModel: ThirdFragmentViewModel by viewModels()
+    private val viewModel: MainActivityViewModel by activityViewModels()
 
     @Inject
     lateinit var prefs: SharedPreferences
