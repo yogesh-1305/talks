@@ -182,13 +182,15 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     @DelicateCoroutinesApi
     @RequiresApi(Build.VERSION_CODES.O)
     private fun subscribeToObservers() {
-        viewModel.existingUserData.observe(viewLifecycleOwner, {
-            if (it != null) {
+
+        viewModel.existingUserData.observe(viewLifecycleOwner, { userData ->
+            userData?.let {
+
                 retrievedImageUrl =
                     Encryption().decrypt(it[USER_IMAGE_URL], encryptionKey).toString()
 
-                binding.thirdFragmentNameEditText.setText(it[USER_NAME])
-                binding.thirdFragmentBioEditText.setText(it[USER_BIO])
+                binding.thirdFragmentNameEditText.setText(it[USER_NAME] ?: "")
+                binding.thirdFragmentBioEditText.setText(it[USER_BIO] ?: "")
 
                 if (Helper.getImage() == null) {
                     Glide.with(this).load(retrievedImageUrl)
@@ -196,9 +198,6 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                         .placeholder(R.drawable.ic_baseline_person_24)
                         .into(binding.thirdFragmentUserImage)
                 }
-            } else {
-                Glide.with(this).load(R.drawable.ic_baseline_person_24)
-                    .into(binding.thirdFragmentUserImage)
             }
         })
 
@@ -226,7 +225,8 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
                     val imageBitmap = async { decryptedImageUrl?.toBitmap(requireContext()) }
                     val imagePath = imageBitmap.await()?.let { bitmap ->
-                        TalksStorageManager.saveProfilePhotoInPrivateStorage(requireContext(),
+                        TalksStorageManager.saveProfilePhotoInPrivateStorage(
+                            requireContext(),
                             bitmap
                         )
                     }
@@ -253,7 +253,9 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 //                val date = CalendarManager.getCurrentDateTime()
 
                 lifecycleScope.launch {
-                    prefs.edit().putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_COMPLETE).apply()
+                    prefs.edit()
+                        .putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_COMPLETE)
+                        .apply()
                     delay(1000L)
                     dialog.dismiss()
                     startActivity(Intent(context, HomeScreenActivity::class.java))
@@ -348,7 +350,6 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             }
         }
     }
-
 
 
     @RequiresApi(Build.VERSION_CODES.O)

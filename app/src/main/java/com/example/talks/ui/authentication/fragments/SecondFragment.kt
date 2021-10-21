@@ -6,6 +6,7 @@ import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.os.CountDownTimer
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,8 +44,8 @@ class SecondFragment : Fragment() {
     @Inject
     lateinit var prefs: SharedPreferences
 
-    private lateinit var otpTextView: TextInputEditText
-    private lateinit var resendOTPTextView: TextView
+    //    private lateinit var otpTextView: TextInputEditText
+//    private lateinit var resendOTPTextView: TextView
     private var phoneNumber: String? = null
     private lateinit var dialog: WaitingDialog
 
@@ -59,7 +60,7 @@ class SecondFragment : Fragment() {
 //        val waitingText = binding.waitingInstructionsTextView
 //        waitingText.text =
 //            "Waiting to automatically detect an SMS sent to \'$phoneNumber\'"
-        otpTextView = binding.otpEditText
+//        otpTextView = binding.otpEditText
 
         dialog = activity?.let { WaitingDialog(it) }!!
 
@@ -72,24 +73,26 @@ class SecondFragment : Fragment() {
 
         viewModel.verificationID.observe(viewLifecycleOwner, {
             if (it != null) {
-                otpScreenProgressBar.visibility = View.VISIBLE
+                Log.d("verification id ===", it)
             }
         })
 
         viewModel.smsCode.observe(viewLifecycleOwner, {
-            otpTextView.setText(it)
+            Log.d("verification code ===", it ?: "no code")
+            otpScreenProgressBar.visibility = View.VISIBLE
+            binding.otpEditText.setText(it)
         })
 
         // OTP Handler
-        otpTextView.addTextChangedListener{
-            if (it?.length == 6){
+        binding.otpEditText.addTextChangedListener {
+            if (it?.length == 6) {
                 viewModel.manualOTPAuth(it.toString())
                 otpScreenProgressBar.visibility = View.VISIBLE
             }
         }
 
         // Resend OTP
-        resendOTPTextView = binding.resendOtpTextView
+//        binding.resendOtpTextView = binding.resendOtpTextView
         startCountdownForResendOTP(phoneNumber!!)
 
         // Revert back to phone number entering screen i.e. First Fragment.
@@ -103,7 +106,9 @@ class SecondFragment : Fragment() {
         viewModel.isUserLoggedIn.observe(viewLifecycleOwner, {
             if (it) {
 
-                prefs.edit().putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_ADD_DATA).apply()
+                prefs.edit()
+                    .putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_ADD_DATA)
+                    .apply()
                 dialog.dismiss()
                 Navigation.findNavController(binding.root)
                     .navigate(R.id.action_secondFragment_to_thirdFragment)
@@ -121,17 +126,22 @@ class SecondFragment : Fragment() {
 
             @SuppressLint("SetTextI18n")
             override fun onTick(millisUntilFinished: Long) {
-                resendOTPTextView.text = "Resend OTP in : " + millisUntilFinished / 1000 + "s"
-                resendOTPTextView.isClickable = false
+                binding.resendOtpTextView.apply {
+                    text = "Resend OTP in : " + millisUntilFinished / 1000 + "s"
+                    isClickable = false
+                }
             }
 
             @SuppressLint("SetTextI18n")
             override fun onFinish() {
-                resendOTPTextView.text = "Resend OTP"
-                resendOTPTextView.isClickable = true
-                resendOTPTextView.setOnClickListener {
-                    viewModel.sendVerificationCode(phoneNumber, requireActivity(), auth)
-                    start()
+
+                binding.resendOtpTextView.apply {
+                    text = "Resend OTP"
+                    isClickable = true
+                    setOnClickListener {
+                        viewModel.sendVerificationCode(phoneNumber, requireActivity(), auth)
+                        start()
+                    }
                 }
             }
         }.start()
@@ -148,8 +158,8 @@ class SecondFragment : Fragment() {
         dialog.show()
     }
 
-    private fun String.formatForScreen() : String{
-        val number  = this
+    private fun String.formatForScreen(): String {
+        val number = this
         val formattedNumber = StringBuilder()
         formattedNumber.apply {
             append(number.substring(0..2))

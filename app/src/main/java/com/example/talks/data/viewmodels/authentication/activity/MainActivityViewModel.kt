@@ -25,6 +25,7 @@ import com.google.firebase.storage.UploadTask
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
@@ -34,7 +35,7 @@ class MainActivityViewModel
 @Inject constructor(
     val db: FirebaseFirestore,
     val auth: FirebaseAuth,
-    val storageRef: FirebaseStorage
+    private val storageRef: FirebaseStorage
 ) : ViewModel() {
 
     // OTP AUTH -----------------------------------------------------------------
@@ -73,12 +74,15 @@ class MainActivityViewModel
 
     private var callbacks = object : PhoneAuthProvider.OnVerificationStateChangedCallbacks() {
         override fun onVerificationCompleted(p0: PhoneAuthCredential) {
-            signInWithPhoneAuthCredentials(p0)
             smsCode.value = p0.smsCode
+            viewModelScope.launch {
+                delay(1000)
+                signInWithPhoneAuthCredentials(p0)
+            }
         }
 
         override fun onVerificationFailed(p0: FirebaseException) {
-//            Toast.makeText(context, p0.localizedMessage, Toast.LENGTH_SHORT).show()
+            Log.e("AUTHENTICATION FAILED ===", p0.localizedMessage)
         }
 
         override fun onCodeSent(
@@ -158,37 +162,6 @@ class MainActivityViewModel
                 }
             }
 
-//            Firebase.database.getReference(ServerConstants.FIREBASE_DB_NAME).get()
-//                .addOnSuccessListener {
-//
-//                    for (data in it.children) {
-//
-//                        val contactNumber =
-//                            data.child(ServerConstants.USER_PHONE_NUMBER).value.toString()
-//                        val contactUserName =
-//                            data.child(ServerConstants.USER_NAME).value.toString()
-//                        val contactImageUrl =
-//                            data.child(ServerConstants.USER_IMAGE_URL).value.toString()
-//                        val contactBio = data.child(ServerConstants.USER_BIO).value.toString()
-//                        val contactId =
-//                            data.child(ServerConstants.USER_UNIQUE_ID).value.toString()
-//
-//                        val decryptedImage =
-//                            Encryption().decrypt(contactImageUrl, encryptionKey)
-//                        val user = TalksContact(
-//                            contactNumber,
-//                            contactNameList[contactNumber]
-//                        ).apply {
-//                            this.contactUserName = contactUserName
-//                            this.contactImageUrl = decryptedImage.toString()
-//                            this.uId = contactId
-//                            this.isTalksUser = true
-//                            this.contactBio = contactBio
-//                        }
-//                        databaseViewModel.updateUser(user)
-//
-//                    }
-//                }
         }
     }
 
@@ -207,21 +180,6 @@ class MainActivityViewModel
                 )
                 existingUserData.value = user
             }
-//            val dbRef = Firebase.database.getReference(ServerConstants.FIREBASE_DB_NAME)
-//            if (userUid != null) {
-//                dbRef.child(userUid).get().addOnSuccessListener {
-//                    val userName = it.child(ServerConstants.USER_NAME).value.toString()
-//                    val userImage = it.child(ServerConstants.USER_IMAGE_URL).value.toString()
-//                    val userBio = it.child(ServerConstants.USER_BIO).value.toString()
-//
-//                    val user = hashMapOf(
-//                        ServerConstants.USER_NAME to userName,
-//                        ServerConstants.USER_IMAGE_URL to userImage,
-//                        ServerConstants.USER_BIO to userBio
-//                    )
-//                    existingUserData.value = user
-//                }
-//            }
         }
     }
 
@@ -240,23 +198,6 @@ class MainActivityViewModel
                     )
                     localUserData.value = localUser
                 }
-
-//            val dbRef = Firebase.database.getReference(ServerConstants.FIREBASE_DB_NAME)
-//            if (user[ServerConstants.USER_UNIQUE_ID] != null) {
-//                dbRef.child(user[ServerConstants.USER_UNIQUE_ID]!!).setValue(user)
-//                    .addOnSuccessListener {
-//                        val localUser = hashMapOf(
-//                            ServerConstants.USER_PHONE_NUMBER to user[ServerConstants.USER_PHONE_NUMBER],
-//                            ServerConstants.USER_NAME to user[ServerConstants.USER_NAME],
-//                            ServerConstants.USER_IMAGE_URL to user[ServerConstants.USER_IMAGE_URL],
-//                            ServerConstants.USER_BIO to user[ServerConstants.USER_BIO],
-//                            ServerConstants.USER_UNIQUE_ID to user[ServerConstants.USER_UNIQUE_ID]
-//                        )
-//                        localUserData.value = localUser
-//                    }.addOnFailureListener {
-//                        Log.i("failed login====", it.toString())
-//                    }
-//            }
         }
     }
 
@@ -264,7 +205,8 @@ class MainActivityViewModel
     fun uploadImageToStorage(image: Uri?, userId: String) {
         if (image != null) {
             viewModelScope.launch(Dispatchers.IO) {
-                val reference = storageRef.getReference(userId).child(ServerConstants.USER_IMAGE_STORAGE_PATH)
+                val reference =
+                    storageRef.getReference(userId).child(ServerConstants.USER_IMAGE_STORAGE_PATH)
                 val uploadTask = reference.putFile(image)
                 uploadTask.addOnSuccessListener {
                     getDownloadUrl(uploadTask, reference)
