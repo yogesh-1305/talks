@@ -40,7 +40,6 @@ class ChatFragment : Fragment() {
 
     private var messageText: String? = null
 
-    //    private var userPhoneNumber: String? = null
     private var otherPersonUniqueId: String = ""
 
     private var isTextEmpty = true
@@ -63,7 +62,14 @@ class ChatFragment : Fragment() {
 
         setupRecyclerView()
 
+        setClickListeners()
 
+        subscribeToObservers()
+
+
+    }
+
+    private fun subscribeToObservers() {
         lifecycleScope.launch {
             dbViewModel.readMessages(args.chatUserPhone)
                 .observe(viewLifecycleOwner, { list ->
@@ -86,7 +92,9 @@ class ChatFragment : Fragment() {
                     }
                 })
         }
+    }
 
+    private fun setClickListeners() {
         binding.etChat.addTextChangedListener {
 
             it?.let {
