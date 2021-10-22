@@ -83,4 +83,7 @@ interface TalksDao {
         contact_number: String,
         messageID: String
     )
+
+    @Query("UPDATE talks_messages SET status = :status WHERE creationTime = :creationTime")
+    suspend fun updateMessageStatus(status: String, creationTime: String)
 }

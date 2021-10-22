@@ -52,6 +52,10 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
         talksDao.createChatChannel(chatListItem)
     }
 
+    suspend fun updateMessageStatus(status: String, creationTime: String) {
+        talksDao.updateMessageStatus(status, creationTime)
+    }
+
 
     suspend fun updateChatChannel(
         contact_number: String,

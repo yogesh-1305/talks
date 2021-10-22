@@ -1,42 +1,23 @@
 package com.example.talks.data.viewmodels.chat.activity
 
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.net.Uri
-import android.os.Environment
 import android.util.Log
-import androidx.core.net.toFile
-import androidx.core.net.toUri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talks.constants.ServerConstants
-import com.example.talks.others.calendar.CalendarManager
 import com.example.talks.data.model.Message
 import com.example.talks.data.model.Message.Companion.toTextMessage
 import com.example.talks.data.model.TextMessage
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.ktx.database
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.ktx.Firebase
-import com.google.firebase.storage.FirebaseStorage
-import com.google.firebase.storage.StorageReference
-import com.google.firebase.storage.UploadTask
 import dagger.hilt.android.lifecycle.HiltViewModel
-import id.zelory.compressor.Compressor
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import java.io.File
-import java.io.FileOutputStream
-import java.nio.file.Files
-import java.nio.file.Paths
-import java.util.*
 import javax.inject.Inject
 
 @HiltViewModel
-class ChatViewModel @Inject constructor(
+class ChatViewModel
+@Inject constructor(
     val firebaseAuth: FirebaseAuth,
     val db: FirebaseFirestore
 ) : ViewModel() {
@@ -44,7 +25,7 @@ class ChatViewModel @Inject constructor(
     fun sendMessage(message: Message, id_other: String, dbViewModel: TalksViewModel) {
         viewModelScope.launch(Dispatchers.IO) {
 
-            dbViewModel.addMessage(message)
+            dbViewModel.addMessage(message) // message status -> pending
 
             val textMessage = message.toTextMessage()
             val messageKey = message.creationTime.toString()
@@ -53,6 +34,10 @@ class ChatViewModel @Inject constructor(
                 .document(firebaseAuth.currentUser?.uid.toString())
                 .collection("user_chats").document(messageKey).set(textMessage)
                 .addOnSuccessListener {
+
+                    // message status -> sent
+                    dbViewModel.updateMessageStatus("sent", message.creationTime.toString())
+
                     setMessageToReceiverEnd(
                         messageKey,
                         id_other,

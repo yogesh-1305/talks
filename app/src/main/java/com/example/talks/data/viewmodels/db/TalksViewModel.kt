@@ -11,7 +11,8 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TalksViewModel @Inject public constructor(private val repository: TalksRepository) : ViewModel() {
+class TalksViewModel @Inject public constructor(private val repository: TalksRepository) :
+    ViewModel() {
 
     val readAllUserData: LiveData<List<User>> = repository.readAllUserData
     val readAllContacts: LiveData<List<TalksContact>> = repository.readContacts
@@ -68,6 +69,12 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
         }
     }
 
+    fun updateMessageStatus(status: String, creationTime: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateMessageStatus(status, creationTime)
+        }
+    }
+
     fun createChatChannel(chatListItem: ChatListItem) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.createChatChannel(chatListItem)
@@ -75,8 +82,8 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
     }
 
     fun updateChatChannel(
-       contact_number: String,
-       messageID: String
+        contact_number: String,
+        messageID: String
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateChatChannel(contact_number, messageID)
