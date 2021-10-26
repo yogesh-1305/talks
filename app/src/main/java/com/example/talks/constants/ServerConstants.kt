@@ -12,4 +12,8 @@ object ServerConstants {
     const val USER_IMAGE_URL = "user_image_url"
 
     const val USER_IMAGE_STORAGE_PATH = "profile_image"
+
+    const val FETCH_DATA_STARTED = 0
+    const val FETCH_DATA_IN_PROGRESS = 1
+    const val FETCH_DATA_FINISHED = 2
 }

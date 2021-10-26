@@ -10,5 +10,6 @@ object LocalConstants {
     const val AUTH_STATE_ADD_NUMBER = 1
     const val AUTH_STATE_ADD_OTP = 2
     const val AUTH_STATE_ADD_DATA = 3
-    const val AUTH_STATE_COMPLETE = 4
+    const val AUTH_STATE_FINAL_SETUP = 4
+    const val AUTH_STATE_COMPLETE = 5
 }
