@@ -11,6 +11,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.talks.constants.ServerConstants
 import com.example.talks.constants.ServerConstants.FETCH_DATA_FINISHED
 import com.example.talks.constants.ServerConstants.FETCH_DATA_IN_PROGRESS
+import com.example.talks.constants.ServerConstants.FETCH_DATA_STARTED
 import com.example.talks.constants.ServerConstants.FIREBASE_DB_NAME
 import com.example.talks.constants.ServerConstants.USER_UNIQUE_ID
 import com.example.talks.data.model.Message
@@ -186,11 +187,11 @@ class MainActivityViewModel
         }
     }
 
-    var userData: HashMap<String, String?> = HashMap()
-    fun addUserToFirebaseDatabase() {
+    // if user already exists -> update its data else -> create new user
+    fun addUserToFirebaseDatabase(userData: HashMap<String, String?>) {
         viewModelScope.launch(Dispatchers.IO) {
             userData.let { data ->
-                db.collection(FIREBASE_DB_NAME).document(data.get(USER_UNIQUE_ID).toString())
+                db.collection(FIREBASE_DB_NAME).document(data[USER_UNIQUE_ID].toString())
                     .set(data).addOnSuccessListener {
                         val localUser = hashMapOf(
                             ServerConstants.USER_PHONE_NUMBER to data[ServerConstants.USER_PHONE_NUMBER],
@@ -222,10 +223,10 @@ class MainActivityViewModel
     }
 
     private fun getDownloadUrl(uploadTask: UploadTask, reference: StorageReference) {
-        uploadTask.continueWithTask {
-            if (!it.isSuccessful) {
-                it.exception?.let {
-                    throw it
+        uploadTask.continueWithTask { task ->
+            if (!task.isSuccessful) {
+                task.exception?.let { exception ->
+                    throw exception
                 }
             }
             reference.downloadUrl
@@ -233,16 +234,15 @@ class MainActivityViewModel
             if (it.isSuccessful) {
                 profileImageUrl.value = it.result.toString()
             } else {
-                profileImageUrl.value = it.exception?.message.toString()
+                profileImageUrl.value = null
             }
         }
     }
 
     val dataFetched: MutableLiveData<Int> = MutableLiveData()
-
     fun readMessagesFromServer(talksVM: TalksViewModel) {
         viewModelScope.launch(Dispatchers.IO) {
-//            dataFetched.postValue(FETCH_DATA_STARTED)
+            dataFetched.postValue(FETCH_DATA_STARTED)
             auth.currentUser?.let { it ->
                 db.collection(FIREBASE_DB_NAME).document(it.uid).collection("user_chats")
                     .get().addOnSuccessListener { snapshot ->
@@ -253,23 +253,11 @@ class MainActivityViewModel
                                 if (message != null) {
                                     talksVM.addMessage(message)
                                 }
-                                dataFetched.postValue(FETCH_DATA_FINISHED)
                             }
+                            dataFetched.postValue(FETCH_DATA_FINISHED)
                         }
 
                     }
-//                    .addSnapshotListener { snapshot, error ->
-//                        if (snapshot != null) {
-//                            size = snapshot.size()
-//                            for (document in snapshot.documents) {
-//                                val message = document.toObject(Message::class.java)
-//                                if (message != null) {
-//                                    talksVM.addMessage(message)
-//                                }
-//                            }
-//
-//                        }
-//                    }
             }
         }
 

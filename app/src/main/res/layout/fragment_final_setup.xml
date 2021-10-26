@@ -9,15 +9,17 @@
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/lottieAnimationView"
         android:layout_width="0dp"
-        android:layout_height="150dp"
+        android:layout_height="300dp"
+        android:layout_marginStart="32dp"
         android:layout_marginTop="32dp"
-        app:lottie_rawRes="@raw/please_wait"
-        app:lottie_autoPlay="true"
-        app:lottie_loop="true"
+        android:layout_marginEnd="32dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:lottie_autoPlay="true"
+        app:lottie_loop="true"
+        app:lottie_rawRes="@raw/please_wait" />
 
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/tv_setup_info"
@@ -25,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="8dp"
         android:text="Setting Up Your Profile"
-        android:textSize="28sp"
+        android:textSize="18sp"
         android:fontFamily="@font/prompt"
         app:layout_constraintEnd_toEndOf="@+id/progressBar"
         app:layout_constraintHorizontal_bias="0.498"

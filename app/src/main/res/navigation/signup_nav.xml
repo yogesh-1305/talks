@@ -80,5 +80,21 @@
         android:id="@+id/finalSetupFragment"
         android:name="com.example.talks.FinalSetupFragment"
         android:label="fragment_final_setup"
-        tools:layout="@layout/fragment_final_setup" />
+        tools:layout="@layout/fragment_final_setup" >
+        <argument
+            android:name="phone_number"
+            app:argType="string" />
+        <argument
+            android:name="name"
+            app:argType="string" />
+        <argument
+            android:name="bio"
+            app:argType="string" />
+        <argument
+            android:name="user_id"
+            app:argType="string" />
+        <argument
+            android:name="existing_image_url"
+            app:argType="string" />
+    </fragment>
 </navigation>

@@ -85,14 +85,12 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     // Pop up dialogs
     private lateinit var dialog: UploadingDialog
 
-    private var dataFetchedOnce = false
-
     private lateinit var storagePermission: ActivityResultLauncher<String>
     private lateinit var storagePermissionBelowAndroidQ: ActivityResultLauncher<Array<String>>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentThirdBinding.inflate(inflater, container, false)
         dialog = UploadingDialog(activity as Activity)
@@ -112,10 +110,10 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        subscribeToObservers()
-        setClickListeners()
 
         registerForPermissionCallbacks()
+        subscribeToObservers()
+        setClickListeners()
 
         binding.thirdFragmentBioEditText.setOnEditorActionListener(this)
     }
@@ -186,57 +184,14 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             }
         })
 
-        viewModel.profileImageUrl.observe(viewLifecycleOwner, {
-            if (it != null) {
-                val image = Encryption().encrypt(it, encryptionKey)
-                val user = hashMapOf(
-                    USER_PHONE_NUMBER to "$phoneNumber",
-                    USER_NAME to getNameFromEditText(),
-                    USER_BIO to getBioFromEditText(),
-                    USER_IMAGE_URL to image,
-                    USER_UNIQUE_ID to userUid,
-                    USER_STATUS to "active now",
-                )
-                viewModel.userData = user
-            }
-        })
-
-        viewModel.localUserData.observe(viewLifecycleOwner, {
-            if (it.isNotEmpty()) {
-                val decryptedImageUrl =
-                    Encryption().decrypt(it[USER_IMAGE_URL], encryptionKey)
-
-                lifecycleScope.launch(Dispatchers.IO) {
-
-                    val imageBitmap = async { decryptedImageUrl?.toBitmap(requireContext()) }
-                    val imagePath = imageBitmap.await()?.let { bitmap ->
-                        TalksStorageManager.saveProfilePhotoInPrivateStorage(
-                            requireContext(),
-                            bitmap
-                        )
-                    }
-                    val dbUser =
-                        User(
-                            phoneNumber = it[USER_PHONE_NUMBER],
-                            userName = it[USER_NAME],
-                            profileImageUrl = decryptedImageUrl,
-                            bio = it[USER_BIO],
-                            firebaseAuthUID = it[USER_UNIQUE_ID]
-                        ).apply {
-                            imageLocalPath = imagePath
-                        }
-                    talksViewModel.addUser(user = dbUser)
-                }
-            }
-        })
-
 //        -----------------------------Room Database VM------------------------------------
         talksViewModel.readAllUserData.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()) {
 
                 lifecycleScope.launch {
                     prefs.edit()
-                        .putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_FINAL_SETUP)
+                        .putInt(LocalConstants.KEY_AUTH_STATE,
+                            LocalConstants.AUTH_STATE_FINAL_SETUP)
                         .apply()
 
                     Navigation.findNavController(binding.root)
@@ -256,7 +211,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
         binding.saveAndContinueButton.setOnClickListener {
             if (getNameFromEditText().isNotEmpty()) {
-                startUploadProcess()
+                navigateToFinalSetupFragment()
             } else {
                 Snackbar.make(
                     binding.root,
@@ -279,48 +234,13 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             Glide.with(binding.root).load(image).diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                 .placeholder(R.drawable.ic_baseline_person_24)
                 .into(binding.thirdFragmentUserImage)
-        }
-    }
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun startUploadProcess() {
-        val image = Helper.getImage()
-        val imageBitmap = image?.toBitmap(requireActivity())
-
-        if (imageBitmap != null) {
-            lifecycleScope.launch {
-                viewModel.imageUri = image
-                imageBitmap.let {
-                    TalksStorageManager.saveProfilePhotoInPrivateStorage(
-                        requireContext(),
-                        it
-                    )
-                }
-            }
+            // save image in a variable in view model for final setup fragment to process it
+            viewModel.imageUri = image
         } else {
-            lifecycleScope.launch {
-                val encryptedImage = Encryption().encrypt(retrievedImageUrl, encryptionKey)
-                val user = hashMapOf(
-                    USER_PHONE_NUMBER to "$phoneNumber",
-                    USER_NAME to getNameFromEditText(),
-                    USER_BIO to getBioFromEditText(),
-                    USER_IMAGE_URL to encryptedImage,
-                    USER_UNIQUE_ID to userUid,
-                    USER_STATUS to "active now",
-                )
-                viewModel.userData = user
-            }
-        }
-        lifecycleScope.launch {
-            prefs.edit()
-                .putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_FINAL_SETUP)
-                .apply()
-
-            Navigation.findNavController(binding.root)
-                .navigate(R.id.action_thirdFragment_to_finalSetupFragment)
+            viewModel.imageUri = null
         }
     }
-
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onEditorAction(v: TextView?, actionId: Int, event: KeyEvent?): Boolean {
@@ -330,7 +250,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 true
             }
             EditorInfo.IME_ACTION_DONE -> {
-                startUploadProcess()
+               navigateToFinalSetupFragment()
                 true
             }
             else -> {
@@ -339,15 +259,25 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         }
     }
 
-
-    private fun View.hideKeyboard() {
-        val imm = context.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        imm.hideSoftInputFromWindow(windowToken, 0)
-    }
-
     private fun navigateToGalleryActivity() {
         val intent = Intent(context, GalleryActivity::class.java)
         activity?.startActivity(intent)
+    }
+
+    private fun navigateToFinalSetupFragment() {
+        lifecycleScope.launch {
+            prefs.edit()
+                .putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_FINAL_SETUP)
+                .apply()
+        }
+        Navigation.findNavController(binding.root)
+            .navigate(ThirdFragmentDirections.actionThirdFragmentToFinalSetupFragment(
+                phoneNumber.toString(),
+                getNameFromEditText(),
+                getBioFromEditText(),
+                userUid,
+                retrievedImageUrl
+            ))
     }
 
     private fun getNameFromEditText(): String {
