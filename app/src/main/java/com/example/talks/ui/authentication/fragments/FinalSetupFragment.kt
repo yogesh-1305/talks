@@ -3,6 +3,7 @@ package com.example.talks.ui.authentication.fragments
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -20,6 +21,8 @@ import com.example.talks.constants.ServerConstants.USER_NAME
 import com.example.talks.constants.ServerConstants.USER_PHONE_NUMBER
 import com.example.talks.constants.ServerConstants.USER_STATUS
 import com.example.talks.constants.ServerConstants.USER_UNIQUE_ID
+import com.example.talks.data.model.ChatListItem
+import com.example.talks.data.model.ChatListQueriedData
 import com.example.talks.data.model.User
 import com.example.talks.data.viewmodels.authentication.activity.MainActivityViewModel
 import com.example.talks.data.viewmodels.db.TalksViewModel
@@ -110,7 +113,21 @@ class FinalSetupFragment : Fragment() {
                 FETCH_DATA_FINISHED -> {
                     binding.tvSetupInfo.text = "Restored messages successfully"
                     binding.progressBar.setProgress(100, true)
-                    navigateToHomeScreen()
+                    dbViewModel.getMessagesDataForChatList.observe(viewLifecycleOwner, {
+                        val items = it as List<ChatListQueriedData>
+
+                        if (items.isNotEmpty()) {
+                            items.forEach { data ->
+                                val item = ChatListItem(contactNumber = data.chatID,
+                                    latestMessageId = data.latest_message_id)
+                                dbViewModel.createChatChannel(item)
+                                Log.d("check item id===", data.latest_message_id.toString())
+                            }
+                            navigateToHomeScreen()
+                        } else {
+                            navigateToHomeScreen()
+                        }
+                    })
                 }
                 else -> { /* NO-OP */
                 }

@@ -9,12 +9,13 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
 
     val readAllUserData: LiveData<List<User>> = talksDao.readUserData()
     val readContacts: LiveData<List<TalksContact>> = talksDao.readContacts()
-    val readChatListItem: LiveData<List<ChatListQueriedData>> = talksDao.readChatList()
+    val readChatListItem: LiveData<List<ChatListItem>> = talksDao.readChatList()
     val readContactPhoneNumbers: LiveData<List<String>> = talksDao.readContactPhoneNumbers()
     val getDistinctMessages: LiveData<List<String>> = talksDao.getDistinctMessages()
     val lastAddedMessage: LiveData<Message> = talksDao.getLastAddedMessage()
     val getChatListPhoneNumbers: LiveData<List<String>> = talksDao.getChatListPhoneNumbers()
     val getDistinctPhoneNumbers: LiveData<List<String>> = talksDao.getDistinctPhoneNumbers()
+    val getMessagesDataForChatList: LiveData<List<ChatListQueriedData>> = talksDao.getMessagesDataForChatList()
 
     suspend fun readMessages(chatID: String): LiveData<List<Message>> {
         return talksDao.readMessages(chatID)

@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.R
+import com.example.talks.data.model.ChatListItem
 import com.example.talks.others.calendar.CalendarManager
 import com.example.talks.data.model.ChatListQueriedData
 import com.example.talks.databinding.ChatListItemBinding
@@ -23,17 +24,17 @@ class HomeScreenAdapter(val context: Activity) :
     class HomeScreenViewHolder(val binding: ChatListItemBinding) :
         RecyclerView.ViewHolder(binding.root)
 
-    private val diffCallback = object : DiffUtil.ItemCallback<ChatListQueriedData>() {
+    private val diffCallback = object : DiffUtil.ItemCallback<ChatListItem>() {
         override fun areItemsTheSame(
-            oldItem: ChatListQueriedData,
-            newItem: ChatListQueriedData
+            oldItem: ChatListItem,
+            newItem: ChatListItem
         ): Boolean {
-            return oldItem.contact_number == newItem.contact_number
+            return oldItem == newItem
         }
 
         override fun areContentsTheSame(
-            oldItem: ChatListQueriedData,
-            newItem: ChatListQueriedData
+            oldItem: ChatListItem,
+            newItem: ChatListItem
         ): Boolean {
             return oldItem.hashCode() == newItem.hashCode()
         }
@@ -41,7 +42,7 @@ class HomeScreenAdapter(val context: Activity) :
 
     private val differ = AsyncListDiffer(this, diffCallback)
 
-    fun submitChatList(list: List<ChatListQueriedData>) = differ.submitList(list)
+    fun submitChatList(list: List<ChatListItem>) = differ.submitList(list)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): HomeScreenViewHolder {
         return HomeScreenViewHolder(
@@ -58,46 +59,46 @@ class HomeScreenAdapter(val context: Activity) :
         val item = differ.currentList[position]
 
         ////////////////////////////////////////////////////////////////////////////////////
-        if (context != null) {
-            Glide.with(context).load(item.contactImageUrl)
-                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
-                .placeholder(R.drawable.icon_person_with_bg)
-                .into(view.chatListImage)
-        }
-        if (item.contactName == null || item.contactName == "") {
-            view.chatListName.text = item.contact_number
-        } else {
-            view.chatListName.text = item.contactName
-        }
-
-        if (item.sentByMe == true) view.sentMessageStatusImage.visibility =
-            View.VISIBLE else view.sentMessageStatusImage.visibility = View.GONE
-
-        when (item.messageType) {
-            "/text" -> {
-                view.chatListLatestMessage.text = item.messageText
-            }
-            "/image" -> {
-                view.chatListLatestMessage.text = "Image"
-            }
-            "/video" -> {
-                view.chatListLatestMessage.text = "Video"
-            }
-        }
-
-        view.chatListTimeStamp.text = item.creationTime.toString()
-
-        ///////////////////////////////////////////////////////////////////////////////////
-        view.chatListItemLayout.setOnClickListener {
-            val action = HomeScreenFragmentDirections
-                .actionHomeScreenFragmentToChatFragment(item.contact_id.toString())
-
-            context.findNavController(R.id.fragment_home_nav)
-                .navigate(action)
-//            val intent = Intent(context, ChatActivity::class.java)
-//            intent.putExtra("contactNumber", item.contact_number)
-//            context?.startActivity(intent)
-        }
+//        if (context != null) {
+//            Glide.with(context).load(item.contactImageUrl)
+//                .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
+//                .placeholder(R.drawable.icon_person_with_bg)
+//                .into(view.chatListImage)
+//        }
+//        if (item.contactName == null || item.contactName == "") {
+//            view.chatListName.text = item.contact_number
+//        } else {
+//            view.chatListName.text = item.contactName
+//        }
+//
+//        if (item.sentByMe == true) view.sentMessageStatusImage.visibility =
+//            View.VISIBLE else view.sentMessageStatusImage.visibility = View.GONE
+//
+//        when (item.messageType) {
+//            "/text" -> {
+//                view.chatListLatestMessage.text = item.messageText
+//            }
+//            "/image" -> {
+//                view.chatListLatestMessage.text = "Image"
+//            }
+//            "/video" -> {
+//                view.chatListLatestMessage.text = "Video"
+//            }
+//        }
+//
+//        view.chatListTimeStamp.text = item.creationTime.toString()
+//
+//        ///////////////////////////////////////////////////////////////////////////////////
+//        view.chatListItemLayout.setOnClickListener {
+//            val action = HomeScreenFragmentDirections
+//                .actionHomeScreenFragmentToChatFragment(item.contact_id.toString())
+//
+//            context.findNavController(R.id.fragment_home_nav)
+//                .navigate(action)
+////            val intent = Intent(context, ChatActivity::class.java)
+////            intent.putExtra("contactNumber", item.contact_number)
+////            context?.startActivity(intent)
+//        }
 
     }
 

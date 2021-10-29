@@ -16,12 +16,13 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
 
     val readAllUserData: LiveData<List<User>> = repository.readAllUserData
     val readAllContacts: LiveData<List<TalksContact>> = repository.readContacts
-    val readChatListItem: LiveData<List<ChatListQueriedData>> = repository.readChatListItem
+    val readChatListItem: LiveData<List<ChatListItem>> = repository.readChatListItem
     val readContactPhoneNumbers: LiveData<List<String>> = repository.readContactPhoneNumbers
     val getDistinctMessages: LiveData<List<String>> = repository.getDistinctMessages
     val lastAddedMessage: LiveData<Message> = repository.lastAddedMessage
     val getChatListPhoneNumbers: LiveData<List<String>> = repository.getChatListPhoneNumbers
     val getDistinctPhoneNumbers: LiveData<List<String>> = repository.getDistinctPhoneNumbers
+    val getMessagesDataForChatList: LiveData<List<ChatListQueriedData>> = repository.getMessagesDataForChatList
 
     suspend fun readMessages(chatID: String): LiveData<List<Message>> {
         return repository.readMessages(chatID)

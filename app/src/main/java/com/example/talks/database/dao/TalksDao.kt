@@ -17,7 +17,7 @@ interface TalksDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addMessage(message: Message)
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun createChatChannel(chatListItem: ChatListItem)
 
 
@@ -34,16 +34,8 @@ interface TalksDao {
     @Query("SELECT contact_number FROM talks_contacts ORDER BY contactName ASC")
     fun readContactPhoneNumbers(): LiveData<List<String>>
 
-    @Query(""
-//        """
-//            select uId as contact_id, contact_number, contactName, contactImageUrl, messageText, messageType, creationTime, sentByMe
-//            from chat_list
-//            left join talks_contacts on contactNumber = contact_number
-//            left join talks_messages on chat_list.latestMessageTime = talks_messages.creationTime
-//            group by contact_number order by creationTime desc
-//            """
-    )
-    fun readChatList(): LiveData<List<ChatListQueriedData>>
+    @Query("select * from chat_list")
+    fun readChatList(): LiveData<List<ChatListItem>>
 
     @Query("SELECT * FROM talks_messages WHERE chatId = :chatID")
     fun readMessages(chatID: String): LiveData<List<Message>>
@@ -59,6 +51,9 @@ interface TalksDao {
 
     @Query("select distinct chatID from talks_messages")
     fun getDistinctPhoneNumbers(): LiveData<List<String>>
+
+    @Query("select chatID, max(id) as latest_message_id, messageText, messageType, status, sentByMe from talks_messages GROUP by chatID")
+    fun getMessagesDataForChatList(): LiveData<List<ChatListQueriedData>>
 
     // Update
 

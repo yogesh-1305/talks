@@ -5,7 +5,7 @@ import androidx.room.Entity
 import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "chat_list", indices = [Index(value = ["contactNumber"], unique = true)])
+@Entity(tableName = "chat_list", indices = [Index(value = ["contact_number"], unique = true)])
 data class ChatListItem(
     @PrimaryKey(autoGenerate = true) var id: Int = 0,
     @ColumnInfo(name = "contact_number") var contactNumber: String?,
