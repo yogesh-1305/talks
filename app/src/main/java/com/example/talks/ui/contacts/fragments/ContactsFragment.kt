@@ -1,15 +1,13 @@
-package com.example.talks
+package com.example.talks.ui.contacts.fragments
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.viewModels
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.talks.data.adapters.contact.activity.ContactAdapter
-import com.example.talks.data.adapters.home.fragments.HomeScreenAdapter
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.FragmentContactsBinding
 import dagger.hilt.android.AndroidEntryPoint

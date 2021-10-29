@@ -9,10 +9,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
-import com.example.talks.ContactsFragmentDirections
 import com.example.talks.R
 import com.example.talks.data.model.TalksContact
 import com.example.talks.databinding.ContactListItemViewBinding
+import com.example.talks.ui.contacts.fragments.ContactsFragmentDirections
 
 class ContactAdapter(val context: Activity) :
     RecyclerView.Adapter<ContactAdapter.ContactViewHolder>() {

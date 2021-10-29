@@ -1,7 +1,6 @@
-package com.example.talks
+package com.example.talks.ui.authentication.fragments
 
 import android.content.Intent
-import android.graphics.Bitmap
 import android.os.Build
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -12,7 +11,7 @@ import androidx.annotation.RequiresApi
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
-import com.example.talks.constants.ServerConstants
+import com.example.talks.BuildConfig
 import com.example.talks.constants.ServerConstants.FETCH_DATA_FINISHED
 import com.example.talks.constants.ServerConstants.FETCH_DATA_IN_PROGRESS
 import com.example.talks.constants.ServerConstants.USER_BIO

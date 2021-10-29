@@ -2,30 +2,19 @@ package com.example.talks.ui.home.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.database.Cursor
-import android.graphics.drawable.Drawable
-import android.opengl.Visibility
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.view.Menu
 import android.view.View
-import android.webkit.*
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.appcompat.widget.Toolbar
 import androidx.core.app.ActivityCompat
-import androidx.core.net.toUri
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.bumptech.glide.Glide
-import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.BuildConfig
 import com.example.talks.R
 import com.example.talks.data.model.ChatListItem
@@ -33,15 +22,11 @@ import com.example.talks.data.model.TalksContact
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.data.viewmodels.home.activity.HomeActivityViewModel
-import com.example.talks.profile.ProfileSettingsActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.novoda.merlin.Merlin
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.android.synthetic.main.activity_calling.*
 import kotlinx.android.synthetic.main.activity_home_screen.*
-import timber.log.Timber
-import java.util.*
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -80,29 +65,26 @@ class HomeScreenActivity : AppCompatActivity() {
         if (isPermissionGranted()) {
             readContacts()
         }
-        viewModel.testValue = 1
+
         viewModel.readMessagesFromServer(auth.currentUser?.phoneNumber, databaseViewModel)
 
         databaseViewModel.getChatListPhoneNumbers.observe(this, {
             chatChannelPhoneNumbers = it as ArrayList<String>
         })
-        databaseViewModel.lastAddedMessage.observe(this, {
-//            if (it != null) {
-//                if (!chatChannelPhoneNumbers.contains(it.chatId)) {
-//                    val chatListItem =
-//                        ChatListItem(contactNumber = it.chatId, messageID = it.messageID)
-//                    databaseViewModel.createChatChannel(chatListItem)
-//                    Timber.d("${it.messageID} at creation====")
-//                } else {
-//                    Timber.d("${it.messageID} at update====")
-//                    it.chatId?.let { it1 ->
-//                        databaseViewModel.updateChatChannel(
-//                            contact_number = it1,
-//                            messageID = it.messageID.toString()
-//                        )
-//                    }
-//                }
-//            }
+        databaseViewModel.lastAddedMessage.observe(this, { latestMessage ->
+            latestMessage?.let { message ->
+                if (!chatChannelPhoneNumbers.contains(message.chatId)) {
+                    val chatListItem =
+                        ChatListItem(contactNumber = message.chatId, latestMessageId = message.id)
+                    databaseViewModel.createChatChannel(chatListItem)
+
+                } else {
+                    databaseViewModel.updateChatListLatestMessage(
+                        contact_number = message.chatId.toString(),
+                        latestMessageId = message.id
+                    )
+                }
+            }
         })
 
         bottomNavigationView = binding.homeBottomNav

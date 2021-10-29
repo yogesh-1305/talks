@@ -39,7 +39,7 @@
     </fragment>
     <fragment
         android:id="@+id/contactsFragment"
-        android:name="com.example.talks.ContactsFragment"
+        android:name="com.example.talks.ui.contacts.fragments.ContactsFragment"
         android:label="fragment_contacts"
         tools:layout="@layout/fragment_contacts" >
         <action

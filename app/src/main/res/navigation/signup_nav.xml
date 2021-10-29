@@ -78,7 +78,7 @@
     </dialog>
     <fragment
         android:id="@+id/finalSetupFragment"
-        android:name="com.example.talks.FinalSetupFragment"
+        android:name="com.example.talks.ui.authentication.fragments.FinalSetupFragment"
         android:label="fragment_final_setup"
         tools:layout="@layout/fragment_final_setup" >
         <argument

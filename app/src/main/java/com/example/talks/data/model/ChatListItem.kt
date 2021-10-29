@@ -7,16 +7,12 @@ import androidx.room.PrimaryKey
 
 @Entity(tableName = "chat_list", indices = [Index(value = ["contactNumber"], unique = true)])
 data class ChatListItem(
-    @ColumnInfo(name = "contactNumber")
-    var contactNumber: String?,
-    @ColumnInfo(name = "messageID")
-    var latestMessageTime: String?,
-) {
-    @PrimaryKey(autoGenerate = true)
-    var id: Int = 0
-    var isChatPinned: Boolean = false
-    var isChatMuted: Boolean = false
-    var isChatArchived: Boolean = false
-    var lastReadMessageID: Int = 0
-    var unseenMessagesCount: Int = 0
-}
+    @PrimaryKey(autoGenerate = true) var id: Int = 0,
+    @ColumnInfo(name = "contact_number") var contactNumber: String?,
+    @ColumnInfo(name = "latest_message_id") var latestMessageId: Int?,
+    var isChatPinned: Boolean = false,
+    var isChatMuted: Boolean = false,
+    var isChatArchived: Boolean = false,
+    var lastReadMessageID: Int = 0,
+    var unseenMessagesCount: Int = 0,
+)

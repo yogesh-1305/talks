@@ -81,12 +81,12 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
         }
     }
 
-    fun updateChatChannel(
+    fun updateChatListLatestMessage(
         contact_number: String,
-        messageID: String
+        latestMessageId: Int
     ) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.updateChatChannel(contact_number, messageID)
+            repository.updateChatListLatestMessage(contact_number, latestMessageId)
         }
     }
 

@@ -57,11 +57,11 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
     }
 
 
-    suspend fun updateChatChannel(
+    suspend fun updateChatListLatestMessage(
         contact_number: String,
-        messageID: String
+        latestMessageId: Int
     ) {
-        talksDao.updateChatChannel(contact_number, messageID)
+        talksDao.updateChatListLatestMessage(contact_number, latestMessageId)
     }
 
     suspend fun readSingleContact(userPhoneNumber: String): LiveData<TalksContact> {

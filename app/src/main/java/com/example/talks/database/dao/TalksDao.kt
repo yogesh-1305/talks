@@ -17,7 +17,7 @@ interface TalksDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addMessage(message: Message)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun createChatChannel(chatListItem: ChatListItem)
 
 
@@ -34,14 +34,14 @@ interface TalksDao {
     @Query("SELECT contact_number FROM talks_contacts ORDER BY contactName ASC")
     fun readContactPhoneNumbers(): LiveData<List<String>>
 
-    @Query(
-        """
-            select uId as contact_id, contact_number, contactName, contactImageUrl, messageText, messageType, creationTime, sentByMe 
-            from chat_list
-            left join talks_contacts on contactNumber = contact_number
-            left join talks_messages on chat_list.messageID = talks_messages.messageID
-            group by contact_number order by creationTime desc
-            """
+    @Query(""
+//        """
+//            select uId as contact_id, contact_number, contactName, contactImageUrl, messageText, messageType, creationTime, sentByMe
+//            from chat_list
+//            left join talks_contacts on contactNumber = contact_number
+//            left join talks_messages on chat_list.latestMessageTime = talks_messages.creationTime
+//            group by contact_number order by creationTime desc
+//            """
     )
     fun readChatList(): LiveData<List<ChatListQueriedData>>
 
@@ -54,7 +54,7 @@ interface TalksDao {
     @Query("SELECT * from talks_messages ORDER by id DESC LIMIT 1")
     fun getLastAddedMessage(): LiveData<Message>
 
-    @Query("SELECT contactNumber FROM chat_list")
+    @Query("SELECT contact_number FROM chat_list")
     fun getChatListPhoneNumbers(): LiveData<List<String>>
 
     @Query("select distinct chatID from talks_messages")
@@ -78,10 +78,10 @@ interface TalksDao {
     @Query("UPDATE user_data SET bio = :userBio")
     suspend fun updateUserBio(userBio: String)
 
-    @Query("UPDATE chat_list SET contactNumber = :contact_number, messageID = :messageID where contactNumber = :contact_number")
-    suspend fun updateChatChannel(
+    @Query( "UPDATE chat_list SET latest_message_id = :latestMessageId where contact_number = :contact_number")
+    suspend fun updateChatListLatestMessage(
         contact_number: String,
-        messageID: String
+        latestMessageId: Int,
     )
 
     @Query("UPDATE talks_messages SET status = :status WHERE creationTime = :creationTime")
