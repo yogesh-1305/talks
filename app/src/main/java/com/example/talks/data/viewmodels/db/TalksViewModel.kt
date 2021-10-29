@@ -1,6 +1,7 @@
 package com.example.talks.data.viewmodels.db
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talks.data.model.*
@@ -22,10 +23,18 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
     val lastAddedMessage: LiveData<Message> = repository.lastAddedMessage
     val getChatListPhoneNumbers: LiveData<List<String>> = repository.getChatListPhoneNumbers
     val getDistinctPhoneNumbers: LiveData<List<String>> = repository.getDistinctPhoneNumbers
-    val getMessagesDataForChatList: LiveData<List<ChatListQueriedData>> = repository.getMessagesDataForChatList
+
+    val messagesDataForChatList: MutableList<ChatListQueriedData> = ArrayList()
 
     suspend fun readMessages(chatID: String): LiveData<List<Message>> {
         return repository.readMessages(chatID)
+    }
+
+    fun getMessagesDataForChatList() {
+        viewModelScope.launch {
+            val data = repository.getMessagesDataForChatList()
+            messagesDataForChatList.addAll(data)
+        }
     }
 
     fun addUser(user: User) {
@@ -84,7 +93,7 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
 
     fun updateChatListLatestMessage(
         contact_number: String,
-        latestMessageId: Int
+        latestMessageId: Int,
     ) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateChatListLatestMessage(contact_number, latestMessageId)

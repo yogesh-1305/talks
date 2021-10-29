@@ -15,10 +15,14 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
     val lastAddedMessage: LiveData<Message> = talksDao.getLastAddedMessage()
     val getChatListPhoneNumbers: LiveData<List<String>> = talksDao.getChatListPhoneNumbers()
     val getDistinctPhoneNumbers: LiveData<List<String>> = talksDao.getDistinctPhoneNumbers()
-    val getMessagesDataForChatList: LiveData<List<ChatListQueriedData>> = talksDao.getMessagesDataForChatList()
+//    val getMessagesDataForChatList: LiveData<List<ChatListQueriedData>> = talksDao.getMessagesDataForChatList()
 
     suspend fun readMessages(chatID: String): LiveData<List<Message>> {
         return talksDao.readMessages(chatID)
+    }
+
+    suspend fun getMessagesDataForChatList(): List<ChatListQueriedData> {
+        return talksDao.getMessagesDataForChatList()
     }
 
     suspend fun addUser(user: User) {

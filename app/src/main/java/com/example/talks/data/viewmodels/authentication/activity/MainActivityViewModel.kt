@@ -9,6 +9,7 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talks.constants.ServerConstants
+import com.example.talks.constants.ServerConstants.FETCH_DATA_EMPTY
 import com.example.talks.constants.ServerConstants.FETCH_DATA_FINISHED
 import com.example.talks.constants.ServerConstants.FETCH_DATA_IN_PROGRESS
 import com.example.talks.constants.ServerConstants.FETCH_DATA_STARTED
@@ -255,6 +256,8 @@ class MainActivityViewModel
                                 }
                             }
                             dataFetched.postValue(FETCH_DATA_FINISHED)
+                        }else {
+                            dataFetched.postValue(FETCH_DATA_EMPTY)
                         }
 
                     }

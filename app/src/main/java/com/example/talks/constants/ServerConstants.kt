@@ -16,4 +16,5 @@ object ServerConstants {
     const val FETCH_DATA_STARTED = 0
     const val FETCH_DATA_IN_PROGRESS = 1
     const val FETCH_DATA_FINISHED = 2
+    const val FETCH_DATA_EMPTY = 3
 }

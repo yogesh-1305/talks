@@ -20,7 +20,6 @@ interface TalksDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun createChatChannel(chatListItem: ChatListItem)
 
-
     // Fetch
     @Query("SELECT * FROM user_data ORDER BY id ASC")
     fun readUserData(): LiveData<List<User>>
@@ -53,7 +52,7 @@ interface TalksDao {
     fun getDistinctPhoneNumbers(): LiveData<List<String>>
 
     @Query("select chatID, max(id) as latest_message_id, messageText, messageType, status, sentByMe from talks_messages GROUP by chatID")
-    fun getMessagesDataForChatList(): LiveData<List<ChatListQueriedData>>
+    suspend fun getMessagesDataForChatList(): List<ChatListQueriedData>
 
     // Update
 

@@ -13,6 +13,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.example.talks.BuildConfig
+import com.example.talks.constants.ServerConstants.FETCH_DATA_EMPTY
 import com.example.talks.constants.ServerConstants.FETCH_DATA_FINISHED
 import com.example.talks.constants.ServerConstants.FETCH_DATA_IN_PROGRESS
 import com.example.talks.constants.ServerConstants.USER_BIO
@@ -113,21 +114,19 @@ class FinalSetupFragment : Fragment() {
                 FETCH_DATA_FINISHED -> {
                     binding.tvSetupInfo.text = "Restored messages successfully"
                     binding.progressBar.setProgress(100, true)
-                    dbViewModel.getMessagesDataForChatList.observe(viewLifecycleOwner, {
-                        val items = it as List<ChatListQueriedData>
 
-                        if (items.isNotEmpty()) {
-                            items.forEach { data ->
-                                val item = ChatListItem(contactNumber = data.chatID,
-                                    latestMessageId = data.latest_message_id)
-                                dbViewModel.createChatChannel(item)
-                                Log.d("check item id===", data.latest_message_id.toString())
-                            }
-                            navigateToHomeScreen()
-                        } else {
-                            navigateToHomeScreen()
+                    val chatList = dbViewModel.messagesDataForChatList
+                    if (chatList.isNotEmpty()) {
+                        chatList.forEach { data ->
+                            val item = ChatListItem(contactNumber = data.chatID,
+                                latestMessageId = data.latest_message_id)
+                            dbViewModel.createChatChannel(item)
                         }
-                    })
+                    }
+                    navigateToHomeScreen()
+                }
+                FETCH_DATA_EMPTY -> {
+                    navigateToHomeScreen()
                 }
                 else -> { /* NO-OP */
                 }
