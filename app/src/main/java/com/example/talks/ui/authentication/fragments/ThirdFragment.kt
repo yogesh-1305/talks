@@ -62,29 +62,19 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
     @Inject
     lateinit var auth: FirebaseAuth
-    private lateinit var userUid: String
-
-    // View Binding
-    private lateinit var binding: FragmentThirdBinding
-
-    // View Models
-    private val talksViewModel: TalksViewModel by viewModels()
-    private val viewModel: MainActivityViewModel by activityViewModels()
-
     @Inject
     lateinit var prefs: SharedPreferences
-
+    // View Binding
+    private lateinit var binding: FragmentThirdBinding
+    //  view models
+    private val viewModel: MainActivityViewModel by activityViewModels()
     //encryption key (v.v.imp)
     private val encryptionKey = BuildConfig.ENCRYPTION_KEY
-
     // Variables
+    private lateinit var userUid: String
     private var phoneNumber: String? = null
-
     private var retrievedImageUrl: String = ""
-
-    // Pop up dialogs
-    private lateinit var dialog: UploadingDialog
-
+    // permissions
     private lateinit var storagePermission: ActivityResultLauncher<String>
     private lateinit var storagePermissionBelowAndroidQ: ActivityResultLauncher<Array<String>>
 
@@ -93,17 +83,13 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         savedInstanceState: Bundle?,
     ): View {
         binding = FragmentThirdBinding.inflate(inflater, container, false)
-        dialog = UploadingDialog(activity as Activity)
 
         // firebase unique user id
         userUid = auth.currentUser!!.uid
-
         // phone number from shared prefs
         phoneNumber = prefs.getString("phoneNumber", "")
-
         // get user data from server if exists
         viewModel.getUserFromDatabaseIfExists(userUid)
-
         return binding.root
     }
 
@@ -115,6 +101,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
         subscribeToObservers()
         setClickListeners()
 
+        binding.thirdFragmentNameEditText.setOnEditorActionListener(this)
         binding.thirdFragmentBioEditText.setOnEditorActionListener(this)
     }
 
@@ -168,34 +155,19 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
         viewModel.existingUserData.observe(viewLifecycleOwner, { userData ->
             userData?.let {
-
                 retrievedImageUrl =
                     Encryption().decrypt(it[USER_IMAGE_URL], encryptionKey).toString()
+                val name = if (it[USER_NAME] != "null") it[USER_NAME] else ""
+                val bio = if (it[USER_BIO] != "null") it[USER_BIO] else ""
 
-                binding.thirdFragmentNameEditText.setText(it[USER_NAME] ?: "")
-                binding.thirdFragmentBioEditText.setText(it[USER_BIO] ?: "")
+                binding.thirdFragmentNameEditText.setText(name)
+                binding.thirdFragmentBioEditText.setText(bio)
 
                 if (Helper.getImage() == null) {
                     Glide.with(this).load(retrievedImageUrl)
                         .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
                         .placeholder(R.drawable.ic_baseline_person_24)
                         .into(binding.thirdFragmentUserImage)
-                }
-            }
-        })
-
-//        -----------------------------Room Database VM------------------------------------
-        talksViewModel.readAllUserData.observe(viewLifecycleOwner, {
-            if (it.isNotEmpty()) {
-
-                lifecycleScope.launch {
-                    prefs.edit()
-                        .putInt(LocalConstants.KEY_AUTH_STATE,
-                            LocalConstants.AUTH_STATE_FINAL_SETUP)
-                        .apply()
-
-                    Navigation.findNavController(binding.root)
-                        .navigate(R.id.action_thirdFragment_to_finalSetupFragment)
                 }
             }
         })
@@ -223,8 +195,6 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                     }.show()
             }
         }
-
-        binding.thirdFragmentNameEditText.setOnEditorActionListener(this)
     }
 
     override fun onResume() {
@@ -250,7 +220,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                 true
             }
             EditorInfo.IME_ACTION_DONE -> {
-               navigateToFinalSetupFragment()
+                navigateToFinalSetupFragment()
                 true
             }
             else -> {
@@ -269,15 +239,16 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
             prefs.edit()
                 .putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_FINAL_SETUP)
                 .apply()
+
+            Navigation.findNavController(binding.root)
+                .navigate(ThirdFragmentDirections.actionThirdFragmentToFinalSetupFragment(
+                    phoneNumber.toString(),
+                    getNameFromEditText(),
+                    getBioFromEditText(),
+                    userUid,
+                    retrievedImageUrl
+                ))
         }
-        Navigation.findNavController(binding.root)
-            .navigate(ThirdFragmentDirections.actionThirdFragmentToFinalSetupFragment(
-                phoneNumber.toString(),
-                getNameFromEditText(),
-                getBioFromEditText(),
-                userUid,
-                retrievedImageUrl
-            ))
     }
 
     private fun getNameFromEditText(): String {

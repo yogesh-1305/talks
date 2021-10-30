@@ -1,6 +1,7 @@
 package com.example.talks.ui.authentication.fragments
 
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -13,6 +14,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import com.example.talks.BuildConfig
+import com.example.talks.constants.LocalConstants
 import com.example.talks.constants.ServerConstants.FETCH_DATA_EMPTY
 import com.example.talks.constants.ServerConstants.FETCH_DATA_FINISHED
 import com.example.talks.constants.ServerConstants.FETCH_DATA_IN_PROGRESS
@@ -37,6 +39,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class FinalSetupFragment : Fragment() {
@@ -47,6 +50,9 @@ class FinalSetupFragment : Fragment() {
     private val dbViewModel: TalksViewModel by activityViewModels()
 
     private val args: FinalSetupFragmentArgs by navArgs()
+
+    @Inject
+    lateinit var prefs: SharedPreferences
 
     //encryption key (v.v.imp)
     private val encryptionKey = BuildConfig.ENCRYPTION_KEY
@@ -176,6 +182,11 @@ class FinalSetupFragment : Fragment() {
 
     private fun navigateToHomeScreen() {
         lifecycleScope.launch {
+
+            prefs.edit()
+                .putInt(LocalConstants.KEY_AUTH_STATE, LocalConstants.AUTH_STATE_COMPLETE)
+                .apply()
+
             delay(1000L)
             startActivity(Intent(context, HomeScreenActivity::class.java))
             delay(500L)

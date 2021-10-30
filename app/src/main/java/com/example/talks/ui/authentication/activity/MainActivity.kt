@@ -25,6 +25,7 @@ import com.example.talks.constants.LocalConstants.AUTH_STATE_ADD_DATA
 import com.example.talks.constants.LocalConstants.AUTH_STATE_ADD_NUMBER
 import com.example.talks.constants.LocalConstants.AUTH_STATE_ADD_OTP
 import com.example.talks.constants.LocalConstants.AUTH_STATE_COMPLETE
+import com.example.talks.constants.LocalConstants.AUTH_STATE_FINAL_SETUP
 import com.example.talks.constants.LocalConstants.KEY_AUTH_STATE
 import com.example.talks.data.model.TalksContact
 import com.example.talks.data.viewmodels.authentication.activity.MainActivityViewModel
@@ -127,7 +128,7 @@ class MainActivity : AppCompatActivity() {
                 startActivity(Intent(applicationContext, HomeScreenActivity::class.java))
                 finish()
             }
-            AUTH_STATE_ADD_DATA -> {
+            AUTH_STATE_ADD_DATA, AUTH_STATE_FINAL_SETUP -> {
                 findNavController(R.id.auth_activity_nav_host).navigate(R.id.thirdFragment)
             }
             AUTH_STATE_ADD_OTP, AUTH_STATE_ADD_NUMBER -> {
@@ -150,7 +151,9 @@ class MainActivity : AppCompatActivity() {
                 if (it) {
                     readContacts()
                 } else {
-//                    AppSettingsDialog.Builder(this).setRationale()
+                    AppSettingsDialog.Builder(this)
+                        .setRationale("Talks require contacts permission to work properly")
+                        .build().show()
                 }
             }
     }
