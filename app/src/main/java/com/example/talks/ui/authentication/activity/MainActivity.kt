@@ -8,19 +8,16 @@ import android.database.Cursor
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
-import android.widget.Toast
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavController
 import androidx.navigation.findNavController
 import com.example.talks.BuildConfig
 import com.example.talks.R
-import com.example.talks.databinding.ActivityMainBinding
 import com.example.talks.constants.LocalConstants.AUTH_STATE_ADD_DATA
 import com.example.talks.constants.LocalConstants.AUTH_STATE_ADD_NUMBER
 import com.example.talks.constants.LocalConstants.AUTH_STATE_ADD_OTP
@@ -30,6 +27,7 @@ import com.example.talks.constants.LocalConstants.KEY_AUTH_STATE
 import com.example.talks.data.model.TalksContact
 import com.example.talks.data.viewmodels.authentication.activity.MainActivityViewModel
 import com.example.talks.data.viewmodels.db.TalksViewModel
+import com.example.talks.databinding.ActivityMainBinding
 import com.example.talks.others.utility.PermissionsUtility
 import com.example.talks.ui.home.activity.HomeScreenActivity
 import dagger.hilt.android.AndroidEntryPoint
@@ -40,6 +38,7 @@ import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
 import javax.inject.Inject
 
+@DelicateCoroutinesApi
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -61,7 +60,6 @@ class MainActivity : AppCompatActivity() {
     @Inject
     lateinit var prefs: SharedPreferences
 
-    @DelicateCoroutinesApi
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
