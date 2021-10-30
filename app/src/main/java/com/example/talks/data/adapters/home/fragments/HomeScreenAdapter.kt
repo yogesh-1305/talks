@@ -90,18 +90,15 @@ class HomeScreenAdapter(val context: Activity) :
             }
         }
 
-        view.chatListTimeStamp.text = item.creationTime.toString()
+        view.chatListTimeStamp.text = item.creationTime
 
         ///////////////////////////////////////////////////////////////////////////////////
         view.chatListItemLayout.setOnClickListener {
             val action = HomeScreenFragmentDirections
-                .actionHomeScreenFragmentToChatFragment(item.contact_id.toString())
+                .actionHomeScreenFragmentToChatFragment(item.contact_number)
 
             context.findNavController(R.id.fragment_home_nav)
                 .navigate(action)
-//            val intent = Intent(context, ChatActivity::class.java)
-//            intent.putExtra("contactNumber", item.contact_number)
-//            context?.startActivity(intent)
         }
 
     }
