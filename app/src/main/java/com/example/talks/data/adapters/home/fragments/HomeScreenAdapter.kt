@@ -32,7 +32,7 @@ class HomeScreenAdapter(val context: Activity) :
             oldItem: HomeScreenChannelList,
             newItem: HomeScreenChannelList,
         ): Boolean {
-            return oldItem == newItem
+            return oldItem.contact_number == newItem.contact_number
         }
 
         override fun areContentsTheSame(
@@ -90,12 +90,12 @@ class HomeScreenAdapter(val context: Activity) :
             }
         }
 
-        view.chatListTimeStamp.text = item.creationTime
+        view.chatListTimeStamp.text = item.creation_time
 
         ///////////////////////////////////////////////////////////////////////////////////
         view.chatListItemLayout.setOnClickListener {
             val action = HomeScreenFragmentDirections
-                .actionHomeScreenFragmentToChatFragment(item.contact_number)
+                .actionHomeScreenFragmentToChatFragment(item.contact_number.toString())
 
             context.findNavController(R.id.fragment_home_nav)
                 .navigate(action)

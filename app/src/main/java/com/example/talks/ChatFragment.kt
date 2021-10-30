@@ -127,7 +127,6 @@ class ChatFragment : Fragment() {
                         creationTime = time,
                         sentByMe = true
                     )
-                    Log.d("add message log===", "$otherPersonUniqueId")
                     viewModel.sendMessage(message, otherPersonUniqueId, dbViewModel)
                 }
             }
