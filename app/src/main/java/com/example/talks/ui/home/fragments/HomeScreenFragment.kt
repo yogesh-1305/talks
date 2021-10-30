@@ -70,7 +70,7 @@ class HomeScreenFragment : Fragment() {
     }
 
     private fun subscribeToObservers() {
-        databaseViewModel.readChatListItem.observe(viewLifecycleOwner, {
+        databaseViewModel.readHomeScreenChannelList.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()) {
                 homeScreenAdapter.submitChatList(it)
             }

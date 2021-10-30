@@ -1,7 +1,6 @@
 package com.example.talks.data.viewmodels.db
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talks.data.model.*
@@ -17,7 +16,7 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
 
     val readAllUserData: LiveData<List<User>> = repository.readAllUserData
     val readAllContacts: LiveData<List<TalksContact>> = repository.readContacts
-    val readChatListItem: LiveData<List<ChatListItem>> = repository.readChatListItem
+    val readHomeScreenChannelList: LiveData<List<HomeScreenChannelList>> = repository.readHomeScreenChannelList
     val readContactPhoneNumbers: LiveData<List<String>> = repository.readContactPhoneNumbers
     val getDistinctMessages: LiveData<List<String>> = repository.getDistinctMessages
     val lastAddedMessage: LiveData<Message> = repository.lastAddedMessage

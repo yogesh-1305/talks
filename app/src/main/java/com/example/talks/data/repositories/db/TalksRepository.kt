@@ -9,7 +9,7 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
 
     val readAllUserData: LiveData<List<User>> = talksDao.readUserData()
     val readContacts: LiveData<List<TalksContact>> = talksDao.readContacts()
-    val readChatListItem: LiveData<List<ChatListItem>> = talksDao.readChatList()
+    val readHomeScreenChannelList: LiveData<List<HomeScreenChannelList>> = talksDao.readHomeScreenChannelList()
     val readContactPhoneNumbers: LiveData<List<String>> = talksDao.readContactPhoneNumbers()
     val getDistinctMessages: LiveData<List<String>> = talksDao.getDistinctMessages()
     val lastAddedMessage: LiveData<Message> = talksDao.getLastAddedMessage()

@@ -33,8 +33,17 @@ interface TalksDao {
     @Query("SELECT contact_number FROM talks_contacts ORDER BY contactName ASC")
     fun readContactPhoneNumbers(): LiveData<List<String>>
 
-    @Query("select * from chat_list")
-    fun readChatList(): LiveData<List<ChatListItem>>
+    @Query("""
+            select uId as contact_id, chat_list.contact_number, talks_contacts.contactName, contactImageUrl, 
+            messageText, messageType, creationTime, sentByMe, isChatPinned, isChatArchived, 
+            isChatMuted, unseenMessagesCount, lastReadMessageID
+            from chat_list 
+            LEFT JOIN talks_contacts on chat_list.contact_number = talks_contacts.contact_number
+            LEFT JOIN talks_messages on chat_list.latest_message_id = talks_messages.id
+            GROUP by chat_list.contact_number ORDER by creationTime
+        """
+    )
+    fun readHomeScreenChannelList(): LiveData<List<HomeScreenChannelList>>
 
     @Query("SELECT * FROM talks_messages WHERE chatId = :chatID")
     fun readMessages(chatID: String): LiveData<List<Message>>
@@ -72,7 +81,7 @@ interface TalksDao {
     @Query("UPDATE user_data SET bio = :userBio")
     suspend fun updateUserBio(userBio: String)
 
-    @Query( "UPDATE chat_list SET latest_message_id = :latestMessageId where contact_number = :contact_number")
+    @Query("UPDATE chat_list SET latest_message_id = :latestMessageId where contact_number = :contact_number")
     suspend fun updateChatListLatestMessage(
         contact_number: String,
         latestMessageId: Int,
