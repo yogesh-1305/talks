@@ -37,6 +37,10 @@ class ContactsFragment : Fragment() {
             binding.tbContacts.subtitle = "${it.size} contacts"
         })
 
+        binding.tbContacts.setNavigationOnClickListener {
+            requireActivity().onBackPressed()
+        }
+
     }
 
     private fun setupRecyclerView() = binding.rvContacts.apply {

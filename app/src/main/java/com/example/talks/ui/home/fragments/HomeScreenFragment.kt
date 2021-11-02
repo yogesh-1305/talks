@@ -54,11 +54,8 @@ class HomeScreenFragment : Fragment() {
         fragmentToolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.home_screen_search_button -> {
-                    Toast.makeText(requireContext(), "Search Button Tap", Toast.LENGTH_SHORT).show()
-                    Navigation.findNavController(binding.root).navigate(R.id.action_homeScreenFragment_to_chatFragment)
                 }
                 R.id.home_screen_starred_button -> {
-                    startActivity(Intent(requireContext(), ContactListActivity::class.java))
                 }
                 R.id.home_screen_web_button -> {
                 }

@@ -16,18 +16,17 @@ import com.example.talks.constants.ServerConstants
 import com.example.talks.constants.ServerConstants.FIREBASE_DB_NAME
 import com.example.talks.data.model.ChatListItem
 import com.example.talks.data.model.Message
-import com.example.talks.data.model.Message.Companion.toTextMessage
 import com.example.talks.data.model.TalksContact
-import com.example.talks.data.model.TextMessage
+import com.example.talks.data.receiver.ActionReceiver
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.others.encryption.Encryption
-import com.example.talks.data.receiver.ActionReceiver
-import com.example.talks.others.calendar.CalendarManager.Companion.toDateTimeObject
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel

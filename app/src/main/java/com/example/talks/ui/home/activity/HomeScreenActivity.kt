@@ -22,6 +22,7 @@ import com.example.talks.data.model.TalksContact
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.data.viewmodels.home.activity.HomeActivityViewModel
+import com.example.talks.others.utility.ExtensionFunctions.gone
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.novoda.merlin.Merlin
@@ -119,7 +120,10 @@ class HomeScreenActivity : AppCompatActivity() {
                         fab_home_activity.show()
                     }
                     R.id.chatFragment -> {
-                        fab_home_activity.hide()
+                        fab_home_activity.gone()
+                    }
+                    R.id.contactsFragment -> {
+                        fab_home_activity.gone()
                     }
                 }
             }
