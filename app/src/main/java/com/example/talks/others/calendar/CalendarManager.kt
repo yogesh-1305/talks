@@ -1,12 +1,9 @@
 package com.example.talks.others.calendar
 
-import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
-import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
 class CalendarManager {
@@ -14,32 +11,60 @@ class CalendarManager {
     companion object {
 
         fun getCurrentDateTime(): LocalDateTime? {
-            val string = "2021-10-17T10:12:15.872"
             return LocalDateTime.now()
         }
 
-        fun String.toDateTimeObject(): LocalDateTime? {
-            return LocalDateTime.parse(this)
+        fun String.parseTime(): String {
+            val dtObject = LocalDateTime.parse(this)
+            val hours = dtObject.hour
+            val formattedHours = if (hours > 12) (hours - 12) else hours
+
+            val minutes = dtObject.minute
+
+            val date = dtObject.toLocalDate().parseDay()
+
+            return when {
+                hours > 12 -> {
+                    "$date, $formattedHours:$minutes pm"
+                }
+                hours == 12 -> {
+                    "$date, 12:$minutes am"
+                }
+                hours < 12 -> {
+                    "$date, $formattedHours:$minutes am"
+                }
+                else -> {
+                    "N/A"
+                }
+            }
         }
 
-        fun getYesterdayDatDate(): String{
+        private fun LocalDate.parseDay(): String {
+            return when {
+                this == getTodayDate() -> {
+                    "Today"
+                }
+                this == getYesterdayDate() -> {
+                    "Yesterday"
+                }
+                else -> {
+                    val date = this.dayOfMonth
+                    val month = this.month
+                    val year = this.year
+                    "$month $date $year"
+                }
+            }
+        }
+
+        fun getYesterdayDate(): LocalDate? {
             val current = LocalDateTime.now().minusDays(1)
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            return current.format(formatter)
+            return current.toLocalDate()
         }
 
-        fun getTodayDate(): String{
+        fun getTodayDate(): LocalDate? {
             val current = LocalDateTime.now()
-            val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
-            return current.format(formatter)
+            return current.toLocalDate()
         }
-
-        fun getDateForImage(): String{
-            val current = LocalDateTime.now()
-            val formatter = DateTimeFormatter.ofPattern("yyyyMMdd")
-            return current.format(formatter)
-        }
-
     }
 
 }

@@ -2,7 +2,6 @@ package com.example.talks.data.adapters.home.fragments
 
 import android.app.Activity
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.AsyncListDiffer
@@ -11,15 +10,12 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.R
-import com.example.talks.data.model.ChatListItem
-import com.example.talks.others.calendar.CalendarManager
-import com.example.talks.data.model.ChatListQueriedData
 import com.example.talks.data.model.HomeScreenChannelList
 import com.example.talks.databinding.ChatListItemBinding
+import com.example.talks.others.calendar.CalendarManager.Companion.parseTime
 import com.example.talks.others.utility.ExtensionFunctions.gone
 import com.example.talks.others.utility.ExtensionFunctions.show
 import com.example.talks.ui.home.fragments.HomeScreenFragmentDirections
-import java.lang.IllegalArgumentException
 
 class HomeScreenAdapter(val context: Activity) :
     RecyclerView.Adapter<HomeScreenAdapter.HomeScreenViewHolder>() {
@@ -90,7 +86,7 @@ class HomeScreenAdapter(val context: Activity) :
             }
         }
 
-        view.chatListTimeStamp.text = item.creation_time
+        view.chatListTimeStamp.text = item.creation_time?.parseTime()
 
         ///////////////////////////////////////////////////////////////////////////////////
         view.chatListItemLayout.setOnClickListener {
@@ -103,44 +99,6 @@ class HomeScreenAdapter(val context: Activity) :
 
     }
 
-    ////////////////////////////////////////////////////////////////////////////////////////
-    private val yesterdayDate = CalendarManager.getYesterdayDatDate()
-    private val todayDate = CalendarManager.getTodayDate()
-
-    private fun checkForDate(timeString: String): String {
-        return when (val messageDate = timeString.substring(0, 10)) {
-            todayDate -> {
-                getTime(timeString)
-            }
-            yesterdayDate -> {
-                "Yesterday"
-            }
-            else -> {
-                messageDate
-            }
-        }
-    }
-
-    private fun getTime(timeString: String): String {
-        val hours = timeString.substring(11, 13).toInt()
-        return when {
-            hours > 12 -> {
-                val newHours = hours - 12
-                "$newHours:${timeString.substring(14, 16)} PM"
-            }
-            hours == 0 -> {
-                "12:${timeString.substring(14, 16)} AM"
-            }
-            hours < 12 -> {
-                "${timeString.substring(11, 16)} AM"
-            }
-            else -> {
-                throw IllegalArgumentException("Date Inaccurate (HomeScreenAdapter)")
-            }
-        }
-    }
-
-    //////////////////////////////////////////////////////////////////////////////
     override fun getItemCount(): Int {
         return differ.currentList.size
     }
