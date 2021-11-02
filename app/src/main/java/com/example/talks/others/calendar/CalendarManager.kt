@@ -18,6 +18,10 @@ class CalendarManager {
             return LocalDateTime.now()
         }
 
+        fun String.toDateTimeObject(): LocalDateTime? {
+            return LocalDateTime.parse(this)
+        }
+
         fun getYesterdayDatDate(): String{
             val current = LocalDateTime.now().minusDays(1)
             val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")

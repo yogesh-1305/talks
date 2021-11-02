@@ -121,15 +121,17 @@ class FinalSetupFragment : Fragment() {
                     binding.tvSetupInfo.text = "Restored messages successfully"
                     binding.progressBar.setProgress(100, true)
 
-                    val chatList = dbViewModel.messagesDataForChatList
-                    if (chatList.isNotEmpty()) {
-                        chatList.forEach { data ->
-                            val item = ChatListItem(contactNumber = data.chatID,
-                                latestMessageId = data.latest_message_id)
-                            dbViewModel.createChatChannel(item)
+                    lifecycleScope.launch {
+                    val chatList = dbViewModel.getMessagesDataForChatList()
+                        if (chatList.isNotEmpty()) {
+                            chatList.forEach { data ->
+                                val item = ChatListItem(contactNumber = data.chatID,
+                                    latestMessageId = data.latest_message_id)
+                                dbViewModel.createChatChannel(item)
+                            }
                         }
+                        navigateToHomeScreen()
                     }
-                    navigateToHomeScreen()
                 }
                 FETCH_DATA_EMPTY -> {
                     navigateToHomeScreen()

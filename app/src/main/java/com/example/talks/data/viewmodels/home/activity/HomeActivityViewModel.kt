@@ -22,8 +22,10 @@ import com.example.talks.data.model.TextMessage
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.others.encryption.Encryption
 import com.example.talks.data.receiver.ActionReceiver
+import com.example.talks.others.calendar.CalendarManager.Companion.toDateTimeObject
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.Query
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import javax.inject.Inject
@@ -86,13 +88,18 @@ class HomeActivityViewModel
 
     fun readMessagesFromServer(userId: String?, talksVM: TalksViewModel) {
         viewModelScope.launch(Dispatchers.IO) {
+            val latestMessageCreationTime = talksVM.getLastMessageCreationTime()
+            Log.d("latest creation time from db===", latestMessageCreationTime.toString())
 
             firebaseAuth.currentUser?.let {
                 db.collection(FIREBASE_DB_NAME).document(it.uid).collection("user_chats")
                     .whereEqualTo("sentByMe", false)
+                    .orderBy("creationTime", Query.Direction.DESCENDING)
+                    .limit(2)
                     .addSnapshotListener { snapshot, error ->
                         if (snapshot != null) {
                             for (document in snapshot.documents) {
+                                Log.d("latest creation time ===", document["creationTime"].toString())
                                 val message = document.toObject(Message::class.java)
                                 if (message != null) {
                                     talksVM.addMessage(message)

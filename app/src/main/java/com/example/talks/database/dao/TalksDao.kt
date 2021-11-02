@@ -40,7 +40,7 @@ interface TalksDao {
             from chat_list 
             LEFT JOIN talks_contacts on chat_list.contact_number = talks_contacts.contact_number
             LEFT JOIN talks_messages on chat_list.latest_message_id = talks_messages.id
-            GROUP by chat_list.contact_number ORDER by creation_time desc
+            ORDER by creation_time desc
         """
     )
     fun readHomeScreenChannelList(): LiveData<List<HomeScreenChannelList>>

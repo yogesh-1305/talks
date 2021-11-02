@@ -11,29 +11,27 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class TalksViewModel @Inject public constructor(private val repository: TalksRepository) :
+class TalksViewModel @Inject constructor(private val repository: TalksRepository) :
     ViewModel() {
 
     val readAllUserData: LiveData<List<User>> = repository.readAllUserData
     val readAllContacts: LiveData<List<TalksContact>> = repository.readContacts
-    val readHomeScreenChannelList: LiveData<List<HomeScreenChannelList>> = repository.readHomeScreenChannelList
+    val readHomeScreenChannelList: LiveData<List<HomeScreenChannelList>> =
+        repository.readHomeScreenChannelList
     val readContactPhoneNumbers: LiveData<List<String>> = repository.readContactPhoneNumbers
-    val getDistinctMessages: LiveData<List<String>> = repository.getDistinctMessages
     val lastAddedMessage: LiveData<Message> = repository.lastAddedMessage
     val getChatListPhoneNumbers: LiveData<List<String>> = repository.getChatListPhoneNumbers
-    val getDistinctPhoneNumbers: LiveData<List<String>> = repository.getDistinctPhoneNumbers
 
-    val messagesDataForChatList: MutableList<ChatListQueriedData> = ArrayList()
-
-    suspend fun readMessages(chatID: String): LiveData<List<Message>> {
+    fun readMessages(chatID: String): LiveData<List<Message>> {
         return repository.readMessages(chatID)
     }
 
-    fun getMessagesDataForChatList() {
-        viewModelScope.launch {
-            val data = repository.getMessagesDataForChatList()
-            messagesDataForChatList.addAll(data)
-        }
+    suspend fun getMessagesDataForChatList(): List<ChatListQueriedData> {
+        return repository.getMessagesDataForChatList()
+    }
+
+    suspend fun getLastMessageCreationTime(): String {
+        return repository.getLastMessageCreationTime()
     }
 
     fun addUser(user: User) {
@@ -99,7 +97,7 @@ class TalksViewModel @Inject public constructor(private val repository: TalksRep
         }
     }
 
-    suspend fun readSingleContact(userPhoneNumber: String): LiveData<TalksContact> {
+    fun readSingleContact(userPhoneNumber: String): LiveData<TalksContact> {
         return repository.readSingleContact(userPhoneNumber)
     }
 }
