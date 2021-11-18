@@ -17,8 +17,11 @@ interface TalksDao {
     @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun addMessage(message: Message)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
     suspend fun createChatChannel(chatListItem: ChatListItem)
+
+    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    suspend fun createChatChannels(list: List<ChatListItem>)
 
     // Fetch
     @Query("SELECT * FROM user_data ORDER BY id ASC")
@@ -63,8 +66,12 @@ interface TalksDao {
     @Query("select distinct chatID from talks_messages")
     fun getDistinctPhoneNumbers(): LiveData<List<String>>
 
-    @Query("select chatID, max(id) as latest_message_id, messageText, messageType, status, sentByMe from talks_messages GROUP by chatID")
-    suspend fun getMessagesDataForChatList(): List<ChatListQueriedData>
+    @Query("""insert into chat_list (contact_number, latest_message_id) 
+        select chatID as contact_number, id as latest_message_id 
+        from talks_messages 
+        GROUP by chatID 
+        order by latest_message_id""")
+    suspend fun getMessagesDataForChatList()
 
     // Update
 

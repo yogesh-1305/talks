@@ -93,8 +93,6 @@ class HomeActivityViewModel
             firebaseAuth.currentUser?.let {
                 db.collection(FIREBASE_DB_NAME).document(it.uid).collection("user_chats")
                     .whereEqualTo("sentByMe", false)
-                    .orderBy("creationTime", Query.Direction.DESCENDING)
-                    .limit(2)
                     .addSnapshotListener { snapshot, error ->
                         if (snapshot != null) {
                             for (document in snapshot.documents) {

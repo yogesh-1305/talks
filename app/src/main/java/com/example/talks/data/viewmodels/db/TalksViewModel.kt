@@ -26,8 +26,8 @@ class TalksViewModel @Inject constructor(private val repository: TalksRepository
         return repository.readMessages(chatID)
     }
 
-    suspend fun getMessagesDataForChatList(): List<ChatListQueriedData> {
-        return repository.getMessagesDataForChatList()
+    suspend fun getMessagesDataForChatList() {
+        repository.getMessagesDataForChatList()
     }
 
     suspend fun getLastMessageCreationTime(): String {
@@ -85,6 +85,12 @@ class TalksViewModel @Inject constructor(private val repository: TalksRepository
     fun createChatChannel(chatListItem: ChatListItem) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.createChatChannel(chatListItem)
+        }
+    }
+
+    fun createChatChannels(list: List<ChatListItem>) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.createChatChannels(list)
         }
     }
 

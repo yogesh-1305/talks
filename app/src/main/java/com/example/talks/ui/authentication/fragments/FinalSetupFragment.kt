@@ -26,6 +26,7 @@ import com.example.talks.constants.ServerConstants.USER_STATUS
 import com.example.talks.constants.ServerConstants.USER_UNIQUE_ID
 import com.example.talks.data.model.ChatListItem
 import com.example.talks.data.model.ChatListQueriedData
+import com.example.talks.data.model.ChatListQueriedData.Companion.toChatListItem
 import com.example.talks.data.model.User
 import com.example.talks.data.viewmodels.authentication.activity.MainActivityViewModel
 import com.example.talks.data.viewmodels.db.TalksViewModel
@@ -112,38 +113,32 @@ class FinalSetupFragment : Fragment() {
             }
         })
 
-        viewModel.dataFetched.observe(viewLifecycleOwner, { dataCallback ->
-            when (dataCallback) {
-                FETCH_DATA_IN_PROGRESS -> {
-                    binding.tvSetupInfo.text = "Restoring your messages"
-                }
-                FETCH_DATA_FINISHED -> {
-                    binding.tvSetupInfo.text = "Restored messages successfully"
-                    binding.progressBar.setProgress(100, true)
-
-                    lifecycleScope.launch {
-                    val chatList = dbViewModel.getMessagesDataForChatList()
-                        if (chatList.isNotEmpty()) {
-                            chatList.forEach { data ->
-                                val item = ChatListItem(contactNumber = data.chatID,
-                                    latestMessageId = data.latest_message_id)
-                                dbViewModel.createChatChannel(item)
-                            }
-                        }
-                        navigateToHomeScreen()
-                    }
-                }
-                FETCH_DATA_EMPTY -> {
-                    navigateToHomeScreen()
-                }
-                else -> { /* NO-OP */
-                }
-            }
-        })
-
         dbViewModel.readAllUserData.observe(viewLifecycleOwner, {
             if (it.isNotEmpty()) {
-                viewModel.readMessagesFromServer(dbViewModel)
+                viewModel.readMessagesFromServer(dbViewModel) { statusCode ->
+                    when (statusCode) {
+                        FETCH_DATA_IN_PROGRESS -> {
+                            binding.tvSetupInfo.text = "Restoring your messages"
+                        }
+                        FETCH_DATA_FINISHED -> {
+                            binding.tvSetupInfo.text = "Restored messages successfully"
+                            binding.progressBar.setProgress(100, true)
+
+                            lifecycleScope.launch(Dispatchers.IO) {
+
+                                dbViewModel.getMessagesDataForChatList()
+                                delay(1000L)
+                                navigateToHomeScreen()
+                            }
+                        }
+                        FETCH_DATA_EMPTY -> {
+                            navigateToHomeScreen()
+                        }
+                        else -> { /* NO-OP */
+                        }
+                    }
+
+                }
             }
         })
 

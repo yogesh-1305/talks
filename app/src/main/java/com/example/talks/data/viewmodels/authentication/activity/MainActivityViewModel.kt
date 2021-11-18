@@ -240,24 +240,23 @@ class MainActivityViewModel
         }
     }
 
-    val dataFetched: MutableLiveData<Int> = MutableLiveData()
-    fun readMessagesFromServer(talksVM: TalksViewModel) {
+    fun readMessagesFromServer(talksVM: TalksViewModel, fetchStatus: (statusCode: Int) -> Unit) {
         viewModelScope.launch(Dispatchers.IO) {
-            dataFetched.postValue(FETCH_DATA_STARTED)
+            fetchStatus(FETCH_DATA_STARTED)
             auth.currentUser?.let { it ->
                 db.collection(FIREBASE_DB_NAME).document(it.uid).collection("user_chats")
                     .get().addOnSuccessListener { snapshot ->
                         if (!snapshot.isEmpty) {
-                            dataFetched.postValue(FETCH_DATA_IN_PROGRESS)
+                            fetchStatus(FETCH_DATA_IN_PROGRESS)
                             for (document in snapshot.documents) {
                                 val message = document.toObject(Message::class.java)
                                 if (message != null) {
                                     talksVM.addMessage(message)
                                 }
                             }
-                            dataFetched.postValue(FETCH_DATA_FINISHED)
+                            fetchStatus(FETCH_DATA_FINISHED)
                         }else {
-                            dataFetched.postValue(FETCH_DATA_EMPTY)
+                            fetchStatus(FETCH_DATA_EMPTY)
                         }
 
                     }

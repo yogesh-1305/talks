@@ -22,8 +22,8 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
         return talksDao.getLastMessageCreationTime()
     }
 
-    suspend fun getMessagesDataForChatList(): List<ChatListQueriedData> {
-        return talksDao.getMessagesDataForChatList()
+    suspend fun getMessagesDataForChatList() {
+        talksDao.getMessagesDataForChatList()
     }
 
     suspend fun addUser(user: User) {
@@ -56,6 +56,10 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
 
     suspend fun createChatChannel(chatListItem: ChatListItem) {
         talksDao.createChatChannel(chatListItem)
+    }
+
+    suspend fun createChatChannels(list: List<ChatListItem>) {
+        talksDao.createChatChannels(list)
     }
 
     suspend fun updateMessageStatus(status: String, creationTime: String) {

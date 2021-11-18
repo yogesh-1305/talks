@@ -1,10 +1,21 @@
 package com.example.talks.data.model
 
-class ChatListQueriedData(
-    var chatID: String? = "",
-    var latest_message_id: Int? = null,
-    var messageText: String? = "",
-    var messageType: String? = "",
-    var status: String? = "",
-    var sentByMe: Boolean? = null,
-)
+import androidx.room.ColumnInfo
+
+data class ChatListQueriedData(
+    @ColumnInfo(name = "chatID")
+    val chatID: String? = "",
+    @ColumnInfo(name = "latest_message_id")
+    val latest_message_id: Int? = null
+) {
+    companion object {
+
+        fun ChatListQueriedData.toChatListItem(): ChatListItem {
+            return ChatListItem(
+                contactNumber = chatID,
+                latestMessageId = latest_message_id
+            )
+        }
+
+    }
+}
