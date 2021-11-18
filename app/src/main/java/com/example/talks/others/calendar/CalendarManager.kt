@@ -57,12 +57,12 @@ class CalendarManager {
             }
         }
 
-        fun getYesterdayDate(): LocalDate? {
+        private fun getYesterdayDate(): LocalDate? {
             val current = LocalDateTime.now().minusDays(1)
             return current.toLocalDate()
         }
 
-        fun getTodayDate(): LocalDate? {
+        private fun getTodayDate(): LocalDate? {
             val current = LocalDateTime.now()
             return current.toLocalDate()
         }

@@ -131,7 +131,6 @@ class MainActivityViewModel
     @RequiresApi(Build.VERSION_CODES.O)
     @DelicateCoroutinesApi
     fun getUsersFromServer(
-        databaseContactList: List<String>,
         contactNameList: HashMap<String, String>,
         databaseViewModel: TalksViewModel,
         encryptionKey: String,

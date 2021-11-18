@@ -24,11 +24,12 @@
         android:theme="@style/Theme.Talks"
         android:usesCleartextTraffic="true"
         tools:ignore="AllowBackup">
-        <activity android:name=".gallery.attachmentEditing.AttachmentEditingActivity"
+        <activity
+            android:name=".gallery.attachmentEditing.AttachmentEditingActivity"
             android:exported="false"></activity>
-        <activity android:name=".gallery.attachmentsGallery.activity.AttachmentsActivity"/>
+        <activity android:name=".gallery.attachmentsGallery.activity.AttachmentsActivity" />
 
-        <receiver android:name=".data.receiver.ActionReceiver"/>
+        <receiver android:name=".data.receiver.ActionReceiver" />
 
         <activity
             android:name=".ui.call.activity.CallingActivity"
@@ -46,18 +47,17 @@
             android:name=".profile.ProfileSettingsActivity"
             android:screenOrientation="sensorPortrait" />
         <activity android:name=".ui.contacts.activity.ContactListActivity" />
-        <activity android:name=".ui.chat.activity.ChatActivity" />
-        <activity android:name=".ui.home.activity.HomeScreenActivity" />
         <activity
-            android:name=".ui.authentication.activity.MainActivity"
-            android:exported="true"
-            android:screenOrientation="sensorPortrait">
+            android:name=".ui.home.activity.HomeScreenActivity"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ui.authentication.activity.MainActivity"
+            android:screenOrientation="sensorPortrait"></activity>
         <activity
             android:name="com.theartofdev.edmodo.cropper.CropImageActivity"
             android:theme="@style/Base.Theme.AppCompat" />

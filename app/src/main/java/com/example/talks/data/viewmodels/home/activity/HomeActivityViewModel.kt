@@ -88,7 +88,7 @@ class HomeActivityViewModel
     fun readMessagesFromServer(userId: String?, talksVM: TalksViewModel) {
         viewModelScope.launch(Dispatchers.IO) {
             val latestMessageCreationTime = talksVM.getLastMessageCreationTime()
-            Log.d("latest creation time from db===", latestMessageCreationTime.toString())
+//            Log.d("latest creation time from db===", latestMessageCreationTime.toString())
 
             firebaseAuth.currentUser?.let {
                 db.collection(FIREBASE_DB_NAME).document(it.uid).collection("user_chats")

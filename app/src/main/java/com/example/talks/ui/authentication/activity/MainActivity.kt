@@ -8,6 +8,7 @@ import android.database.Cursor
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
@@ -36,6 +37,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import pub.devrel.easypermissions.AppSettingsDialog
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @DelicateCoroutinesApi
@@ -52,8 +54,6 @@ class MainActivity : AppCompatActivity() {
     private val talksViewModel: TalksViewModel by viewModels()
     private val viewModel: MainActivityViewModel by viewModels()
 
-    private var dataFetchedOnce = false
-
     //encryption key (v.v.imp)
     private val encryptionKey = BuildConfig.ENCRYPTION_KEY
 
@@ -66,27 +66,15 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupNavController()
         authScreenStateHandler()
+    }
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onStart() {
+        super.onStart()
+
+        setupNavController()
         registerForPermissionCallbacks()
-
-        lifecycleScope.launch {
-            talksViewModel.readContactPhoneNumbers.observe(this@MainActivity, {
-                if (it != null) {
-                    if (!dataFetchedOnce) {
-                        viewModel.getUsersFromServer(
-                            it,
-                            contactNameList,
-                            talksViewModel,
-                            encryptionKey
-                        )
-                        dataFetchedOnce = true
-                    }
-                }
-            })
-        }
-
     }
 
     @DelicateCoroutinesApi
@@ -118,6 +106,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun authScreenStateHandler() {
 
         when (prefs.getInt(KEY_AUTH_STATE, 0)) {
@@ -132,7 +121,8 @@ class MainActivity : AppCompatActivity() {
             AUTH_STATE_ADD_OTP, AUTH_STATE_ADD_NUMBER -> {
                 findNavController(R.id.auth_activity_nav_host).navigate(R.id.firstFragment)
             }
-            0 -> { /* NO_OP */ }
+            0 -> { /* NO_OP */
+            }
         }
     }
 
@@ -143,6 +133,7 @@ class MainActivity : AppCompatActivity() {
 
 
     private lateinit var contactPermission: ActivityResultLauncher<String>
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun registerForPermissionCallbacks() {
         contactPermission =
             registerForActivityResult(ActivityResultContracts.RequestPermission()) {
@@ -156,6 +147,7 @@ class MainActivity : AppCompatActivity() {
             }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun readContacts() {
         val phones = contentResolver?.query(
             ContactsContract.CommonDataKinds.Phone.CONTENT_URI,
@@ -168,6 +160,8 @@ class MainActivity : AppCompatActivity() {
 
     private var contactPhoneNumberList = ArrayList<String>()
     private var contactNameList = HashMap<String, String>()
+
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("Range")
     private fun showContacts(phones: Cursor) {
         lifecycleScope.launch {
@@ -186,6 +180,11 @@ class MainActivity : AppCompatActivity() {
                 )
                 talksViewModel.addContact(contact)
             }
+            viewModel.getUsersFromServer(
+                contactNameList,
+                talksViewModel,
+                encryptionKey
+            )
         }
     }
 
@@ -215,11 +214,14 @@ class MainActivity : AppCompatActivity() {
     override fun onBackPressed() {
         when (screenState) {
             ScreenState.AT_WELCOME_SCREEN,
-            ScreenState.AT_PHONE_SCREEN -> finish()
+            ScreenState.AT_PHONE_SCREEN,
+            -> finish()
 
             ScreenState.AT_VERIFICATION_SCREEN,
-            ScreenState.AT_DATA_SCREEN -> moveTaskToBack(true)
-            else -> { /* NO-OP */ }
+            ScreenState.AT_DATA_SCREEN,
+            -> moveTaskToBack(true)
+            else -> { /* NO-OP */
+            }
         }
 
     }

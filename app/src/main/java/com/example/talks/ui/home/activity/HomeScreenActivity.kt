@@ -2,11 +2,14 @@ package com.example.talks.ui.home.activity
 
 import android.Manifest
 import android.annotation.SuppressLint
+import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.database.Cursor
 import android.os.Build
 import android.os.Bundle
 import android.provider.ContactsContract
+import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -17,17 +20,22 @@ import androidx.navigation.findNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.talks.BuildConfig
 import com.example.talks.R
+import com.example.talks.constants.LocalConstants
 import com.example.talks.data.model.ChatListItem
 import com.example.talks.data.model.TalksContact
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.data.viewmodels.home.activity.HomeActivityViewModel
 import com.example.talks.others.utility.ExtensionFunctions.gone
+import com.example.talks.ui.authentication.activity.MainActivity
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
 import com.novoda.merlin.Merlin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_home_screen.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import java.time.LocalDateTime
+import javax.inject.Inject
 import kotlin.collections.ArrayList
 import kotlin.collections.HashMap
 
@@ -45,7 +53,7 @@ class HomeScreenActivity : AppCompatActivity() {
     private val databaseViewModel: TalksViewModel by viewModels()
 
     private lateinit var binding: ActivityHomeScreenBinding
-    private lateinit var auth: FirebaseAuth
+    private val auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     private val encryptionKey = BuildConfig.ENCRYPTION_KEY
     var contactNamesWithPhoneNumberAsKey = HashMap<String, String>()
@@ -55,13 +63,22 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private lateinit var merlin: Merlin
 
+    @Inject
+    lateinit var prefs: SharedPreferences
+
+    @DelicateCoroutinesApi
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        auth = FirebaseAuth.getInstance()
+        Log.d("home activity starts ===", LocalDateTime.now().toString())
+
+        if (prefs.getInt(LocalConstants.KEY_AUTH_STATE, 0) == 0) {
+            startActivity(Intent(this, MainActivity::class.java))
+            finish()
+        }
 
         if (isPermissionGranted()) {
             readContacts()
