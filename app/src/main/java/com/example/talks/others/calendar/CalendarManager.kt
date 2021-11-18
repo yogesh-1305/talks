@@ -19,19 +19,20 @@ class CalendarManager {
             val hours = dtObject.hour
             val formattedHours = if (hours > 12) (hours - 12) else hours
 
-            val minutes = dtObject.minute
+            val minutes =
+                if (dtObject.minute.toString().length == 2) dtObject.minute else "0${dtObject.minute}"
 
             val date = dtObject.toLocalDate().parseDay()
 
             return when {
                 hours > 12 -> {
-                    "$date, $formattedHours:$minutes pm"
+                    "$date at $formattedHours:$minutes pm"
                 }
                 hours == 12 -> {
-                    "$date, 12:$minutes am"
+                    "$date at 12:$minutes am"
                 }
                 hours < 12 -> {
-                    "$date, $formattedHours:$minutes am"
+                    "$date at $formattedHours:$minutes am"
                 }
                 else -> {
                     "N/A"
@@ -49,7 +50,7 @@ class CalendarManager {
                 }
                 else -> {
                     val date = this.dayOfMonth
-                    val month = this.month
+                    val month = this.month.toString().substring(0,3)
                     val year = this.year
                     "$month $date $year"
                 }
