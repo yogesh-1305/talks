@@ -6,7 +6,8 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/ripple_effect"
-    android:clickable="true">
+    android:clickable="true"
+    android:focusable="true">
 
     <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/chatListImage"
@@ -29,9 +30,12 @@
         android:layout_marginTop="8dp"
         android:elevation="2dp"
         android:fontFamily="@font/prompt"
-        android:text="TextView"
+        tools:text="TextView"
         android:textSize="15sp"
         android:textStyle="bold"
+        android:maxLines="1"
+        android:ellipsize="marquee"
+        android:marqueeRepeatLimit="marquee_forever"
         app:layout_constraintBottom_toTopOf="@+id/chatListLatestMessage"
         app:layout_constraintEnd_toStartOf="@+id/chatListTimeStamp"
         app:layout_constraintStart_toEndOf="@+id/chatListImage"
@@ -44,10 +48,13 @@
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
         android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
         android:elevation="2dp"
         android:fontFamily="@font/prompt"
         android:maxLines="2"
+        android:ellipsize="end"
         android:textSize="12sp"
+        android:textStyle="italic"
         app:layout_constraintBottom_toBottomOf="@+id/chatListImage"
         app:layout_constraintEnd_toStartOf="@+id/chatListMuteImage"
         app:layout_constraintStart_toEndOf="@+id/message_mediaType_image"
@@ -63,6 +70,7 @@
         android:maxLines="1"
         android:fontFamily="@font/prompt"
         tools:text="Today, 2:33pm"
+        android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/chatListName" />
 

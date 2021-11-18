@@ -44,7 +44,6 @@ class HomeScreenActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
 
-    //    private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var destinationChangedListener: NavController.OnDestinationChangedListener
 
     private lateinit var bottomNavigationView: BottomNavigationView
@@ -68,17 +67,40 @@ class HomeScreenActivity : AppCompatActivity() {
 
     @DelicateCoroutinesApi
     @RequiresApi(Build.VERSION_CODES.O)
-    @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityHomeScreenBinding.inflate(layoutInflater)
         setContentView(binding.root)
         Log.d("home activity starts ===", LocalDateTime.now().toString())
 
+        // if user is not logged in -> go to login activity
         if (prefs.getInt(LocalConstants.KEY_AUTH_STATE, 0) == 0) {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    override fun onStart() {
+        super.onStart()
+
+        clickListeners()
+
+        setFragmentDestinationChangeListener()
+
+
+
+        // works when network is connected
+        merlin = Merlin.Builder().withConnectableCallbacks()
+            .build(this).apply {
+                registerConnectable {
+//                    viewModel.readPeerConnections(
+//                        this@HomeScreenActivity,
+//                        auth.currentUser?.uid.toString(),
+//                        contactNamesWithPhoneNumberAsKey
+//                    )
+                }
+            }
 
         if (isPermissionGranted()) {
             readContacts()
@@ -129,7 +151,9 @@ class HomeScreenActivity : AppCompatActivity() {
                 }
             }
         })
+    }
 
+    private fun setFragmentDestinationChangeListener() {
         destinationChangedListener =
             NavController.OnDestinationChangedListener { _, destination, _ ->
                 when (destination.id) {
@@ -146,42 +170,11 @@ class HomeScreenActivity : AppCompatActivity() {
             }
     }
 
-    override fun onStart() {
-        super.onStart()
-
+    private fun clickListeners() {
         fab_home_activity.setOnClickListener {
             findNavController(R.id.fragment_home_nav)
                 .navigate(R.id.action_homeScreenFragment_to_contactsFragment)
         }
-
-//        databaseViewModel.readAllUserData.observe(this, {
-//            val user1 = it[0]
-//
-////            val inputStream = contentResolver.openInputStream(user1.imageLocalPath!!.toUri())
-////            val imageDrawable = Drawable.createFromStream(inputStream, user1.imageLocalPath.toString())
-////            binding.toolbar.navigationIcon = imageDrawable
-//
-////            Glide.with(this).load(user1.imageLocalPath ?: user1.profileImageUrl).diskCacheStrategy(
-////                DiskCacheStrategy.AUTOMATIC
-////            ).placeholder(R.drawable.ic_baseline_person_24).into()
-//        })
-
-//        binding.toolbarDP.setOnClickListener {
-//            val intent = Intent(this, ProfileSettingsActivity::class.java)
-//            startActivity(intent)
-//        }
-
-        // works when network is connected
-        merlin = Merlin.Builder().withConnectableCallbacks()
-            .build(this).apply {
-                registerConnectable {
-//                    viewModel.readPeerConnections(
-//                        this@HomeScreenActivity,
-//                        auth.currentUser?.uid.toString(),
-//                        contactNamesWithPhoneNumberAsKey
-//                    )
-                }
-            }
     }
 
     override fun onResume() {
@@ -191,7 +184,6 @@ class HomeScreenActivity : AppCompatActivity() {
     }
 
     override fun onPause() {
-
         navController.removeOnDestinationChangedListener(destinationChangedListener)
         super.onPause()
     }
@@ -256,14 +248,6 @@ class HomeScreenActivity : AppCompatActivity() {
         } else {
             true
         }
-    }
-
-    private fun View.hide() {
-        this.visibility = View.INVISIBLE
-    }
-
-    private fun View.show() {
-        this.visibility = View.VISIBLE
     }
 
 }

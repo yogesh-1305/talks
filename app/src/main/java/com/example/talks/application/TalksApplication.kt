@@ -31,7 +31,7 @@ class TalksApplication : Application() {
 //        Firebase.database.setPersistenceEnabled(true)
 //        val dbRef = Firebase.database.getReference("talks_database_chats")
 //        dbRef.keepSynced(false)
-//        EmojiManager.install(GoogleEmojiProvider())
+        EmojiManager.install(GoogleEmojiProvider())
 
 
         // create directories
