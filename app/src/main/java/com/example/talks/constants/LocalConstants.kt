@@ -17,4 +17,10 @@ object LocalConstants {
     const val MEDIA_MIME_TYPE_IMAGE = "/image"
     const val MEDIA_MIME_TYPE_VIDEO = "/video"
     const val MEDIA_MIME_TYPE_AUDIO = "/audio"
+
+    const val MESSAGE_PENDING = "pending"
+    const val MESSAGE_SENT = "sent"
+    const val MESSAGE_DELIVERED = "delivered"
+    const val MESSAGE_SEEN = "seen"
+    const val MESSAGE_RECEIVED = "received"
 }

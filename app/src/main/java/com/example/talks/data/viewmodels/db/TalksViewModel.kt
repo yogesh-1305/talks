@@ -30,7 +30,7 @@ class TalksViewModel @Inject constructor(private val repository: TalksRepository
         repository.getMessagesDataForChatList()
     }
 
-    suspend fun getLastMessageCreationTime(): String {
+    suspend fun getLastMessageCreationTime(): String? {
         return repository.getLastMessageCreationTime()
     }
 

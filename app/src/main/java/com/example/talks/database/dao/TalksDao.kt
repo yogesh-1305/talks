@@ -58,7 +58,7 @@ interface TalksDao {
     fun getLastAddedMessage(): LiveData<Message>
 
     @Query("select creation_time from talks_messages order by creation_time desc limit 1")
-    suspend fun getLastMessageCreationTime(): String
+    suspend fun getLastMessageCreationTime(): String?
 
     @Query("SELECT contact_number FROM chat_list")
     fun getChatListPhoneNumbers(): LiveData<List<String>>

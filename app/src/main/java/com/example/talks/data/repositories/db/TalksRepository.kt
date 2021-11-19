@@ -18,7 +18,7 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
         return talksDao.readMessages(chatID)
     }
 
-    suspend fun getLastMessageCreationTime(): String {
+    suspend fun getLastMessageCreationTime(): String? {
         return talksDao.getLastMessageCreationTime()
     }
 

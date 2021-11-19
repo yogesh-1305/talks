@@ -106,7 +106,7 @@ class HomeScreenActivity : AppCompatActivity() {
             readContacts()
         }
 
-        viewModel.readMessagesFromServer(auth.currentUser?.phoneNumber, databaseViewModel)
+        viewModel.readMessagesFromServer(databaseViewModel)
 
         databaseViewModel.getChatListPhoneNumbers.observe(this, {
             chatChannelPhoneNumbers = it as ArrayList<String>

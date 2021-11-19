@@ -2,7 +2,6 @@ package com.example.talks
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,23 +9,22 @@ import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
+import com.example.talks.constants.LocalConstants.MEDIA_MIME_TYPE_TEXT
+import com.example.talks.constants.LocalConstants.MESSAGE_PENDING
 import com.example.talks.data.adapters.chat.activity.ChatAdapter
 import com.example.talks.data.model.Message
 import com.example.talks.data.viewmodels.chat.activity.ChatViewModel
 import com.example.talks.data.viewmodels.db.TalksViewModel
-import com.example.talks.data.viewmodels.home.activity.HomeActivityViewModel
 import com.example.talks.databinding.FragmentChatBinding
 import com.example.talks.others.calendar.CalendarManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import java.time.LocalDateTime
 
 @AndroidEntryPoint
 class ChatFragment : Fragment() {
@@ -123,9 +121,9 @@ class ChatFragment : Fragment() {
                     val time = CalendarManager.getCurrentDateTime().toString()
                     val message = Message(
                         chatId = args.chatUserPhone,
-                        messageType = "/text",
+                        messageType = MEDIA_MIME_TYPE_TEXT,
                         messageText = this@ChatFragment.messageText?.trim(),
-                        status = "offline",
+                        status = MESSAGE_PENDING,
                         creationTime = time,
                         sentByMe = true
                     )

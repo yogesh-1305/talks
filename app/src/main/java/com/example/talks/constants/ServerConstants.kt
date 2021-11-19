@@ -3,6 +3,7 @@ package com.example.talks.constants
 object ServerConstants {
 
     const val FIREBASE_DB_NAME = "talks_database"
+    const val FIREBASE_CHATS_DB_NAME = "user_chats"
 
     const val USER_PHONE_NUMBER = "phone_number"
     const val USER_UNIQUE_ID = "user_UID"

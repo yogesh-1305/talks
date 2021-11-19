@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.talks.R
 import com.example.talks.constants.ServerConstants
+import com.example.talks.constants.ServerConstants.FIREBASE_CHATS_DB_NAME
 import com.example.talks.constants.ServerConstants.FIREBASE_DB_NAME
 import com.example.talks.data.model.ChatListItem
 import com.example.talks.data.model.Message
@@ -33,7 +34,7 @@ import javax.inject.Inject
 class HomeActivityViewModel
 @Inject constructor(
     val firebaseAuth: FirebaseAuth,
-    val db: FirebaseFirestore
+    val db: FirebaseFirestore,
 ) : ViewModel() {
 
     val chatListItem: MutableLiveData<ChatListItem> by lazy {
@@ -48,7 +49,7 @@ class HomeActivityViewModel
         databaseContactList: List<String>,
         contactNameList: HashMap<String, String>,
         databaseViewModel: TalksViewModel,
-        encryptionKey: String
+        encryptionKey: String,
     ) {
 
         viewModelScope.launch(Dispatchers.IO) {
@@ -85,23 +86,26 @@ class HomeActivityViewModel
         }
     }
 
-    fun readMessagesFromServer(userId: String?, talksVM: TalksViewModel) {
+    fun readMessagesFromServer(talksVM: TalksViewModel) {
         viewModelScope.launch(Dispatchers.IO) {
             val latestMessageCreationTime = talksVM.getLastMessageCreationTime()
-//            Log.d("latest creation time from db===", latestMessageCreationTime.toString())
 
             firebaseAuth.currentUser?.let {
-                db.collection(FIREBASE_DB_NAME).document(it.uid).collection("user_chats")
+                db.collection(FIREBASE_DB_NAME).document(it.uid).collection(FIREBASE_CHATS_DB_NAME)
+                    .whereGreaterThanOrEqualTo("creationTime", latestMessageCreationTime ?: "")
                     .whereEqualTo("sentByMe", false)
                     .addSnapshotListener { snapshot, error ->
                         if (snapshot != null) {
                             for (document in snapshot.documents) {
-                                Log.d("latest creation time ===", document["creationTime"].toString())
                                 val message = document.toObject(Message::class.java)
                                 if (message != null) {
                                     talksVM.addMessage(message)
                                 }
                             }
+//
+//                            for (changes in snapshot.documentChanges) {
+//                                val message = changes.document["sentByMe"]
+//                            }
 
                         }
                     }
@@ -142,7 +146,7 @@ class HomeActivityViewModel
 //}
 
     private fun getCallerName(
-        contactNames: HashMap<String, String>, callerID: String
+        contactNames: HashMap<String, String>, callerID: String,
     ): String {
         return if (contactNames.containsKey(callerID)) {
             contactNames[callerID].toString()

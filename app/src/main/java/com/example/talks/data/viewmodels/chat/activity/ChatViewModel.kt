@@ -3,6 +3,7 @@ package com.example.talks.data.viewmodels.chat.activity
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.talks.constants.LocalConstants.MESSAGE_SENT
 import com.example.talks.constants.ServerConstants
 import com.example.talks.data.model.Message
 import com.example.talks.data.model.Message.Companion.toTextMessage
@@ -36,7 +37,7 @@ class ChatViewModel
                 .addOnSuccessListener {
 
                     // message status -> sent
-                    dbViewModel.updateMessageStatus("sent", message.creationTime.toString())
+                    dbViewModel.updateMessageStatus(MESSAGE_SENT, message.creationTime.toString())
 
                     setMessageToReceiverEnd(
                         messageKey,

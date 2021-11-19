@@ -29,12 +29,11 @@ Message(
     val mediaUrl: String? = null,
     val mediaThumbnailString: String? = null,
     val mediaLocalPath: String? = null,
-    val sentByMe: Boolean? = null,
-    val deleted: Boolean? = null,
+    val sentByMe: Boolean? = null
 ) {
     constructor() : this(
         0, "", "", "", "",
-        "", "", "", "", "",
+        "", "", "", "",
         "", "", "", "", "", null, null
     )
 
