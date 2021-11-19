@@ -99,4 +99,10 @@ interface TalksDao {
 
     @Query("UPDATE talks_messages SET status = :status WHERE creation_time = :creationTime")
     suspend fun updateMessageStatus(status: String, creationTime: String)
+
+    @Query("UPDATE talks_messages SET deliveryTime = :deliveryTime WHERE creation_time = :creationTime")
+    suspend fun updateMessageDeliveryTime(deliveryTime: String, creationTime: String)
+
+    @Query("UPDATE talks_messages SET seenTime = :seenTime WHERE creation_time = :creationTime")
+    suspend fun updateMessageSeenTime(seenTime: String, creationTime: String)
 }

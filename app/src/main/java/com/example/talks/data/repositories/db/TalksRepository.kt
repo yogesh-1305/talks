@@ -66,6 +66,13 @@ class TalksRepository @Inject constructor(private val talksDao: TalksDao) {
         talksDao.updateMessageStatus(status, creationTime)
     }
 
+    suspend fun updateMessageDeliveryTime(deliveryTime: String, creationTime: String) {
+        talksDao.updateMessageDeliveryTime(deliveryTime, creationTime)
+    }
+
+    suspend fun updateMessageSeenTime(seenTime: String, creationTime: String) {
+        talksDao.updateMessageSeenTime(seenTime, creationTime)
+    }
 
     suspend fun updateChatListLatestMessage(
         contact_number: String,

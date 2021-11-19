@@ -22,12 +22,14 @@ import com.example.talks.data.receiver.ActionReceiver
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.others.encryption.Encryption
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.w3c.dom.Document
 import javax.inject.Inject
 
 @HiltViewModel
@@ -102,21 +104,54 @@ class HomeActivityViewModel
                                     talksVM.addMessage(message)
                                 }
                             }
-//
-//                            for (changes in snapshot.documentChanges) {
-//                                val message = changes.document["sentByMe"]
-//                            }
-
                         }
                     }
             }
         }
 
+        viewModelScope.launch(Dispatchers.IO) {
+            firebaseAuth.currentUser?.let {
+                db.collection(FIREBASE_DB_NAME).document(it.uid).collection(FIREBASE_CHATS_DB_NAME)
+                    .addSnapshotListener { snapshot, error ->
+                        if (snapshot != null) {
+
+                            for (changes in snapshot.documentChanges) {
+
+                                when (changes.type) {
+                                    DocumentChange.Type.MODIFIED -> {
+                                        val creationTime =
+                                            changes.document["creationTime"].toString()
+                                        val deliveryTime =
+                                            changes.document["deliveryTime"].toString()
+                                        val seenTime = changes.document["seenTime"].toString()
+
+                                        if (deliveryTime.isNotEmpty()) {
+                                            // update delivery time in db
+                                            talksVM.updateMessageDeliveryTime(deliveryTime,
+                                                creationTime)
+                                        }
+                                        if (seenTime.isNotEmpty()) {
+                                            // update seen time in db
+                                            talksVM.updateMessageSeenTime(seenTime, creationTime)
+                                        }
+                                    }
+                                    DocumentChange.Type.REMOVED -> {
+                                        TODO("handle message removal")
+                                    }
+                                    else -> { /* NO-OP */}
+                                }
+                            }
+                        }
+                    }
+            }
+        }
     }
 
-    val contactData: MutableLiveData<TalksContact> by lazy {
-        MutableLiveData<TalksContact>()
-    }
+}
+
+val contactData: MutableLiveData<TalksContact> by lazy {
+    MutableLiveData<TalksContact>()
+}
 
 //fun readPeerConnections(
 //    context: Context,
@@ -145,38 +180,36 @@ class HomeActivityViewModel
 //    }
 //}
 
-    private fun getCallerName(
-        contactNames: HashMap<String, String>, callerID: String,
-    ): String {
-        return if (contactNames.containsKey(callerID)) {
-            contactNames[callerID].toString()
-        } else {
-            callerID
-        }
+private fun getCallerName(
+    contactNames: HashMap<String, String>, callerID: String,
+): String {
+    return if (contactNames.containsKey(callerID)) {
+        contactNames[callerID].toString()
+    } else {
+        callerID
     }
+}
 
-    private fun createNotificationForCall(context: Context, callerName: String) {
-        val declineIntent = Intent(context, ActionReceiver::class.java)
-        val acceptIntent = Intent(context, ActionReceiver::class.java)
+private fun createNotificationForCall(context: Context, callerName: String) {
+    val declineIntent = Intent(context, ActionReceiver::class.java)
+    val acceptIntent = Intent(context, ActionReceiver::class.java)
 
-        declineIntent.putExtra("action", 0)
-        acceptIntent.putExtra("action", 1)
+    declineIntent.putExtra("action", 0)
+    acceptIntent.putExtra("action", 1)
 
-        val pendingIntentDecline = PendingIntent.getBroadcast(context, 0, declineIntent, 0)
-        val pendingIntentAccept = PendingIntent.getBroadcast(context, 1, acceptIntent, 0)
+    val pendingIntentDecline = PendingIntent.getBroadcast(context, 0, declineIntent, 0)
+    val pendingIntentAccept = PendingIntent.getBroadcast(context, 1, acceptIntent, 0)
 
-        val builder = NotificationCompat.Builder(context, "Calls")
-            .setSmallIcon(R.drawable.bell_icon)
-            .setContentTitle(callerName)
-            .setContentText("Incoming Video Call")
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setAutoCancel(false)
-            .addAction(R.drawable.video_call_icon, "Decline", pendingIntentDecline)
-            .addAction(R.drawable.video_call_icon, "Accept", pendingIntentAccept)
+    val builder = NotificationCompat.Builder(context, "Calls")
+        .setSmallIcon(R.drawable.bell_icon)
+        .setContentTitle(callerName)
+        .setContentText("Incoming Video Call")
+        .setPriority(NotificationCompat.PRIORITY_HIGH)
+        .setAutoCancel(false)
+        .addAction(R.drawable.video_call_icon, "Decline", pendingIntentDecline)
+        .addAction(R.drawable.video_call_icon, "Accept", pendingIntentAccept)
 
-        val manager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        manager.notify(1001, builder.build())
-    }
-
+    val manager =
+        context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+    manager.notify(1001, builder.build())
 }

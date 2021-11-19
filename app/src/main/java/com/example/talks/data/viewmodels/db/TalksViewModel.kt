@@ -82,6 +82,18 @@ class TalksViewModel @Inject constructor(private val repository: TalksRepository
         }
     }
 
+    fun updateMessageDeliveryTime(deliveryTime: String, creationTime: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateMessageDeliveryTime(deliveryTime, creationTime)
+        }
+    }
+
+    fun updateMessageSeenTime(seenTime: String, creationTime: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.updateMessageSeenTime(seenTime, creationTime)
+        }
+    }
+
     fun createChatChannel(chatListItem: ChatListItem) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.createChatChannel(chatListItem)
