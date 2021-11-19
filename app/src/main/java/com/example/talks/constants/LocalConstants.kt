@@ -12,4 +12,9 @@ object LocalConstants {
     const val AUTH_STATE_ADD_DATA = 3
     const val AUTH_STATE_FINAL_SETUP = 4
     const val AUTH_STATE_COMPLETE = 5
+
+    const val MEDIA_MIME_TYPE_TEXT = "/text"
+    const val MEDIA_MIME_TYPE_IMAGE = "/image"
+    const val MEDIA_MIME_TYPE_VIDEO = "/video"
+    const val MEDIA_MIME_TYPE_AUDIO = "/audio"
 }

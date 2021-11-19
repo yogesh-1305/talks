@@ -67,12 +67,13 @@
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
         android:elevation="2dp"
-        android:maxLines="1"
         android:fontFamily="@font/prompt"
-        tools:text="Today, 2:33pm"
-        android:textSize="12sp"
+        android:maxLines="1"
+        android:textSize="11sp"
+        app:layout_constraintBottom_toBottomOf="@+id/chatListName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/chatListName" />
+        app:layout_constraintTop_toTopOf="@+id/chatListName"
+        tools:text="Today, 2:33pm" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/chatListUnreadMessageCount"

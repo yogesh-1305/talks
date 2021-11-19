@@ -10,6 +10,9 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.R
+import com.example.talks.constants.LocalConstants.MEDIA_MIME_TYPE_IMAGE
+import com.example.talks.constants.LocalConstants.MEDIA_MIME_TYPE_TEXT
+import com.example.talks.constants.LocalConstants.MEDIA_MIME_TYPE_VIDEO
 import com.example.talks.data.model.HomeScreenChannelList
 import com.example.talks.databinding.ChatListItemBinding
 import com.example.talks.others.calendar.CalendarManager.Companion.parseTime
@@ -58,34 +61,40 @@ class HomeScreenAdapter(val context: Activity) :
         val item = differ.currentList[position]
 
         ////////////////////////////////////////////////////////////////////////////////////
+
+        // chat list user image
         Glide.with(context).load(item.contactImageUrl)
             .diskCacheStrategy(DiskCacheStrategy.AUTOMATIC)
             .placeholder(R.drawable.icon_person_with_bg)
             .into(view.chatListImage)
 
-        if (item.contactName == "") {
+        // chat list name or number
+        if (item.contactName.isNullOrEmpty()) {
             view.chatListName.text = item.contact_number
         } else {
             view.chatListName.text = item.contactName
         }
 
+        // shows whether the message is sent or received
         if (item.sentByMe == true)
             view.sentMessageStatusImage.show()
         else
             view.sentMessageStatusImage.gone()
 
+        // message type
         when (item.messageType) {
-            "/text" -> {
+            MEDIA_MIME_TYPE_TEXT -> {
                 view.chatListLatestMessage.text = item.messageText
             }
-            "/image" -> {
-                view.chatListLatestMessage.text = "Image"
+            MEDIA_MIME_TYPE_IMAGE -> {
+                view.chatListLatestMessage.text = context.getString(R.string.text_image) // Image
             }
-            "/video" -> {
-                view.chatListLatestMessage.text = "Video"
+            MEDIA_MIME_TYPE_VIDEO -> {
+                view.chatListLatestMessage.text = context.getString(R.string.text_video) // Video
             }
         }
 
+        // latest message time
         view.chatListTimeStamp.text = item.creation_time?.parseTime()
 
         ///////////////////////////////////////////////////////////////////////////////////

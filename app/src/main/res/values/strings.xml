@@ -55,4 +55,7 @@
     <string name="title_activity_attachment">AttachmentActivity</string>
     <string name="tab_text_1">Tab 1</string>
     <string name="tab_text_2">Tab 2</string>
+
+    <string name="text_image">Image</string>
+    <string name="text_video">Video</string>
 </resources>
