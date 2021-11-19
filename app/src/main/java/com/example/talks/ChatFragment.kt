@@ -1,11 +1,13 @@
 package com.example.talks
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -24,6 +26,7 @@ import com.example.talks.databinding.FragmentChatBinding
 import com.example.talks.others.calendar.CalendarManager
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
 
 @AndroidEntryPoint
 class ChatFragment : Fragment() {
@@ -42,31 +45,23 @@ class ChatFragment : Fragment() {
 
     private var otherPersonUniqueId: String = ""
 
-    private var isTextEmpty = true
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
+        savedInstanceState: Bundle?,
     ): View {
         binding = FragmentChatBinding.inflate(inflater, container, false)
-
-        binding.btnCloseChatScreen.setOnClickListener {
-            requireActivity().onBackPressed()
-        }
-
         return binding.root
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         setupRecyclerView()
 
-        setClickListeners()
-
         subscribeToObservers()
 
-
+        setClickListeners()
     }
 
     private fun subscribeToObservers() {
@@ -83,11 +78,17 @@ class ChatFragment : Fragment() {
             dbViewModel.readSingleContact(args.chatUserPhone)
                 .observe(viewLifecycleOwner, {
                     if (it != null) {
-                        binding.tvChatUsername.text = it.contactName
+
+                        // setting name on screen
+                        binding.tvChatUsername.text =
+                            if (it.contactName.isNullOrEmpty()) it.contactNumber else it.contactName
+
+                        // setting user image
                         Glide.with(requireContext()).load(it.contactImageUrl).diskCacheStrategy(
                             DiskCacheStrategy.AUTOMATIC
                         ).placeholder(R.drawable.ic_baseline_person_color)
                             .into(binding.ivChatUserImage)
+
                         otherPersonUniqueId = it.uId.toString()
                     }
                 })
@@ -95,10 +96,11 @@ class ChatFragment : Fragment() {
     }
 
     private fun setClickListeners() {
+        var isTextEmpty = true
         binding.etChat.addTextChangedListener {
 
             it?.let {
-                if (it.isEmpty()) {
+                if (it.isBlank()) {
                     isTextEmpty = true
                     binding.btnChatAttach.visibility = View.VISIBLE
                     binding.btnMicAndSend.setImageResource(R.drawable.ic_baseline_mic_24)
@@ -122,7 +124,7 @@ class ChatFragment : Fragment() {
                     val message = Message(
                         chatId = args.chatUserPhone,
                         messageType = "/text",
-                        messageText = this@ChatFragment.messageText,
+                        messageText = this@ChatFragment.messageText?.trim(),
                         status = "offline",
                         creationTime = time,
                         sentByMe = true
@@ -130,6 +132,10 @@ class ChatFragment : Fragment() {
                     viewModel.sendMessage(message, otherPersonUniqueId, dbViewModel)
                 }
             }
+        }
+
+        binding.btnCloseChatScreen.setOnClickListener {
+            requireActivity().onBackPressed()
         }
     }
 
