@@ -76,10 +76,10 @@ class HomeScreenAdapter(val context: Activity) :
         }
 
         // shows whether the message is sent or received
-        if (item.sentByMe == true)
-            view.sentMessageStatusImage.show()
-        else
-            view.sentMessageStatusImage.gone()
+//        if (item.sentByMe == true)
+//            view.sentMessageStatusImage.show()
+//        else
+//            view.sentMessageStatusImage.gone()
 
         // message type
         when (item.messageType) {

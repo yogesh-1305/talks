@@ -120,12 +120,10 @@ class ChatFragment : Fragment() {
                     binding.etChat.text = null
                     val time = CalendarManager.getCurrentDateTime().toString()
                     val message = Message(
-                        chatId = args.chatUserPhone,
+                        chatID = args.chatUserPhone,
                         messageType = MEDIA_MIME_TYPE_TEXT,
-                        messageText = this@ChatFragment.messageText?.trim(),
-                        status = MESSAGE_PENDING,
+                        messageText = this.messageText?.trim(),
                         creationTime = time,
-                        sentByMe = true
                     )
                     viewModel.sendMessage(message, otherPersonUniqueId, dbViewModel)
                 }

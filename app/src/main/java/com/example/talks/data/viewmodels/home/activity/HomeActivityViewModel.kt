@@ -5,7 +5,6 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.MutableLiveData
@@ -24,12 +23,11 @@ import com.example.talks.others.encryption.Encryption
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentChange
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.w3c.dom.Document
+import java.time.LocalDateTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -88,6 +86,7 @@ class HomeActivityViewModel
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     fun readMessagesFromServer(talksVM: TalksViewModel) {
         viewModelScope.launch(Dispatchers.IO) {
             val latestMessageCreationTime = talksVM.getLastMessageCreationTime()
@@ -95,13 +94,14 @@ class HomeActivityViewModel
             firebaseAuth.currentUser?.let {
                 db.collection(FIREBASE_DB_NAME).document(it.uid).collection(FIREBASE_CHATS_DB_NAME)
                     .whereGreaterThanOrEqualTo("creationTime", latestMessageCreationTime ?: "")
-                    .whereEqualTo("sentByMe", false)
+                    .whereNotEqualTo("senderID", firebaseAuth.currentUser?.uid.toString())
                     .addSnapshotListener { snapshot, error ->
                         if (snapshot != null) {
                             for (document in snapshot.documents) {
                                 val message = document.toObject(Message::class.java)
                                 if (message != null) {
                                     talksVM.addMessage(message)
+                                    updateDeliveryTimeInFirebase(message)
                                 }
                             }
                         }
@@ -144,6 +144,16 @@ class HomeActivityViewModel
                         }
                     }
             }
+        }
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
+    private fun updateDeliveryTimeInFirebase(message: Message?) {
+        val ref = db.collection(FIREBASE_DB_NAME).document(message?.senderID.toString()).collection(
+            FIREBASE_CHATS_DB_NAME).document()
+
+        db.runBatch { batch ->
+            batch.update(ref, "deliveryTime", LocalDateTime.now().toString())
         }
     }
 

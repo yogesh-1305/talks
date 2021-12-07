@@ -55,9 +55,8 @@ class ChatViewModel
     ) {
 
         val newMessage = message.copy(
-            chatId = firebaseAuth.currentUser?.phoneNumber.toString(),
-            status = "received",
-            sentByMe = false
+            chatID = firebaseAuth.currentUser?.phoneNumber.toString(),
+            senderID = firebaseAuth.currentUser?.uid.toString()
         )
 
         db.collection(ServerConstants.FIREBASE_DB_NAME)

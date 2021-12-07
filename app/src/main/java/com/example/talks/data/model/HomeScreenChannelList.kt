@@ -8,7 +8,7 @@ data class HomeScreenChannelList(
     var messageText: String? = "",
     var messageType: String? = "",
     var creation_time: String? = "",
-    var sentByMe: Boolean? = null,
+    var senderID: String? = null,
     var isChatPinned: Boolean? = false,
     var isChatArchived: Boolean? = false,
     var isChatMuted: Boolean? = false,

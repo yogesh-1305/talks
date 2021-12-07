@@ -38,7 +38,7 @@ interface TalksDao {
 
     @Query("""
             select uId as contact_id, chat_list.contact_number, talks_contacts.contactName, contactImageUrl, 
-            messageText, messageType, creation_time, sentByMe, isChatPinned, isChatArchived, 
+            messageText, messageType, creation_time, senderID, isChatPinned, isChatArchived, 
             isChatMuted, unseenMessagesCount, lastReadMessageID
             from chat_list 
             LEFT JOIN talks_contacts on chat_list.contact_number = talks_contacts.contact_number

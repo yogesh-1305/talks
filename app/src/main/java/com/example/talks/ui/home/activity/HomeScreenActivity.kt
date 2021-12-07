@@ -113,14 +113,14 @@ class HomeScreenActivity : AppCompatActivity() {
         })
         databaseViewModel.lastAddedMessage.observe(this, { latestMessage ->
             latestMessage?.let { message ->
-                if (!chatChannelPhoneNumbers.contains(message.chatId)) {
+                if (!chatChannelPhoneNumbers.contains(message.chatID)) {
                     val chatListItem =
-                        ChatListItem(contactNumber = message.chatId, latestMessageId = message.id)
+                        ChatListItem(contactNumber = message.chatID, latestMessageId = message.id)
                     databaseViewModel.createChatChannel(chatListItem)
 
                 } else {
                     databaseViewModel.updateChatListLatestMessage(
-                        contact_number = message.chatId.toString(),
+                        contact_number = message.chatID.toString(),
                         latestMessageId = message.id
                     )
                 }

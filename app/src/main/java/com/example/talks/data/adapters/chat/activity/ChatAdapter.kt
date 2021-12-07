@@ -143,8 +143,8 @@ class ChatAdapter(
         if (position >= messages.size) {
             return 0
         } else {
-            when (messages[position].sentByMe) {
-                true -> {
+            when (messages[position].senderID) {
+                "true" -> {
                     return when (messages[position].messageType) {
                         "/text" -> {
                             senderTextMessageCode
@@ -155,7 +155,7 @@ class ChatAdapter(
                         else -> throw IllegalArgumentException("Invalid view type")
                     }
                 }
-                false -> {
+                "false" -> {
                     return when (messages[position].messageType) {
                         "/text" -> {
                             receiverTextMessageCode
