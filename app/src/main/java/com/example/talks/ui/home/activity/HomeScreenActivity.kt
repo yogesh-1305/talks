@@ -11,6 +11,7 @@ import android.os.Bundle
 import android.provider.ContactsContract
 import android.util.Log
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
@@ -27,9 +28,12 @@ import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.ActivityHomeScreenBinding
 import com.example.talks.data.viewmodels.home.activity.HomeActivityViewModel
 import com.example.talks.others.utility.ExtensionFunctions.gone
+import com.example.talks.session.SessionManager
 import com.example.talks.ui.authentication.activity.MainActivity
+import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.messaging.FirebaseMessaging
 import com.novoda.merlin.Merlin
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.activity_home_screen.*
@@ -41,6 +45,9 @@ import kotlin.collections.HashMap
 
 @AndroidEntryPoint
 class HomeScreenActivity : AppCompatActivity() {
+
+    @Inject
+    lateinit var preferences: SharedPreferences
 
     private lateinit var navController: NavController
 
@@ -78,6 +85,20 @@ class HomeScreenActivity : AppCompatActivity() {
             startActivity(Intent(this, MainActivity::class.java))
             finish()
         }
+        getFcmToken()
+    }
+
+    private fun getFcmToken() {
+        FirebaseMessaging.getInstance().token.addOnCompleteListener(OnCompleteListener { task ->
+            if (!task.isSuccessful) {
+                return@OnCompleteListener
+            }
+            // Get new FCM registration token
+            val token = task.result
+            // Log and toast
+            SessionManager.fcmToken = token.toString()
+            Toast.makeText(baseContext, token.toString(), Toast.LENGTH_SHORT).show()
+        })
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

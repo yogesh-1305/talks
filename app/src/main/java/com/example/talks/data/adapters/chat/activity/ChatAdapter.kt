@@ -18,6 +18,7 @@ import java.time.LocalDateTime
 
 class ChatAdapter(
     val context: Context?,
+    private val currentUserId: String,
 ) :
     RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
@@ -33,10 +34,10 @@ class ChatAdapter(
 
     private val differ = AsyncListDiffer(this, diffCallback)
 
-    fun submitChatList(list:List<Message>) = differ.submitList(list)
+    fun submitChatList(list: List<Message>) = differ.submitList(list)
 
 
-    inner class SenderTextViewHolder(val binding: CustomSenderMessagesBinding) :
+    inner class SentTextViewHolder(val binding: CustomSenderMessagesBinding) :
         RecyclerView.ViewHolder(binding.root) {
         @RequiresApi(Build.VERSION_CODES.O)
         fun bind(message: Message) {
@@ -45,7 +46,7 @@ class ChatAdapter(
         }
     }
 
-    inner class ReceiverTextViewHolder(val binding: CustomReceiverMessagesBinding) :
+    inner class ReceivedTextViewHolder(val binding: CustomReceiverMessagesBinding) :
         RecyclerView.ViewHolder(binding.root) {
         @RequiresApi(Build.VERSION_CODES.O)
         fun bind(message: Message) {
@@ -54,7 +55,7 @@ class ChatAdapter(
         }
     }
 
-    inner class SenderImageViewHolder(val binding: SenderChatImageLayoutBinding) :
+    inner class SentImageViewHolder(val binding: SenderChatImageLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
         @RequiresApi(Build.VERSION_CODES.O)
         fun bind(message: Message) {
@@ -63,7 +64,7 @@ class ChatAdapter(
         }
     }
 
-    inner class ReceiverImageViewHolder(val binding: ReceiverChatImageLayoutBinding) :
+    inner class ReceivedImageViewHolder(val binding: ReceiverChatImageLayoutBinding) :
         RecyclerView.ViewHolder(binding.root) {
         @RequiresApi(Build.VERSION_CODES.O)
         fun bind(message: Message) {
@@ -77,9 +78,9 @@ class ChatAdapter(
         val time = LocalDateTime.parse(timeString)
         val hours = time.hour
         val min = time.minute
-        return if (hours > 12){
+        return if (hours > 12) {
             "${hours - 12}:$min pm"
-        }else {
+        } else {
             "$hours:$min am"
         }
     }
@@ -87,7 +88,7 @@ class ChatAdapter(
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         when (viewType) {
             1 -> {
-                return SenderTextViewHolder(
+                return SentTextViewHolder(
                     CustomSenderMessagesBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent,
@@ -96,20 +97,20 @@ class ChatAdapter(
                 )
             }
             2 -> {
-                return ReceiverTextViewHolder(
+                return ReceivedTextViewHolder(
                     CustomReceiverMessagesBinding.inflate(
                         LayoutInflater.from(parent.context),
                         parent, false
                     )
                 )
             }
-            3 -> return SenderImageViewHolder(
+            3 -> return SentImageViewHolder(
                 SenderChatImageLayoutBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent, false
                 )
             )
-            4 -> return ReceiverImageViewHolder(
+            4 -> return ReceivedImageViewHolder(
                 ReceiverChatImageLayoutBinding.inflate(
                     LayoutInflater.from(parent.context),
                     parent, false
@@ -125,52 +126,47 @@ class ChatAdapter(
         val message = differ.currentList[position]
 
         when (holder) {
-            is SenderTextViewHolder -> holder.bind(message)
-            is ReceiverTextViewHolder -> holder.bind(message)
-            is SenderImageViewHolder -> holder.bind(message)
-            is ReceiverImageViewHolder -> holder.bind(message)
+            is SentTextViewHolder -> holder.bind(message)
+            is ReceivedTextViewHolder -> holder.bind(message)
+            is SentImageViewHolder -> holder.bind(message)
+            is ReceivedImageViewHolder -> holder.bind(message)
             else -> throw java.lang.IllegalArgumentException("invalid view type")
         }
     }
 
-    private val senderTextMessageCode = 1
-    private val receiverTextMessageCode = 2
-    private val senderImageMessageCode = 3
-    private val receiverImageMessageCode = 4
+    private val sentTextMessageCode = 1
+    private val receivedTextMessageCode = 2
+    private val sentImageMessageCode = 3
+    private val receivedImageMessageCode = 4
 
     override fun getItemViewType(position: Int): Int {
         val messages = differ.currentList
         if (position >= messages.size) {
             return 0
         } else {
-            when (messages[position].senderID) {
-                "true" -> {
-                    return when (messages[position].messageType) {
-                        "/text" -> {
-                            senderTextMessageCode
-                        }
-                        "/image" -> {
-                            senderImageMessageCode
-                        }
-                        else -> throw IllegalArgumentException("Invalid view type")
+            return if (messages[position].senderID == currentUserId) {
+                when (messages[position].messageType) {
+                    "/text" -> {
+                        sentTextMessageCode
                     }
-                }
-                "false" -> {
-                    return when (messages[position].messageType) {
-                        "/text" -> {
-                            receiverTextMessageCode
-                        }
-                        "/image" -> {
-                            receiverImageMessageCode
-                        }
-                        else -> throw IllegalArgumentException("Invalid view type")
+                    "/image" -> {
+                        sentImageMessageCode
                     }
+                    else -> throw IllegalArgumentException("Invalid view type")
                 }
-                else -> throw IllegalArgumentException("Invalid view type")
+            } else {
+                when (messages[position].messageType) {
+                    "/text" -> {
+                        receivedTextMessageCode
+                    }
+                    "/image" -> {
+                        receivedImageMessageCode
+                    }
+                    else -> throw IllegalArgumentException("Invalid view type")
+                }
             }
         }
     }
-
 
     override fun getItemCount(): Int {
         return differ.currentList.size

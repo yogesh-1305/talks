@@ -94,7 +94,6 @@ class HomeActivityViewModel
             firebaseAuth.currentUser?.let {
                 db.collection(FIREBASE_DB_NAME).document(it.uid).collection(FIREBASE_CHATS_DB_NAME)
                     .whereGreaterThanOrEqualTo("creationTime", latestMessageCreationTime ?: "")
-                    .whereNotEqualTo("senderID", firebaseAuth.currentUser?.uid.toString())
                     .addSnapshotListener { snapshot, error ->
                         if (snapshot != null) {
                             for (document in snapshot.documents) {

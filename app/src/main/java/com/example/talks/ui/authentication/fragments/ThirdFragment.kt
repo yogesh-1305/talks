@@ -136,14 +136,14 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
 
     private fun hasStoragePermissions(): Boolean {
         if (PermissionsUtility.hasStoragePermissions(requireContext())) return true
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             storagePermission.launch(Manifest.permission.READ_EXTERNAL_STORAGE)
         } else {
-            storagePermission.launch(
+            storagePermissionBelowAndroidQ.launch(
                 arrayOf(
                     Manifest.permission.READ_EXTERNAL_STORAGE,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
-                ).toString()
+                )
             )
         }
         return false
@@ -153,7 +153,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
     @RequiresApi(Build.VERSION_CODES.O)
     private fun subscribeToObservers() {
 
-        viewModel.existingUserData.observe(viewLifecycleOwner, { userData ->
+        viewModel.existingUserData.observe(viewLifecycleOwner) { userData ->
             userData?.let {
                 retrievedImageUrl =
                     Encryption().decrypt(it[USER_IMAGE_URL], encryptionKey).toString()
@@ -170,7 +170,7 @@ class ThirdFragment : Fragment(), TextView.OnEditorActionListener {
                         .into(binding.thirdFragmentUserImage)
                 }
             }
-        })
+        }
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

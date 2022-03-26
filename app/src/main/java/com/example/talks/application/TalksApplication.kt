@@ -3,25 +3,33 @@ package com.example.talks.application
 import android.app.Application
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.SharedPreferences
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
 import com.example.talks.others.fileManager.TalksStorageManager
+import com.example.talks.session.SessionManager
 import com.google.firebase.FirebaseApp
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.ktx.database
 import com.google.firebase.ktx.Firebase
 import com.vanniktech.emoji.EmojiManager
 import com.vanniktech.emoji.google.GoogleEmojiProvider
+import dagger.hilt.android.AndroidEntryPoint
 import dagger.hilt.android.HiltAndroidApp
 import java.time.LocalDateTime
+import javax.inject.Inject
 
 @HiltAndroidApp
 class TalksApplication : Application() {
 
+    @Inject
+    lateinit var sharedPreferences: SharedPreferences
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate() {
         super.onCreate()
+        SessionManager.setSessionInstance(sharedPreferences)
         Log.d("application starts ===", LocalDateTime.now().toString())
 //        FirebaseApp.initializeApp(this)
 //        val auth = FirebaseAuth.getInstance()

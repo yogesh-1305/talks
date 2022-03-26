@@ -16,18 +16,22 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import com.example.talks.constants.LocalConstants.MEDIA_MIME_TYPE_TEXT
-import com.example.talks.constants.LocalConstants.MESSAGE_PENDING
 import com.example.talks.data.adapters.chat.activity.ChatAdapter
 import com.example.talks.data.model.Message
 import com.example.talks.data.viewmodels.chat.activity.ChatViewModel
 import com.example.talks.data.viewmodels.db.TalksViewModel
 import com.example.talks.databinding.FragmentChatBinding
 import com.example.talks.others.calendar.CalendarManager
+import com.google.firebase.auth.FirebaseAuth
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatFragment : Fragment() {
+
+    @Inject
+    lateinit var auth: FirebaseAuth
 
     private lateinit var binding: FragmentChatBinding
 
@@ -65,16 +69,16 @@ class ChatFragment : Fragment() {
     private fun subscribeToObservers() {
         lifecycleScope.launch {
             dbViewModel.readMessages(args.chatUserPhone)
-                .observe(viewLifecycleOwner, { list ->
+                .observe(viewLifecycleOwner) { list ->
                     list?.let {
                         chatAdapter.submitChatList(list)
                     }
-                })
+                }
         }
 
         lifecycleScope.launch {
             dbViewModel.readSingleContact(args.chatUserPhone)
-                .observe(viewLifecycleOwner, {
+                .observe(viewLifecycleOwner) {
                     if (it != null) {
 
                         // setting name on screen
@@ -89,10 +93,11 @@ class ChatFragment : Fragment() {
 
                         otherPersonUniqueId = it.uId.toString()
                     }
-                })
+                }
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun setClickListeners() {
         var isTextEmpty = true
         binding.etChat.addTextChangedListener {
@@ -124,6 +129,7 @@ class ChatFragment : Fragment() {
                         messageType = MEDIA_MIME_TYPE_TEXT,
                         messageText = this.messageText?.trim(),
                         creationTime = time,
+                        senderID = auth.currentUser?.uid.toString(),
                     )
                     viewModel.sendMessage(message, otherPersonUniqueId, dbViewModel)
                 }
@@ -136,7 +142,7 @@ class ChatFragment : Fragment() {
     }
 
     private fun setupRecyclerView() = binding.rvChat.apply {
-        chatAdapter = ChatAdapter(requireContext())
+        chatAdapter = ChatAdapter(requireContext(), auth.currentUser!!.uid)
         this.adapter = chatAdapter
         this.setHasFixedSize(true)
         layoutManager = LinearLayoutManager(requireContext()).apply {
